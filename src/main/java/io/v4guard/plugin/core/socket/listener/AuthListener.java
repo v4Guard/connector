@@ -65,7 +65,7 @@ public class AuthListener implements Emitter.Listener {
                 v4GuardCore.getInstance().getLogger().log(Level.INFO,"Instance connected using secret key: " + doc.getString("secret"));
                 v4GuardCore.getInstance().getLogger().log(Level.INFO,"License assigned to " + company.getString("name") + "/" + company.getString("code"));
                 v4GuardCore.getInstance().getLogger().log(Level.INFO,"Plan: " + company.getString("plan"));
-                v4GuardCore.getInstance().getLogger().log(Level.INFO,"Manage your settings using the dashboard: https://dashboard.v4guard.io/networks/select/" + company.getString("uuid"));
+                v4GuardCore.getInstance().getLogger().log(Level.INFO,"Manage your settings using the dashboard: https://dashboard.v4guard.io/companies/select/" + company.getString("uuid"));
                 backendConnector.setReconnected(true);
             }
         }
