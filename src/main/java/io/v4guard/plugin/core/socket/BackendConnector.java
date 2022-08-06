@@ -13,11 +13,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 public class BackendConnector {
     private Socket socket;
@@ -32,7 +34,7 @@ public class BackendConnector {
     public BackendConnector() throws IOException, URISyntaxException {
         HashMap<String, List<String>> headers = new HashMap<>();
         headers.put("v4g-version", Collections.singletonList("1.0.0"));
-        headers.put("v4g-hostname", Collections.singletonList(InetAddress.getLocalHost().getHostName()));
+        headers.put("v4g-hostname", Collections.singletonList(getHostname()));
         headers.put("v4g-name", Collections.singletonList(new File(System.getProperty("user.dir")).getName()));
         headers.put("v4g-service", Collections.singletonList("minecraft"));
         headers.put("v4g-mode", Collections.singletonList(v4GuardCore.getInstance().getPluginMode().name()));
@@ -130,5 +132,25 @@ public class BackendConnector {
 
     public Runtime getRuntime() {
         return runtime;
+    }
+
+    public String getHostname(){
+        if(isRunningInsideDocker()){
+            return "Docker Container";
+        } else {
+            try {
+                return InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException e) {
+                return "Unknown";
+            }
+        }
+    }
+
+    public static Boolean isRunningInsideDocker() {
+        try (Stream<String> stream = Files.lines(Paths.get("/proc/1/cgroup"))) {
+            return stream.anyMatch(line -> line.contains("/docker"));
+        } catch (IOException e) {
+            return false;
+        }
     }
 }
