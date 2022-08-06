@@ -17,14 +17,13 @@ public class v4GuardSpigot extends JavaPlugin {
     public void onEnable(){
         this.getServer().getConsoleSender().sendMessage("§e[v4guard-plugin] (Spigot) Enabling...");
         try {
-            core = new v4GuardCore();
+            core = new v4GuardCore(v4GuardMode.SPIGOT);
         } catch (Exception e) {
             this.getServer().getConsoleSender().sendMessage("§c[v4guard-plugin] (Spigot) Enabling... [ERROR]");
             this.getServer().getConsoleSender().sendMessage("§cPlease check the console for more information and report this error.");
             e.printStackTrace();
             Bukkit.getPluginManager().disablePlugin(this);
         }
-        core.setPluginMode(v4GuardMode.SPIGOT);
         v4GuardSpigot = this;
         this.getServer().getPluginManager().registerEvents(new AntiVPNListener(), this);
         this.getServer().getConsoleSender().sendMessage("§e[v4guard-plugin] (Spigot) Enabling... [DONE]");

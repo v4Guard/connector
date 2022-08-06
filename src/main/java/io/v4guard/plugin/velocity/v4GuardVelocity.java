@@ -33,14 +33,13 @@ public class v4GuardVelocity {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         server.getConsoleCommandSource().sendMessage(Component.text("§e[v4guard-plugin] (Velocity) Enabling..."));
         try {
-            core = new v4GuardCore();
+            core = new v4GuardCore(v4GuardMode.VELOCITY);
         } catch (Exception e) {
             server.getConsoleCommandSource().sendMessage(Component.text("§c[v4guard-plugin] (Velocity) Enabling... [ERROR]"));
             server.getConsoleCommandSource().sendMessage(Component.text("§cPlease check the console for more information and report this error."));
             e.printStackTrace();
             return;
         }
-        core.setPluginMode(v4GuardMode.VELOCITY);
         v4GuardVelocity = this;
         server.getEventManager().register(this, new AntiVPNListener());
         server.getConsoleCommandSource().sendMessage(Component.text("§e[v4guard-plugin] (Velocity) Enabling... [DONE]"));
