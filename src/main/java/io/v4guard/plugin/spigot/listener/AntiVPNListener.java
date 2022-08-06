@@ -28,12 +28,11 @@ public class AntiVPNListener implements Listener {
         }
         Document kickMessages = (Document) v4GuardSpigot.getCoreInstance().getBackendConnector().getSettings().get("messages");
         final boolean wait = (boolean) v4GuardSpigot.getCoreInstance().getBackendConnector().getSettings().get("waitResponse");
-        //((CraftPlayer) player).getHandle().playerConnection.networkManager.getVersion() <- this is the version of the client
         new CompletableNameCheckTask(e.getName()) {
             @Override
             public void complete(boolean nameIsValid) {
                 if(nameIsValid){
-                    new CompletableIPCheckTask(e.getAddress().getHostAddress(), e.getName(), -1 /*version*/) {
+                    new CompletableIPCheckTask(e.getAddress().getHostAddress(), e.getName(), -1) {
                         CompletableIPCheckTask task = this;
                         @Override
                         public void complete() {
