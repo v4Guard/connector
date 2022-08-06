@@ -54,7 +54,6 @@ public class v4GuardCore {
             catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
-            return;
         }).start();
     }
 
