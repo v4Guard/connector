@@ -14,7 +14,7 @@
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
     <build>
-        <finalName>v4Guard-1.0</finalName>
+        <finalName>v4Guard-1.0.2</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
