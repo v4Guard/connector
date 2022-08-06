@@ -20,9 +20,9 @@ public class IPSetListener implements Emitter.Listener {
         try {
             String action = doc.getString("action");
             if (action.equals("add")) {
-                backendConnector.getRuntime().exec(String.format("ipset add avpn %s timeout %s", doc.getString("ip"), doc.getString("timeout")));
+                backendConnector.getRuntime().exec(String.format("ipset add v4guard %s timeout %s", doc.getString("ip"), doc.getString("timeout")));
             } else if (action.equals("flush")) {
-                backendConnector.getRuntime().exec("ipset flush avpn");
+                backendConnector.getRuntime().exec("ipset flush v4guard");
             }
         } catch (IOException e) {
             e.printStackTrace();
