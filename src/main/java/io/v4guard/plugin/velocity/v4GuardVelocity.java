@@ -13,7 +13,7 @@ import net.kyori.adventure.text.Component;
 
 import java.util.logging.Logger;
 
-@Plugin(id = "v4guard-plugin", name = "v4Guard Plugin", version = "1.0.2",
+@Plugin(id = "v4guard-plugin", name = "v4Guard Plugin", version = "1.0.3",
         url = "https://v4guard.io", description = "v4Guard Plugin for Minecraft Servers", authors = {"DigitalSynware"})
 public class v4GuardVelocity {
 
