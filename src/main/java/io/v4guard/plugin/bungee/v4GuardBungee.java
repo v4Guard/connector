@@ -16,14 +16,13 @@ public class v4GuardBungee extends Plugin {
     public void onEnable(){
         this.getProxy().getConsole().sendMessage("§e[v4guard-plugin] (Bungee) Enabling...");
         try {
-            core = new v4GuardCore();
+            core = new v4GuardCore(v4GuardMode.BUNGEE);
         } catch (Exception e) {
             this.getProxy().getConsole().sendMessage("§c[v4guard-plugin] (Bungee) Enabling... [ERROR]");
             this.getProxy().getConsole().sendMessage("§cPlease check the console for more information and report this error.");
             e.printStackTrace();
             return;
         }
-        core.setPluginMode(v4GuardMode.BUNGEE);
         v4GuardBungee = this;
         this.getProxy().getPluginManager().registerListener(this, new AntiVPNListener());
         this.getProxy().getConsole().sendMessage("§e[v4guard-plugin] (Bungee) Enabling... [DONE]");

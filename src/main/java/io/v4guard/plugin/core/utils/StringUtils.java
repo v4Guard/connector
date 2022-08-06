@@ -8,6 +8,7 @@ import java.util.List;
 public class StringUtils {
 
     public static String replacePlaceholders(String message, Document placeholders){
+        if(placeholders == null) return message;
         for(String var : placeholders.keySet()){
             message = message.replace("{" + var + "}", placeholders.get(var).toString());
         }

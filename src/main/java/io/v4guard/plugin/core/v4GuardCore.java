@@ -23,8 +23,9 @@ public class v4GuardCore {
     private v4GuardMode pluginMode = v4GuardMode.UNKNOWN;
     private Logger logger;
 
-    public v4GuardCore() throws IOException, URISyntaxException {
+    public v4GuardCore(v4GuardMode mode) throws IOException, URISyntaxException {
         INSTANCE = this;
+        this.pluginMode = mode;
         initializeLogger();
         this.folder = new File("plugins/v4Guard/");
         if (!this.folder.exists()) {
