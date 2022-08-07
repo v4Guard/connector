@@ -1,11 +1,11 @@
 
 package io.v4guard.plugin.core.socket;
 
-import io.v4guard.plugin.core.v4GuardCore;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 import io.v4guard.plugin.core.socket.listener.*;
+import io.v4guard.plugin.core.v4GuardCore;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 public class BackendConnector {
@@ -33,7 +32,7 @@ public class BackendConnector {
 
     public BackendConnector() throws IOException, URISyntaxException {
         HashMap<String, List<String>> headers = new HashMap<>();
-        headers.put("v4g-version", Collections.singletonList("1.0.4"));
+        headers.put("v4g-version", Collections.singletonList(v4GuardCore.pluginVersion));
         headers.put("v4g-hostname", Collections.singletonList(getHostname()));
         headers.put("v4g-name", Collections.singletonList(new File(System.getProperty("user.dir")).getName()));
         headers.put("v4g-service", Collections.singletonList("minecraft"));

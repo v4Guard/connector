@@ -8,10 +8,8 @@ import io.v4guard.plugin.core.tasks.CompletableTaskManager;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.logging.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class v4GuardCore {
 
@@ -21,6 +19,8 @@ public class v4GuardCore {
     private CompletableTaskManager completableTaskManager;
     private BackendConnector backendConnector;
     private CheckManager checkManager;
+
+    public static final String pluginVersion = "1.0.5";
 
     private boolean debug = false;
     private v4GuardMode pluginMode = v4GuardMode.UNKNOWN;
@@ -102,6 +102,4 @@ public class v4GuardCore {
         logger = Logger.getLogger("v4Guard");
         logger.setUseParentHandlers(true);
     }
-
-
 }
