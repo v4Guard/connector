@@ -34,6 +34,7 @@ public class v4GuardVelocity {
         server.getConsoleCommandSource().sendMessage(Component.text("§e[v4guard-plugin] (Velocity) Enabling..."));
         try {
             core = new v4GuardCore(v4GuardMode.VELOCITY);
+            core.getCheckManager().addProcessor(new VelocityCheckProcessor());
         } catch (Exception e) {
             server.getConsoleCommandSource().sendMessage(Component.text("§c[v4guard-plugin] (Velocity) Enabling... [ERROR]"));
             server.getConsoleCommandSource().sendMessage(Component.text("§cPlease check the console for more information and report this error."));

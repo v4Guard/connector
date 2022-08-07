@@ -18,6 +18,7 @@ public class v4GuardSpigot extends JavaPlugin {
         this.getServer().getConsoleSender().sendMessage("§e[v4guard-plugin] (Spigot) Enabling...");
         try {
             core = new v4GuardCore(v4GuardMode.SPIGOT);
+            core.getCheckManager().addProcessor(new SpigotCheckProcessor());
         } catch (Exception e) {
             this.getServer().getConsoleSender().sendMessage("§c[v4guard-plugin] (Spigot) Enabling... [ERROR]");
             this.getServer().getConsoleSender().sendMessage("§cPlease check the console for more information and report this error.");

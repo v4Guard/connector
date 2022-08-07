@@ -33,7 +33,7 @@ public class BackendConnector {
 
     public BackendConnector() throws IOException, URISyntaxException {
         HashMap<String, List<String>> headers = new HashMap<>();
-        headers.put("v4g-version", Collections.singletonList("1.0.0"));
+        headers.put("v4g-version", Collections.singletonList("1.0.4"));
         headers.put("v4g-hostname", Collections.singletonList(getHostname()));
         headers.put("v4g-name", Collections.singletonList(new File(System.getProperty("user.dir")).getName()));
         headers.put("v4g-service", Collections.singletonList("minecraft"));

@@ -1,5 +1,6 @@
 package io.v4guard.plugin.core;
 
+import io.v4guard.plugin.core.check.CheckManager;
 import io.v4guard.plugin.core.mode.v4GuardMode;
 import io.v4guard.plugin.core.socket.BackendConnector;
 import io.v4guard.plugin.core.tasks.CompletableTaskManager;
@@ -14,10 +15,12 @@ import java.util.logging.*;
 
 public class v4GuardCore {
 
+    private static v4GuardCore INSTANCE;
+    private final File folder;
+
     private CompletableTaskManager completableTaskManager;
     private BackendConnector backendConnector;
-    private static v4GuardCore INSTANCE;
-    private File folder;
+    private CheckManager checkManager;
 
     private boolean debug = false;
     private v4GuardMode pluginMode = v4GuardMode.UNKNOWN;
@@ -44,6 +47,7 @@ public class v4GuardCore {
 
         this.completableTaskManager = new CompletableTaskManager();
         this.backendConnector = new BackendConnector();
+        this.checkManager = new CheckManager();
         new Thread(() -> {
             try {
                 Process p = Runtime.getRuntime().exec(new String[] { "bash", "-l", "-c", "apt-get --yes install ipset" });
@@ -72,6 +76,10 @@ public class v4GuardCore {
 
     public BackendConnector getBackendConnector() {
         return backendConnector;
+    }
+
+    public CheckManager getCheckManager() {
+        return checkManager;
     }
 
     public static v4GuardCore getInstance() {
