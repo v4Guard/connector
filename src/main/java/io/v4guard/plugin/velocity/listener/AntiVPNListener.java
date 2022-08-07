@@ -3,9 +3,8 @@ package io.v4guard.plugin.velocity.listener;
 import com.velocitypowered.api.event.Continuation;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
-import io.v4guard.plugin.core.kick.KickReason;
+import com.velocitypowered.api.proxy.Player;
 import io.v4guard.plugin.core.socket.BackendConnector;
 import io.v4guard.plugin.core.socket.SocketStatus;
 import io.v4guard.plugin.core.tasks.types.CompletableIPCheckTask;
@@ -15,12 +14,11 @@ import io.v4guard.plugin.velocity.v4GuardVelocity;
 import net.kyori.adventure.text.Component;
 import org.bson.Document;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 public class AntiVPNListener {
 
-    private final HashMap<String, KickReason> kickReasonsMap = new HashMap();
     private BackendConnector conn = v4GuardVelocity.getCoreInstance().getBackendConnector();
 
     @Subscribe(order = PostOrder.FIRST)
@@ -55,9 +53,9 @@ public class AntiVPNListener {
                                 String kickReasonMessage = StringUtils.buildMultilineString((List<String>) kickMessages.get("kick"));
                                 Document data = (Document) this.getData().get("result");
                                 kickReasonMessage = StringUtils.replacePlaceholders(kickReasonMessage, (Document) data.get("variables"));
-                                KickReason reason = new KickReason(username, kickReasonMessage);
-                                if(v4GuardVelocity.getV4Guard().getServer().getPlayer(username) != null) {
-                                    kickReasonsMap.put(username, reason);
+                                Optional<Player> pp = v4GuardVelocity.getV4Guard().getServer().getPlayer(username);
+                                if(pp.isPresent()) {
+                                    pp.get().disconnect(Component.text(kickReasonMessage));
                                 } else {
                                     e.setResult(PreLoginEvent.PreLoginComponentResult.denied(Component.text(kickReasonMessage)));
                                 }
@@ -74,15 +72,5 @@ public class AntiVPNListener {
                 }
             }
         };
-    }
-
-    @Subscribe(order = PostOrder.FIRST)
-    public void onLogin(PostLoginEvent e) {
-        if (this.kickReasonsMap.containsKey(e.getPlayer().getUsername())) {
-            KickReason reason = this.kickReasonsMap.get(e.getPlayer().getUsername());
-            if(reason == null) return;
-            e.getPlayer().disconnect(Component.text(reason.getMessage()));
-            this.kickReasonsMap.remove(e.getPlayer().getUsername());
-        }
     }
 }
