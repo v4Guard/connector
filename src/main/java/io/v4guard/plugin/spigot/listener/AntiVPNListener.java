@@ -1,6 +1,5 @@
 package io.v4guard.plugin.spigot.listener;
 
-import io.v4guard.plugin.core.kick.KickReason;
 import io.v4guard.plugin.core.socket.SocketStatus;
 import io.v4guard.plugin.core.tasks.types.CompletableIPCheckTask;
 import io.v4guard.plugin.core.tasks.types.CompletableNameCheckTask;
@@ -14,12 +13,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class AntiVPNListener implements Listener {
-
-    private final HashMap<String, KickReason> kickReasonsMap = new HashMap();
 
     @EventHandler
     public void onPreLogin(final AsyncPlayerPreLoginEvent e) {
@@ -43,14 +39,13 @@ public class AntiVPNListener implements Listener {
                                     String kickReasonMessage = StringUtils.buildMultilineString((List<String>) kickMessages.get("kick"));
                                     Document data = (Document) task.getData().get("result");
                                     kickReasonMessage = StringUtils.replacePlaceholders(kickReasonMessage, (Document) data.get("variables"));
-                                    KickReason reason = new KickReason(username, kickReasonMessage);
                                     if(isBlocked()){
                                         if(wait){
                                             e.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
-                                            e.setKickMessage(reason.getMessage());
+                                            e.setKickMessage(kickReasonMessage);
                                         } else {
                                             Player player = v4GuardSpigot.getV4Guard().getServer().getPlayer(e.getName());
-                                            player.kickPlayer(reason.getMessage());
+                                            player.kickPlayer(kickReasonMessage);
                                         }
                                     }
                                 }
