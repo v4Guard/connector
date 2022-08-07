@@ -1,4 +1,4 @@
 name: v4guard-plugin
-version: 1.0.3
+version: 1.0.4
 main: io.v4guard.plugin.bungee.v4GuardBungee
 author: DigitalSynware
