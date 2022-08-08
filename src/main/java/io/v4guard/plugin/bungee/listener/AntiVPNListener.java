@@ -25,4 +25,5 @@ public class AntiVPNListener implements Listener {
     public void onPostLogin(PostLoginEvent e){
         v4GuardBungee.getCoreInstance().getCheckManager().runPostLoginCheck(e.getPlayer().getName(), e);
     }
+
 }
