@@ -1,7 +1,10 @@
 package io.v4guard.plugin.core.tasks.types;
 
-import io.v4guard.plugin.core.v4GuardCore;
+import io.v4guard.plugin.bungee.v4GuardBungee;
 import io.v4guard.plugin.core.tasks.common.CompletableTask;
+import io.v4guard.plugin.core.utils.CheckStatus;
+import io.v4guard.plugin.core.utils.StringUtils;
+import io.v4guard.plugin.core.v4GuardCore;
 import org.bson.Document;
 
 import java.util.Timer;
@@ -16,6 +19,7 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
     private final String username;
     private int version;
     private final ConcurrentHashMap<String, Object> data;
+    private CheckStatus check;
 
     public CompletableIPCheckTask(String address, String username, int version) {
         this.address = address;
@@ -50,7 +54,7 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
         return this.taskID;
     }
 
-    public boolean isBlocked() {
+    private boolean isBlocked() {
         if (!this.isCompleted()) throw new UnsupportedOperationException("Task is not completed yet");
         Document result = (Document)this.data.get("result");
         return result.getBoolean("block");
@@ -68,6 +72,10 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
 
     public void check() {
         if (this.isCompleted()) {
+            this.check = v4GuardBungee.getCoreInstance().getCheckManager().buildCheckStatus(this.getUsername());
+            this.replacePlaceholders(check);
+            check.setBlocked(isBlocked());
+            v4GuardBungee.getCoreInstance().getCheckManager().getCheckStatusMap().put(username, check);
             this.complete();
             v4GuardCore.getInstance().getCompletableTaskManager().getTasks().remove(this.getTaskID());
         }
@@ -91,5 +99,14 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
 
     public String getUsername() {
         return this.username;
+    }
+
+    public CheckStatus getCheck() {
+        return check;
+    }
+
+    public void replacePlaceholders(CheckStatus status){
+        Document data = (Document) this.getData().get("result");
+        status.setReason(StringUtils.replacePlaceholders(status.getReason(), (Document) data.get("variables")));
     }
 }

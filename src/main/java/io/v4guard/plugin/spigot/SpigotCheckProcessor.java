@@ -25,33 +25,26 @@ public class SpigotCheckProcessor implements CheckProcessor {
         if (!v4GuardSpigot.getCoreInstance().getBackendConnector().getSocketStatus().equals(SocketStatus.AUTHENTICATED)) {
             return;
         }
-        Document kickMessages = (Document) v4GuardSpigot.getCoreInstance().getBackendConnector().getSettings().get("messages");
+        v4GuardSpigot.getCoreInstance().getCheckManager().getCheckStatusMap().remove(e.getName());
         final boolean wait = (boolean) v4GuardSpigot.getCoreInstance().getBackendConnector().getSettings().get("waitResponse");
         new CompletableNameCheckTask(e.getName()) {
             @Override
             public void complete(boolean nameIsValid) {
                 if(nameIsValid){
                     new CompletableIPCheckTask(e.getAddress().getHostAddress(), e.getName(), -1) {
-                        CompletableIPCheckTask task = this;
                         @Override
                         public void complete() {
                             new BukkitRunnable() {
                                 @Override
                                 public void run() {
-                                    String kickReasonMessage = StringUtils.buildMultilineString((List<String>) kickMessages.get("kick"));
-                                    Document data = (Document) task.getData().get("result");
-                                    kickReasonMessage = StringUtils.replacePlaceholders(kickReasonMessage, (Document) data.get("variables"));
-                                    String username = e.getName();
-                                    if(isBlocked()){
+                                    CheckStatus check = getCheck();
+                                    if(check.isBlocked()){
                                         if(wait){
                                             e.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
-                                            e.setKickMessage(kickReasonMessage);
+                                            e.setKickMessage(check.getReason());
                                         } else {
-                                            v4GuardSpigot.getCoreInstance().getCheckManager().getCheckStatusMap().put(username, new CheckStatus(username, kickReasonMessage, true));
-                                            Player p = Bukkit.getPlayer(username);
-                                            if(p != null){
-                                                p.kickPlayer(kickReasonMessage);
-                                            }
+                                            //Try kick player if is online
+                                            actionOnExpire(check);
                                         }
                                     }
                                 }
@@ -63,6 +56,7 @@ public class SpigotCheckProcessor implements CheckProcessor {
                     if (player == null) {
                         return;
                     }
+                    Document kickMessages = (Document) v4GuardSpigot.getCoreInstance().getBackendConnector().getSettings().get("messages");
                     String message= StringUtils.buildMultilineString((List<String>) kickMessages.get("invalidUsername"));
                     message = StringUtils.replacePlaceholders(message, new Document("username", e.getName()));
                     player.kickPlayer(ChatColor.translateAlternateColorCodes('&', message));
@@ -80,19 +74,24 @@ public class SpigotCheckProcessor implements CheckProcessor {
     public void onLogin(String username, Object event) {
         PlayerLoginEvent e = (PlayerLoginEvent) event;
         CheckStatus status = v4GuardSpigot.getCoreInstance().getCheckManager().getCheckStatus(e.getPlayer().getName());
-        if(status != null && status.isBlocked()){
-            e.disallow(PlayerLoginEvent.Result.KICK_OTHER, status.getReason());
-            v4GuardSpigot.getCoreInstance().getCheckManager().getCheckStatusMap().remove(e.getPlayer().getName());
-        }
+        if(status != null && status.isBlocked()) e.disallow(PlayerLoginEvent.Result.KICK_OTHER, status.getReason());
+
     }
 
     @Override
     public void onPostLogin(String username, Object event) {
         PlayerJoinEvent e = (PlayerJoinEvent) event;
         CheckStatus status = v4GuardSpigot.getCoreInstance().getCheckManager().getCheckStatus(e.getPlayer().getName());
-        if(status != null && status.isBlocked()){
-            e.getPlayer().kickPlayer(status.getReason());
-            v4GuardSpigot.getCoreInstance().getCheckManager().getCheckStatusMap().remove(e.getPlayer().getName());
+        if(status != null && status.isBlocked()) e.getPlayer().kickPlayer(status.getReason());
+    }
+
+    @Override
+    public boolean actionOnExpire(CheckStatus status) {
+        Player p = Bukkit.getPlayer(status.getName());
+        if(p != null){
+            p.kickPlayer(status.getReason());
+            return true;
         }
+        return false;
     }
 }

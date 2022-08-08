@@ -1,12 +1,19 @@
 package io.v4guard.plugin.core.utils;
 
+import io.v4guard.plugin.core.check.CheckProcessor;
+import io.v4guard.plugin.core.v4GuardCore;
+
 public class CheckStatus {
 
+    private static final long EXPIRATION_TIME = 2000L; // 2 seconds
+
+    private final long createdAt;
     private final String name;
-    private final String reason;
+    private String reason;
     private boolean blocked;
 
     public CheckStatus(String name, String reason, boolean blocked) {
+        this.createdAt = System.currentTimeMillis();
         this.name = name;
         this.reason = reason;
         this.blocked = blocked;
@@ -26,5 +33,24 @@ public class CheckStatus {
 
     public String getReason() {
         return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public boolean hasExpired() {
+        return System.currentTimeMillis() - this.createdAt > EXPIRATION_TIME;
+    }
+
+    public void makeCheckExpire(){
+        v4GuardCore.getInstance().getCheckManager().getCheckStatusMap().remove(this.name);
+        for(CheckProcessor processor : v4GuardCore.getInstance().getCheckManager().getProcessors()){
+            processor.actionOnExpire(this);
+        }
     }
 }
