@@ -17,6 +17,7 @@ public class v4GuardBungee extends Plugin {
         this.getProxy().getConsole().sendMessage("§e[v4guard-plugin] (Bungee) Enabling...");
         try {
             core = new v4GuardCore(v4GuardMode.BUNGEE);
+            core.getCheckManager().addProcessor(new BungeeCheckProcessor());
         } catch (Exception e) {
             this.getProxy().getConsole().sendMessage("§c[v4guard-plugin] (Bungee) Enabling... [ERROR]");
             this.getProxy().getConsole().sendMessage("§cPlease check the console for more information and report this error.");

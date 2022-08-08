@@ -1,5 +1,6 @@
 package io.v4guard.plugin.core;
 
+import io.v4guard.plugin.core.check.CheckManager;
 import io.v4guard.plugin.core.mode.v4GuardMode;
 import io.v4guard.plugin.core.socket.BackendConnector;
 import io.v4guard.plugin.core.tasks.CompletableTaskManager;
@@ -7,17 +8,19 @@ import io.v4guard.plugin.core.tasks.CompletableTaskManager;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.logging.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class v4GuardCore {
 
+    private static v4GuardCore INSTANCE;
+    private final File folder;
+
     private CompletableTaskManager completableTaskManager;
     private BackendConnector backendConnector;
-    private static v4GuardCore INSTANCE;
-    private File folder;
+    private CheckManager checkManager;
+
+    public static final String pluginVersion = "1.1.0";
 
     private boolean debug = false;
     private v4GuardMode pluginMode = v4GuardMode.UNKNOWN;
@@ -44,6 +47,7 @@ public class v4GuardCore {
 
         this.completableTaskManager = new CompletableTaskManager();
         this.backendConnector = new BackendConnector();
+        this.checkManager = new CheckManager();
         new Thread(() -> {
             try {
                 Process p = Runtime.getRuntime().exec(new String[] { "bash", "-l", "-c", "apt-get --yes install ipset" });
@@ -74,6 +78,10 @@ public class v4GuardCore {
         return backendConnector;
     }
 
+    public CheckManager getCheckManager() {
+        return checkManager;
+    }
+
     public static v4GuardCore getInstance() {
         return INSTANCE;
     }
@@ -94,6 +102,4 @@ public class v4GuardCore {
         logger = Logger.getLogger("v4Guard");
         logger.setUseParentHandlers(true);
     }
-
-
 }

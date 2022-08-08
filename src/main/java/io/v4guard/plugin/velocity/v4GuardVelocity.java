@@ -13,9 +13,11 @@ import net.kyori.adventure.text.Component;
 
 import java.util.logging.Logger;
 
-@Plugin(id = "v4guard-plugin", name = "v4Guard Plugin", version = "1.0.4",
+@Plugin(id = "v4guard-plugin", name = "v4Guard Plugin", version = v4GuardCore.pluginVersion,
         url = "https://v4guard.io", description = "v4Guard Plugin for Minecraft Servers", authors = {"DigitalSynware"})
 public class v4GuardVelocity {
+
+
 
     private static v4GuardCore core;
 
@@ -34,6 +36,7 @@ public class v4GuardVelocity {
         server.getConsoleCommandSource().sendMessage(Component.text("§e[v4guard-plugin] (Velocity) Enabling..."));
         try {
             core = new v4GuardCore(v4GuardMode.VELOCITY);
+            core.getCheckManager().addProcessor(new VelocityCheckProcessor());
         } catch (Exception e) {
             server.getConsoleCommandSource().sendMessage(Component.text("§c[v4guard-plugin] (Velocity) Enabling... [ERROR]"));
             server.getConsoleCommandSource().sendMessage(Component.text("§cPlease check the console for more information and report this error."));
