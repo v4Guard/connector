@@ -12,7 +12,6 @@ import io.v4guard.plugin.core.tasks.types.CompletableIPCheckTask;
 import io.v4guard.plugin.core.tasks.types.CompletableNameCheckTask;
 import io.v4guard.plugin.core.utils.CheckStatus;
 import io.v4guard.plugin.core.utils.StringUtils;
-import io.v4guard.plugin.spigot.v4GuardSpigot;
 import net.kyori.adventure.text.Component;
 import org.bson.Document;
 
@@ -44,20 +43,20 @@ public class VelocityCheckProcessor implements CheckProcessor {
     @Override
     public void onLogin(String username, Object event) {
         LoginEvent e = (LoginEvent) event;
-        CheckStatus status = v4GuardSpigot.getCoreInstance().getCheckManager().getCheckStatus(e.getPlayer().getUsername());
+        CheckStatus status = v4GuardVelocity.getCoreInstance().getCheckManager().getCheckStatus(e.getPlayer().getUsername());
         if(status != null && status.isBlocked()){
             e.setResult(ResultedEvent.ComponentResult.denied(Component.text(status.getReason())));
-            v4GuardSpigot.getCoreInstance().getCheckManager().getCheckStatusMap().remove(e.getPlayer().getUsername());
+            v4GuardVelocity.getCoreInstance().getCheckManager().getCheckStatusMap().remove(e.getPlayer().getUsername());
         }
     }
 
     @Override
     public void onPostLogin(String username, Object event) {
         PostLoginEvent e = (PostLoginEvent) event;
-        CheckStatus status = v4GuardSpigot.getCoreInstance().getCheckManager().getCheckStatus(e.getPlayer().getUsername());
+        CheckStatus status = v4GuardVelocity.getCoreInstance().getCheckManager().getCheckStatus(e.getPlayer().getUsername());
         if(status != null && status.isBlocked()){
             e.getPlayer().disconnect(Component.text(status.getReason()));
-            v4GuardSpigot.getCoreInstance().getCheckManager().getCheckStatusMap().remove(e.getPlayer().getUsername());
+            v4GuardVelocity.getCoreInstance().getCheckManager().getCheckStatusMap().remove(e.getPlayer().getUsername());
         }
     }
 
