@@ -7,6 +7,7 @@ import io.v4guard.plugin.core.tasks.types.CompletableIPCheckTask;
 import io.v4guard.plugin.core.tasks.types.CompletableNameCheckTask;
 import io.v4guard.plugin.core.utils.CheckStatus;
 import io.v4guard.plugin.core.utils.StringUtils;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.LoginEvent;
@@ -37,13 +38,10 @@ public class BungeeCheckProcessor implements CheckProcessor {
                     new CompletableIPCheckTask(e.getConnection().getAddress().getAddress().getHostAddress(), e.getConnection().getName(), e.getConnection().getVersion()){
                         @Override
                         public void complete() {
-                            //Build kick message
                             String kickReasonMessage = StringUtils.buildMultilineString((List<String>) kickMessages.get("kick"));
                             Document data = (Document) this.getData().get("result");
                             kickReasonMessage = StringUtils.replacePlaceholders(kickReasonMessage, (Document) data.get("variables"));
-
                             String username = this.getUsername();
-
                             if (wait) {
                                 if (this.isBlocked()) {
                                     e.setCancelled(true);
@@ -53,6 +51,10 @@ public class BungeeCheckProcessor implements CheckProcessor {
                             } else {
                                 if (this.isBlocked()) {
                                     v4GuardBungee.getCoreInstance().getCheckManager().getCheckStatusMap().put(username, new CheckStatus(username, kickReasonMessage, true));
+                                    ProxiedPlayer player = ProxyServer.getInstance().getPlayer(username);
+                                    if (player != null) {
+                                        player.disconnect(TextComponent.fromLegacyText(kickReasonMessage));
+                                    }
                                 }
                             }
                         }
@@ -77,7 +79,6 @@ public class BungeeCheckProcessor implements CheckProcessor {
             e.setCancelReason(TextComponent.fromLegacyText(status.getReason()));
             v4GuardBungee.getCoreInstance().getCheckManager().getCheckStatusMap().remove(e.getConnection().getName());
         }
-
     }
 
     @Override

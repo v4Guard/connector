@@ -7,6 +7,7 @@ import io.v4guard.plugin.core.tasks.types.CompletableNameCheckTask;
 import io.v4guard.plugin.core.utils.CheckStatus;
 import io.v4guard.plugin.core.utils.StringUtils;
 import org.bson.Document;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
@@ -47,6 +48,10 @@ public class SpigotCheckProcessor implements CheckProcessor {
                                             e.setKickMessage(kickReasonMessage);
                                         } else {
                                             v4GuardSpigot.getCoreInstance().getCheckManager().getCheckStatusMap().put(username, new CheckStatus(username, kickReasonMessage, true));
+                                            Player p = Bukkit.getPlayer(username);
+                                            if(p != null){
+                                                p.kickPlayer(kickReasonMessage);
+                                            }
                                         }
                                     }
                                 }
