@@ -1,6 +1,5 @@
 package io.v4guard.plugin.core.tasks.types;
 
-import io.v4guard.plugin.bungee.v4GuardBungee;
 import io.v4guard.plugin.core.tasks.common.CompletableTask;
 import io.v4guard.plugin.core.utils.CheckStatus;
 import io.v4guard.plugin.core.utils.StringUtils;
@@ -72,10 +71,10 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
 
     public void check() {
         if (this.isCompleted()) {
-            this.check = v4GuardBungee.getCoreInstance().getCheckManager().buildCheckStatus(this.getUsername());
+            this.check = v4GuardCore.getInstance().getCheckManager().buildCheckStatus(this.getUsername());
             this.replacePlaceholders(check);
             check.setBlocked(isBlocked());
-            v4GuardBungee.getCoreInstance().getCheckManager().getCheckStatusMap().put(username, check);
+            v4GuardCore.getInstance().getCheckManager().getCheckStatusMap().put(username, check);
             this.complete();
             v4GuardCore.getInstance().getCompletableTaskManager().getTasks().remove(this.getTaskID());
         }

@@ -1,8 +1,8 @@
 package io.v4guard.plugin.core.check;
 
-import io.v4guard.plugin.bungee.v4GuardBungee;
 import io.v4guard.plugin.core.utils.CheckStatus;
 import io.v4guard.plugin.core.utils.StringUtils;
+import io.v4guard.plugin.core.v4GuardCore;
 import org.bson.Document;
 
 import java.util.*;
@@ -78,7 +78,7 @@ public class CheckManager {
     }
 
     public CheckStatus buildCheckStatus(String username){
-        Document kickMessages = (Document) v4GuardBungee.getCoreInstance().getBackendConnector().getSettings().get("messages");
+        Document kickMessages = (Document) v4GuardCore.getInstance().getBackendConnector().getSettings().get("messages");
         String kickReasonMessage = StringUtils.buildMultilineString((List<String>) kickMessages.get("kick"));
         return new CheckStatus(username, kickReasonMessage, false);
     }
