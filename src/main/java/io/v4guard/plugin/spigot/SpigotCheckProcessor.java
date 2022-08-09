@@ -1,5 +1,6 @@
 package io.v4guard.plugin.spigot;
 
+import io.v4guard.plugin.bungee.v4GuardBungee;
 import io.v4guard.plugin.core.check.CheckProcessor;
 import io.v4guard.plugin.core.socket.SocketStatus;
 import io.v4guard.plugin.core.tasks.types.CompletableIPCheckTask;
@@ -25,7 +26,12 @@ public class SpigotCheckProcessor implements CheckProcessor {
         if (!v4GuardSpigot.getCoreInstance().getBackendConnector().getSocketStatus().equals(SocketStatus.AUTHENTICATED)) {
             return;
         }
-        v4GuardSpigot.getCoreInstance().getCheckManager().getCheckStatusMap().remove(e.getName());
+        CheckStatus status = v4GuardBungee.getCoreInstance().getCheckManager().getCheckStatus(e.getName());
+        if (status != null && status.isBlocked()) {
+            e.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
+            e.setKickMessage(status.getReason());
+            return;
+        }
         final boolean wait = (boolean) v4GuardSpigot.getCoreInstance().getBackendConnector().getSettings().get("waitResponse");
         new CompletableNameCheckTask(e.getName()) {
             @Override

@@ -25,7 +25,12 @@ public class BungeeCheckProcessor implements CheckProcessor {
         if (!conn.getSocketStatus().equals(SocketStatus.AUTHENTICATED)) {
             return;
         }
-        v4GuardBungee.getCoreInstance().getCheckManager().getCheckStatusMap().remove(e.getConnection().getName());
+        CheckStatus status = v4GuardBungee.getCoreInstance().getCheckManager().getCheckStatus(e.getConnection().getName());
+        if (status != null && status.isBlocked()) {
+            e.setCancelled(true);
+            e.setCancelReason(TextComponent.fromLegacyText(status.getReason()));
+            return;
+        }
         final boolean wait = (boolean) v4GuardBungee.getCoreInstance().getBackendConnector().getSettings().get("waitResponse");
         if (wait) {
             e.registerIntent(v4GuardBungee.getV4Guard());
