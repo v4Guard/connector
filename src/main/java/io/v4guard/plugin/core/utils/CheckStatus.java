@@ -5,7 +5,7 @@ import io.v4guard.plugin.core.v4GuardCore;
 
 public class CheckStatus {
 
-    private static final long EXPIRATION_TIME = 2000L; // 2 seconds
+    private static final long EXPIRATION_TIME = 1000L; // 1 second
 
     private final long createdAt;
     private final String name;
