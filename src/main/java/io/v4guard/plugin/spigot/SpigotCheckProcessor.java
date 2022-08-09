@@ -88,7 +88,7 @@ public class SpigotCheckProcessor implements CheckProcessor {
     @Override
     public boolean actionOnExpire(CheckStatus status) {
         Player p = Bukkit.getPlayer(status.getName());
-        if(p != null){
+        if(status.isBlocked() && p != null){
             p.kickPlayer(status.getReason());
             return true;
         }

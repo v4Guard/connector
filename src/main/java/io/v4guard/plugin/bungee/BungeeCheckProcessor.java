@@ -86,7 +86,7 @@ public class BungeeCheckProcessor implements CheckProcessor {
     @Override
     public boolean actionOnExpire(CheckStatus check) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(check.getName());
-        if (player != null) {
+        if (check.isBlocked() && player != null) {
             player.disconnect(TextComponent.fromLegacyText(check.getReason()));
             return true;
         }

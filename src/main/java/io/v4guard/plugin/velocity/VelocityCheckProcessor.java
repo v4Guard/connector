@@ -55,7 +55,7 @@ public class VelocityCheckProcessor implements CheckProcessor {
     @Override
     public boolean actionOnExpire(CheckStatus status) {
         Optional<Player> pp = v4GuardVelocity.getV4Guard().getServer().getPlayer(status.getName());
-        if(pp.isPresent()) {
+        if(status.isBlocked() && pp.isPresent()) {
             pp.get().disconnect(Component.text(status.getReason()));
             return true;
         }
