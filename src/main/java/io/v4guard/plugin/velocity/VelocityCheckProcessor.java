@@ -24,7 +24,7 @@ public class VelocityCheckProcessor implements CheckProcessor {
     public void onPreLoginWithContinuation(Object event, Continuation continuation) {
         PreLoginEvent e = (PreLoginEvent) event;
         final boolean wait = (boolean) v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings().get("waitResponse");
-        CheckStatus status = v4GuardBungee.getCoreInstance().getCheckManager().getCheckStatus(e.getUsername());
+        CheckStatus status = v4GuardVelocity.getCoreInstance().getCheckManager().getCheckStatus(e.getUsername());
         if (status != null && status.isBlocked()) {
             e.setResult(PreLoginEvent.PreLoginComponentResult.denied(Component.text(status.getReason())));
             return;
