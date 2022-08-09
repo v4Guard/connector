@@ -89,7 +89,12 @@ public class SpigotCheckProcessor implements CheckProcessor {
     public boolean actionOnExpire(CheckStatus status) {
         Player p = Bukkit.getPlayer(status.getName());
         if(status.isBlocked() && p != null){
-            p.kickPlayer(status.getReason());
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    p.kickPlayer(status.getReason());
+                }
+            }.runTask(v4GuardSpigot.getV4Guard());
             return true;
         }
         return false;
