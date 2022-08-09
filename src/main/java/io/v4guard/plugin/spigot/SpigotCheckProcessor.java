@@ -44,7 +44,7 @@ public class SpigotCheckProcessor implements CheckProcessor {
                                             e.setKickMessage(check.getReason());
                                         } else {
                                             //Try kick player if is online
-                                            actionOnExpire(check);
+                                            //actionOnExpire(check);
                                         }
                                     }
                                 }
@@ -74,7 +74,7 @@ public class SpigotCheckProcessor implements CheckProcessor {
     public void onLogin(String username, Object event) {
         PlayerLoginEvent e = (PlayerLoginEvent) event;
         CheckStatus status = v4GuardSpigot.getCoreInstance().getCheckManager().getCheckStatus(e.getPlayer().getName());
-        if(status != null && status.isBlocked()) e.disallow(PlayerLoginEvent.Result.KICK_OTHER, status.getReason());
+        //if(status != null && status.isBlocked()) e.disallow(PlayerLoginEvent.Result.KICK_OTHER, status.getReason());
 
     }
 
@@ -82,7 +82,7 @@ public class SpigotCheckProcessor implements CheckProcessor {
     public void onPostLogin(String username, Object event) {
         PlayerJoinEvent e = (PlayerJoinEvent) event;
         CheckStatus status = v4GuardSpigot.getCoreInstance().getCheckManager().getCheckStatus(e.getPlayer().getName());
-        if(status != null && status.isBlocked()) e.getPlayer().kickPlayer(status.getReason());
+        //if(status != null && status.isBlocked()) e.getPlayer().kickPlayer(status.getReason());
     }
 
     @Override
