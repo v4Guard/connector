@@ -1,6 +1,7 @@
 package io.v4guard.plugin.velocity;
 
 import com.velocitypowered.api.event.Continuation;
+import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
@@ -42,14 +43,14 @@ public class VelocityCheckProcessor implements CheckProcessor {
     public void onLogin(String username, Object event) {
         LoginEvent e = (LoginEvent) event;
         CheckStatus status = v4GuardVelocity.getCoreInstance().getCheckManager().getCheckStatus(e.getPlayer().getUsername());
-        //if(status != null && status.isBlocked()) e.setResult(ResultedEvent.ComponentResult.denied(Component.text(status.getReason())));
+        if(status != null && status.isBlocked()) e.setResult(ResultedEvent.ComponentResult.denied(Component.text(status.getReason())));
     }
 
     @Override
     public void onPostLogin(String username, Object event) {
         PostLoginEvent e = (PostLoginEvent) event;
         CheckStatus status = v4GuardVelocity.getCoreInstance().getCheckManager().getCheckStatus(e.getPlayer().getUsername());
-        //if(status != null && status.isBlocked()) e.getPlayer().disconnect(Component.text(status.getReason()));
+        if(status != null && status.isBlocked()) e.getPlayer().disconnect(Component.text(status.getReason()));
     }
 
     @Override
@@ -73,7 +74,7 @@ public class VelocityCheckProcessor implements CheckProcessor {
                             CheckStatus check = this.getCheck();
                             if (check.isBlocked()) {
                                 if(actionOnExpire(check)) return;
-                                //e.setResult(PreLoginEvent.PreLoginComponentResult.denied(Component.text(check.getReason())));
+                                e.setResult(PreLoginEvent.PreLoginComponentResult.denied(Component.text(check.getReason())));
                             }
                             if(continuation != null) continuation.resume();
                         }
