@@ -26,7 +26,7 @@ public class BungeeCheckProcessor implements CheckProcessor {
             return;
         }
         CheckStatus status = v4GuardBungee.getCoreInstance().getCheckManager().getCheckStatus(e.getConnection().getName());
-        if (status != null && status.isBlocked()) {
+        if (status != null && status.isBlocked() && !status.hasExpired()) {
             e.setCancelled(true);
             e.setCancelReason(TextComponent.fromLegacyText(status.getReason()));
             return;

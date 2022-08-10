@@ -26,7 +26,7 @@ public class SpigotCheckProcessor implements CheckProcessor {
             return;
         }
         CheckStatus status = v4GuardSpigot.getCoreInstance().getCheckManager().getCheckStatus(e.getName());
-        if (status != null && status.isBlocked()) {
+        if (status != null && status.isBlocked() && !status.hasExpired()) {
             e.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
             e.setKickMessage(status.getReason());
             return;
