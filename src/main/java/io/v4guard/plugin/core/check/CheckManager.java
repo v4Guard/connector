@@ -1,10 +1,11 @@
 package io.v4guard.plugin.core.check;
 
 import io.v4guard.plugin.core.utils.CheckStatus;
+import io.v4guard.plugin.core.utils.StringUtils;
+import io.v4guard.plugin.core.v4GuardCore;
+import org.bson.Document;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class CheckManager {
 
@@ -14,6 +15,23 @@ public class CheckManager {
     public CheckManager() {
         this.checkStatusMap = new HashMap<>();
         this.processors = new ArrayList<>();
+        scheduleExpirationTask();
+    }
+
+    public void scheduleExpirationTask(){
+        new Timer().schedule(new TimerTask(){
+            @Override
+            public void run() {
+                Iterator<Map.Entry<String, CheckStatus>> it = checkStatusMap.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry<String, CheckStatus> entry = it.next();
+                    CheckStatus checkStatus = entry.getValue();
+                    if (checkStatus.hasExpired()) {
+                        checkStatus.makeCheckExpire();
+                    }
+                }
+            }
+        }, 200L, 200L);
     }
 
     public CheckProcessor getProcessorByClass(Class clazz) {
@@ -57,5 +75,11 @@ public class CheckManager {
         for (CheckProcessor processor : processors) {
             processor.onPostLogin(name, e);
         }
+    }
+
+    public CheckStatus buildCheckStatus(String username){
+        Document kickMessages = (Document) v4GuardCore.getInstance().getBackendConnector().getSettings().get("messages");
+        String kickReasonMessage = StringUtils.buildMultilineString((List<String>) kickMessages.get("kick"));
+        return new CheckStatus(username, kickReasonMessage, false);
     }
 }
