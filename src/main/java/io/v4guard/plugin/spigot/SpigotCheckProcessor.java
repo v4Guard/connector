@@ -1,6 +1,5 @@
 package io.v4guard.plugin.spigot;
 
-import io.v4guard.plugin.bungee.v4GuardBungee;
 import io.v4guard.plugin.core.check.CheckProcessor;
 import io.v4guard.plugin.core.socket.SocketStatus;
 import io.v4guard.plugin.core.tasks.types.CompletableIPCheckTask;
