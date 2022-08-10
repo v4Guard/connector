@@ -6,6 +6,7 @@ import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.proxy.Player;
+import io.v4guard.plugin.bungee.v4GuardBungee;
 import io.v4guard.plugin.core.check.CheckProcessor;
 import io.v4guard.plugin.core.socket.SocketStatus;
 import io.v4guard.plugin.core.tasks.types.CompletableIPCheckTask;
@@ -24,9 +25,8 @@ public class VelocityCheckProcessor implements CheckProcessor {
         PreLoginEvent e = (PreLoginEvent) event;
         final boolean wait = (boolean) v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings().get("waitResponse");
         CheckStatus status = v4GuardVelocity.getCoreInstance().getCheckManager().getCheckStatus(e.getUsername());
-        if (status != null && status.isBlocked() && !status.hasExpired()) {
+        if (status != null && status.isBlocked()) {
             e.setResult(PreLoginEvent.PreLoginComponentResult.denied(Component.text(status.getReason())));
-            if(continuation != null) continuation.resume();
             return;
         }
         if (!wait || !v4GuardVelocity.getCoreInstance().getBackendConnector().getSocketStatus().equals(SocketStatus.AUTHENTICATED)) {
@@ -40,11 +40,6 @@ public class VelocityCheckProcessor implements CheckProcessor {
     public void onPreLogin(String username, Object event) {
         PreLoginEvent e = (PreLoginEvent) event;
         final boolean wait = (boolean) v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings().get("waitResponse");
-        CheckStatus status = v4GuardVelocity.getCoreInstance().getCheckManager().getCheckStatus(e.getUsername());
-        if (status != null && status.isBlocked()&& !status.hasExpired()) {
-            e.setResult(PreLoginEvent.PreLoginComponentResult.denied(Component.text(status.getReason())));
-            return;
-        }
         if(wait || !v4GuardVelocity.getCoreInstance().getBackendConnector().getSocketStatus().equals(SocketStatus.AUTHENTICATED)) return;
         doChecks(e, null);
     }
