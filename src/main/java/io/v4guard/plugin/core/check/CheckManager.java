@@ -22,13 +22,17 @@ public class CheckManager {
         new Timer().schedule(new TimerTask(){
             @Override
             public void run() {
-                Iterator<Map.Entry<String, CheckStatus>> it = checkStatusMap.entrySet().iterator();
-                while (it.hasNext()) {
-                    Map.Entry<String, CheckStatus> entry = it.next();
-                    CheckStatus checkStatus = entry.getValue();
-                    if (checkStatus.hasExpired()) {
-                        checkStatus.makeCheckExpire();
+                try {
+                    Iterator<Map.Entry<String, CheckStatus>> it = checkStatusMap.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Map.Entry<String, CheckStatus> entry = it.next();
+                        CheckStatus checkStatus = entry.getValue();
+                        if (checkStatus != null && checkStatus.hasExpired()) {
+                            checkStatus.makeCheckExpire();
+                        }
                     }
+                } catch (Exception ex){
+                    ex.printStackTrace();
                 }
             }
         }, 200L, 200L);
