@@ -6,7 +6,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 
 public class AntiVPNListener implements Listener {
 
@@ -16,12 +15,7 @@ public class AntiVPNListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onLogin(final PlayerLoginEvent e) {
-        v4GuardSpigot.getCoreInstance().getCheckManager().runLoginCheck(e.getPlayer().getName(), e);
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPostLogin(final PlayerJoinEvent e) {
+    public void onPostLogin(PlayerJoinEvent e) {
         v4GuardSpigot.getCoreInstance().getCheckManager().runPostLoginCheck(e.getPlayer().getName(), e);
     }
 

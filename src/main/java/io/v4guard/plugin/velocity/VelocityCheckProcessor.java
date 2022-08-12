@@ -1,17 +1,14 @@
 package io.v4guard.plugin.velocity;
 
 import com.velocitypowered.api.event.Continuation;
-import com.velocitypowered.api.event.ResultedEvent;
-import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.proxy.Player;
-import io.v4guard.plugin.bungee.v4GuardBungee;
 import io.v4guard.plugin.core.check.CheckProcessor;
-import io.v4guard.plugin.core.socket.SocketStatus;
+import io.v4guard.plugin.core.check.common.CheckStatus;
+import io.v4guard.plugin.core.check.common.VPNCheck;
 import io.v4guard.plugin.core.tasks.types.CompletableIPCheckTask;
 import io.v4guard.plugin.core.tasks.types.CompletableNameCheckTask;
-import io.v4guard.plugin.core.utils.CheckStatus;
 import io.v4guard.plugin.core.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import org.bson.Document;
@@ -23,13 +20,13 @@ public class VelocityCheckProcessor implements CheckProcessor {
 
     public void onPreLoginWithContinuation(Object event, Continuation continuation) {
         PreLoginEvent e = (PreLoginEvent) event;
+
+        //Clear other checks if player changes his address
+        String address = e.getConnection().getRemoteAddress().getAddress().getHostAddress();
+        v4GuardVelocity.getCoreInstance().getCheckManager().cleanupChecks(e.getUsername());
+
         final boolean wait = (boolean) v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings().get("waitResponse");
-        CheckStatus status = v4GuardVelocity.getCoreInstance().getCheckManager().getCheckStatus(e.getUsername());
-        if (status != null && status.isBlocked()) {
-            e.setResult(PreLoginEvent.PreLoginComponentResult.denied(Component.text(status.getReason())));
-            return;
-        }
-        if (!wait || !v4GuardVelocity.getCoreInstance().getBackendConnector().getSocketStatus().equals(SocketStatus.AUTHENTICATED)) {
+        if (!wait) {
             if(continuation != null) continuation.resume();
             return;
         }
@@ -39,29 +36,32 @@ public class VelocityCheckProcessor implements CheckProcessor {
     @Override
     public void onPreLogin(String username, Object event) {
         PreLoginEvent e = (PreLoginEvent) event;
+
+        //Clear other checks if player changes his address
+        String address = e.getConnection().getRemoteAddress().getAddress().getHostAddress();
+        v4GuardVelocity.getCoreInstance().getCheckManager().cleanupChecks(e.getUsername());
+
         final boolean wait = (boolean) v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings().get("waitResponse");
-        if(wait || !v4GuardVelocity.getCoreInstance().getBackendConnector().getSocketStatus().equals(SocketStatus.AUTHENTICATED)) return;
+        if(wait) return;
         doChecks(e, null);
     }
 
     @Override
-    public void onLogin(String username, Object event) {
-        LoginEvent e = (LoginEvent) event;
-        CheckStatus status = v4GuardVelocity.getCoreInstance().getCheckManager().getCheckStatus(e.getPlayer().getUsername());
-        if(status != null && status.isBlocked()) e.setResult(ResultedEvent.ComponentResult.denied(Component.text(status.getReason())));
-    }
-
-    @Override
     public void onPostLogin(String username, Object event) {
-        PostLoginEvent e = (PostLoginEvent) event;
-        CheckStatus status = v4GuardVelocity.getCoreInstance().getCheckManager().getCheckStatus(e.getPlayer().getUsername());
-        if(status != null && status.isBlocked()) e.getPlayer().disconnect(Component.text(status.getReason()));
+        VPNCheck check = v4GuardVelocity.getCoreInstance().getCheckManager().getCheckStatus(username);
+        if(check == null) return;
+        check.setPostLoginTime(System.currentTimeMillis());
+        if(check.getStatus() == CheckStatus.USER_DENIED){
+            PostLoginEvent e = (PostLoginEvent) event;
+            Player player = e.getPlayer();
+            player.disconnect(Component.text(check.getReason()));
+        }
     }
 
     @Override
-    public boolean actionOnExpire(CheckStatus status) {
+    public boolean onExpire(VPNCheck status) {
         Optional<Player> pp = v4GuardVelocity.getV4Guard().getServer().getPlayer(status.getName());
-        if(status.isBlocked() && pp.isPresent()) {
+        if(status.getStatus() == CheckStatus.USER_DENIED && pp.isPresent()) {
             pp.get().disconnect(Component.text(status.getReason()));
             return true;
         }
@@ -76,9 +76,9 @@ public class VelocityCheckProcessor implements CheckProcessor {
                     new CompletableIPCheckTask(e.getConnection().getRemoteAddress().getAddress().getHostAddress(), e.getUsername(), e.getConnection().getProtocolVersion().getProtocol()){
                         @Override
                         public void complete() {
-                            CheckStatus check = this.getCheck();
-                            if (check.isBlocked()) {
-                                if(actionOnExpire(check)) return;
+                            VPNCheck check = this.getCheck();
+                            if (check.getStatus() == CheckStatus.USER_DENIED) {
+                                if(onExpire(check)) return;
                                 e.setResult(PreLoginEvent.PreLoginComponentResult.denied(Component.text(check.getReason())));
                             }
                             if(continuation != null) continuation.resume();
