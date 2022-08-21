@@ -32,6 +32,7 @@ public class CheckManager {
                         VPNCheck check = entry.getValue();
                         if (check != null && (check.hasExpired() || check.hasPostExpired())) {
                             check.performActionOnExpire();
+                            checkStatusMap.remove(check);
                         }
                     }
                 } catch (Exception ex){
