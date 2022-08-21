@@ -3,7 +3,6 @@ package io.v4guard.plugin.bungee;
 import io.v4guard.plugin.core.check.CheckProcessor;
 import io.v4guard.plugin.core.check.common.CheckStatus;
 import io.v4guard.plugin.core.check.common.VPNCheck;
-import io.v4guard.plugin.core.socket.BackendConnector;
 import io.v4guard.plugin.core.tasks.types.CompletableIPCheckTask;
 import io.v4guard.plugin.core.tasks.types.CompletableNameCheckTask;
 import io.v4guard.plugin.core.utils.StringUtils;
