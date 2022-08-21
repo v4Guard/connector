@@ -1,7 +1,8 @@
 package io.v4guard.plugin.core.tasks.types;
 
+import io.v4guard.plugin.core.check.common.CheckStatus;
 import io.v4guard.plugin.core.tasks.common.CompletableTask;
-import io.v4guard.plugin.core.utils.CheckStatus;
+import io.v4guard.plugin.core.check.common.VPNCheck;
 import io.v4guard.plugin.core.utils.StringUtils;
 import io.v4guard.plugin.core.v4GuardCore;
 import org.bson.Document;
@@ -18,7 +19,7 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
     private final String username;
     private int version;
     private final ConcurrentHashMap<String, Object> data;
-    private CheckStatus check;
+    private VPNCheck check;
 
     public CompletableIPCheckTask(String address, String username, int version) {
         this.address = address;
@@ -71,9 +72,9 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
 
     public void check() {
         if (this.isCompleted()) {
-            this.check = v4GuardCore.getInstance().getCheckManager().buildCheckStatus(this.getUsername());
+            this.check = v4GuardCore.getInstance().getCheckManager().buildCheckStatus(this.getUsername(), this.getAddress());
             this.replacePlaceholders(check);
-            check.setBlocked(isBlocked());
+            check.setStatus(isBlocked() ? CheckStatus.USER_DENIED : CheckStatus.USER_ALLOWED);
             v4GuardCore.getInstance().getCheckManager().getCheckStatusMap().put(username, check);
             this.complete();
             v4GuardCore.getInstance().getCompletableTaskManager().getTasks().remove(this.getTaskID());
@@ -100,11 +101,11 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
         return this.username;
     }
 
-    public CheckStatus getCheck() {
+    public VPNCheck getCheck() {
         return check;
     }
 
-    public void replacePlaceholders(CheckStatus status){
+    public void replacePlaceholders(VPNCheck status){
         Document data = (Document) this.getData().get("result");
         status.setReason(StringUtils.replacePlaceholders(status.getReason(), (Document) data.get("variables")));
     }

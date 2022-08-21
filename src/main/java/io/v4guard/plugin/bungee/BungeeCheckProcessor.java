@@ -1,16 +1,14 @@
 package io.v4guard.plugin.bungee;
 
 import io.v4guard.plugin.core.check.CheckProcessor;
-import io.v4guard.plugin.core.socket.BackendConnector;
-import io.v4guard.plugin.core.socket.SocketStatus;
+import io.v4guard.plugin.core.check.common.CheckStatus;
+import io.v4guard.plugin.core.check.common.VPNCheck;
 import io.v4guard.plugin.core.tasks.types.CompletableIPCheckTask;
 import io.v4guard.plugin.core.tasks.types.CompletableNameCheckTask;
-import io.v4guard.plugin.core.utils.CheckStatus;
 import io.v4guard.plugin.core.utils.StringUtils;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.PreLoginEvent;
 import org.bson.Document;
@@ -21,16 +19,12 @@ public class BungeeCheckProcessor implements CheckProcessor {
 
     @Override
     public void onPreLogin(String username, Object event) {
-        PreLoginEvent e = (PreLoginEvent) event; BackendConnector conn = v4GuardBungee.getCoreInstance().getBackendConnector();
-        if (!conn.getSocketStatus().equals(SocketStatus.AUTHENTICATED)) {
-            return;
-        }
-        CheckStatus status = v4GuardBungee.getCoreInstance().getCheckManager().getCheckStatus(e.getConnection().getName());
-        if (status != null && status.isBlocked()) {
-            e.setCancelled(true);
-            e.setCancelReason(TextComponent.fromLegacyText(status.getReason()));
-            return;
-        }
+        PreLoginEvent e = (PreLoginEvent) event;
+
+        //Clear other checks if player changes his address
+        String address = e.getConnection().getAddress().getAddress().getHostAddress();
+        v4GuardBungee.getCoreInstance().getCheckManager().cleanupChecks(username);
+
         final boolean wait = (boolean) v4GuardBungee.getCoreInstance().getBackendConnector().getSettings().get("waitResponse");
         if (wait) {
             e.registerIntent(v4GuardBungee.getV4Guard());
@@ -39,20 +33,20 @@ public class BungeeCheckProcessor implements CheckProcessor {
             @Override
             public void complete(boolean nameIsValid) {
                 if(nameIsValid){
-                    new CompletableIPCheckTask(e.getConnection().getAddress().getAddress().getHostAddress(), e.getConnection().getName(), e.getConnection().getVersion()){
+                    new CompletableIPCheckTask(address, e.getConnection().getName(), e.getConnection().getVersion()){
                         @Override
                         public void complete() {
-                            CheckStatus check = this.getCheck();
+                            VPNCheck check = this.getCheck();
                             if (wait) {
-                                if (check.isBlocked()) {
+                                if (check.getStatus() == CheckStatus.USER_DENIED) {
                                     e.setCancelled(true);
                                     e.setCancelReason(TextComponent.fromLegacyText(check.getReason()));
-                                    e.completeIntent(v4GuardBungee.getV4Guard());
                                 }
+                                e.completeIntent(v4GuardBungee.getV4Guard());
                             } else {
-                                if (check.isBlocked()) {
+                                if (check.getStatus() == CheckStatus.USER_DENIED) {
                                     //Try kick player if is online
-                                    actionOnExpire(check);
+                                    onExpire(check);
                                 }
                             }
                         }
@@ -70,32 +64,24 @@ public class BungeeCheckProcessor implements CheckProcessor {
     }
 
     @Override
-    public void onLogin(String username, Object event) {
-        LoginEvent e = (LoginEvent) event;
-        CheckStatus status = v4GuardBungee.getCoreInstance().getCheckManager().getCheckStatus(e.getConnection().getName());
-        if(status != null && status.isBlocked()){
-            e.setCancelled(true);
-            e.setCancelReason(TextComponent.fromLegacyText(status.getReason()));
+    public void onPostLogin(String username, Object event) {
+        VPNCheck check = v4GuardBungee.getCoreInstance().getCheckManager().getCheckStatus(username);
+        if(check == null) return;
+        check.setPostLoginTime(System.currentTimeMillis());
+        if(check.getStatus() == CheckStatus.USER_DENIED){
+            PostLoginEvent e = (PostLoginEvent) event;
+            ProxiedPlayer player = e.getPlayer();
+            player.disconnect(TextComponent.fromLegacyText(check.getReason()));
         }
     }
 
     @Override
-    public void onPostLogin(String username, Object event) {
-        PostLoginEvent e = (PostLoginEvent) event;
-        ProxiedPlayer player = e.getPlayer();
-        if(player == null) return;
-        CheckStatus status = v4GuardBungee.getCoreInstance().getCheckManager().getCheckStatus(player.getName());
-        if(status != null && status.isBlocked()) player.disconnect(TextComponent.fromLegacyText(status.getReason()));
-    }
-
-    @Override
-    public boolean actionOnExpire(CheckStatus check) {
+    public boolean onExpire(VPNCheck check) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(check.getName());
-        if (check.isBlocked() && player != null) {
+        if (check.getStatus() == CheckStatus.USER_DENIED && player != null) {
             player.disconnect(TextComponent.fromLegacyText(check.getReason()));
             return true;
         }
         return false;
-
     }
 }

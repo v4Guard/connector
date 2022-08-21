@@ -5,6 +5,7 @@ import io.v4guard.plugin.bungee.messager.Messager;
 import io.v4guard.plugin.core.mode.v4GuardMode;
 import io.v4guard.plugin.core.v4GuardCore;
 import net.md_5.bungee.api.plugin.Plugin;
+import org.bstats.bungeecord.Metrics;
 
 public class v4GuardBungee extends Plugin {
 
@@ -15,6 +16,7 @@ public class v4GuardBungee extends Plugin {
     @Override
     public void onEnable(){
         this.getProxy().getConsole().sendMessage("§e[v4guard-plugin] (Bungee) Enabling...");
+        new Metrics(this, 16219);
         try {
             core = new v4GuardCore(v4GuardMode.BUNGEE);
             core.getCheckManager().addProcessor(new BungeeCheckProcessor());

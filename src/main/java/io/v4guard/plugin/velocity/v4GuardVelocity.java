@@ -10,6 +10,7 @@ import io.v4guard.plugin.core.v4GuardCore;
 import io.v4guard.plugin.velocity.listener.AntiVPNListener;
 import io.v4guard.plugin.velocity.messager.Messager;
 import net.kyori.adventure.text.Component;
+import org.bstats.velocity.Metrics;
 
 import java.util.logging.Logger;
 
@@ -22,18 +23,23 @@ public class v4GuardVelocity {
     private static v4GuardCore core;
 
     private static v4GuardVelocity v4GuardVelocity;
+    private final Metrics.Factory metricsFactory;
     private ProxyServer server;
+    private Logger logger;
     private Messager messager;
 
     @Inject
-    public v4GuardVelocity(ProxyServer server, Logger logger) {
+    public v4GuardVelocity(ProxyServer server, Logger logger, Metrics.Factory metricsFactory) {
         v4GuardVelocity = this;
         this.server = server;
+        this.logger = logger;
+        this.metricsFactory = metricsFactory;
     }
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         server.getConsoleCommandSource().sendMessage(Component.text("§e[v4guard-plugin] (Velocity) Enabling..."));
+        metricsFactory.make(this, 16220);
         try {
             core = new v4GuardCore(v4GuardMode.VELOCITY);
             core.getCheckManager().addProcessor(new VelocityCheckProcessor());

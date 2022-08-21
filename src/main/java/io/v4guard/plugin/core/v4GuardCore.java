@@ -20,7 +20,7 @@ public class v4GuardCore {
     private BackendConnector backendConnector;
     private CheckManager checkManager;
 
-    public static final String pluginVersion = "1.1.0";
+    public static final String pluginVersion = "1.1.1";
 
     private boolean debug = false;
     private v4GuardMode pluginMode = v4GuardMode.UNKNOWN;
@@ -48,18 +48,20 @@ public class v4GuardCore {
         this.completableTaskManager = new CompletableTaskManager();
         this.backendConnector = new BackendConnector();
         this.checkManager = new CheckManager();
-        new Thread(() -> {
-            try {
-                Process p = Runtime.getRuntime().exec(new String[] { "bash", "-l", "-c", "apt-get --yes install ipset" });
-                p.waitFor();
-                Process p2 = Runtime.getRuntime().exec(new String[] { "bash", "-l", "-c", "ipset create -! v4guard hash:ip hashsize 4096 timeout 1200" });
-                p2.waitFor();
-                Runtime.getRuntime().exec(new String[] { "bash", "-l", "-c", "iptables -t raw -A PREROUTING -p tcp --dport 25565:25600 -m set --match-set v4guard src -j DROP" });
-            }
-            catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
+        if(!BackendConnector.isRunningInsideDocker()){
+            new Thread(() -> {
+                try {
+                    Process p = Runtime.getRuntime().exec(new String[] { "bash", "-l", "-c", "apt-get --yes install ipset" });
+                    p.waitFor();
+                    Process p2 = Runtime.getRuntime().exec(new String[] { "bash", "-l", "-c", "ipset create -! v4guard hash:ip hashsize 4096 timeout 1200" });
+                    p2.waitFor();
+                    Runtime.getRuntime().exec(new String[] { "bash", "-l", "-c", "iptables -t raw -A PREROUTING -p tcp --dport 25565:25600 -m set --match-set v4guard src -j DROP" });
+                }
+                catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
     }
 
     public Logger getLogger() {

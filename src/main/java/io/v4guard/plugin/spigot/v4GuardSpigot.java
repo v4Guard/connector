@@ -4,6 +4,7 @@ import io.v4guard.plugin.bungee.messager.Messager;
 import io.v4guard.plugin.core.mode.v4GuardMode;
 import io.v4guard.plugin.core.v4GuardCore;
 import io.v4guard.plugin.spigot.listener.AntiVPNListener;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -17,6 +18,7 @@ public class v4GuardSpigot extends JavaPlugin {
     public void onEnable(){
         this.getServer().getConsoleSender().sendMessage("§e[v4guard-plugin] (Spigot) Enabling...");
         try {
+            new Metrics(this, 16218);
             core = new v4GuardCore(v4GuardMode.SPIGOT);
             core.getCheckManager().addProcessor(new SpigotCheckProcessor());
         } catch (Exception e) {
