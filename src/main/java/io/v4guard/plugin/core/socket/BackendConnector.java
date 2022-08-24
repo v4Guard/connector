@@ -76,7 +76,7 @@ public class BackendConnector {
         registerListener("auth", new AuthListener(this));
         registerListener("settings", new SettingsListener(this));
         registerListener("setting", new SettingListener(this));
-        registerListener("ipset", new IPSetListener(this));
+        //registerListener("ipset", new IPSetListener(this));
         registerListener("check", new CheckListener());
         registerListener("message", new MessageListener(this));
     }
