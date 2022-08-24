@@ -6,7 +6,7 @@
 
     <groupId>io.v4guard</groupId>
     <artifactId>v4guard-plugin</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.1b</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -22,7 +22,6 @@
                 <version>3.3.1-SNAPSHOT</version>
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
-                    <createSourcesJar>true</createSourcesJar>
                     <artifactSet>
                         <includes>
                             <include>io.socket:socket.io-client</include>
@@ -38,8 +37,32 @@
                     </artifactSet>
                     <relocations>
                         <relocation>
+                            <pattern>io.socket</pattern>
+                            <shadedPattern>io.v4guard.shaded.io.socket</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>okhttp3</pattern>
+                            <shadedPattern>io.v4guard.shaded.okhttp3</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>okio</pattern>
+                            <shadedPattern>io.v4guard.shaded.okio</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.bson</pattern>
+                            <shadedPattern>io.v4guard.shaded.org.bson</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.json</pattern>
+                            <shadedPattern>io.v4guard.shaded.org.json</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>kotlin</pattern>
+                            <shadedPattern>io.v4guard.shaded.kotlin</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>org.bstats</pattern>
-                            <shadedPattern>io.v4guard.shaded.bstats</shadedPattern>
+                            <shadedPattern>io.v4guard.shaded.org.bstats</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>

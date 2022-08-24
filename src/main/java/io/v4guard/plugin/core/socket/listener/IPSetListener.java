@@ -6,6 +6,7 @@ import org.bson.Document;
 
 import java.io.IOException;
 
+@Deprecated
 public class IPSetListener implements Emitter.Listener {
 
     BackendConnector backendConnector;
