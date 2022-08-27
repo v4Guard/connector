@@ -16,7 +16,11 @@ public class v4GuardBungee extends Plugin {
     @Override
     public void onEnable(){
         this.getProxy().getConsole().sendMessage("§e[v4guard-plugin] (Bungee) Enabling...");
-        new Metrics(this, 16219);
+        try {
+            new Metrics(this, 16219);
+        } catch (Exception ex){
+            this.getProxy().getConsole().sendMessage("§e[v4guard-plugin] (Bungee) Failed to connect with bStats [WARN]");
+        }
         try {
             core = new v4GuardCore(v4GuardMode.BUNGEE);
             core.getCheckManager().addProcessor(new BungeeCheckProcessor());

@@ -39,7 +39,11 @@ public class v4GuardVelocity {
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         server.getConsoleCommandSource().sendMessage(Component.text("§e[v4guard-plugin] (Velocity) Enabling..."));
-        metricsFactory.make(this, 16220);
+        try {
+            metricsFactory.make(this, 16220);
+        } catch (Exception ex) {
+            server.getConsoleCommandSource().sendMessage(Component.text("§e[v4guard-plugin] (Velocity) Failed to connect with bStats [WARN]"));
+        }
         try {
             core = new v4GuardCore(v4GuardMode.VELOCITY);
             core.getCheckManager().addProcessor(new VelocityCheckProcessor());

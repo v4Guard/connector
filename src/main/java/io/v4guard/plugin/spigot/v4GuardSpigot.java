@@ -19,6 +19,10 @@ public class v4GuardSpigot extends JavaPlugin {
         this.getServer().getConsoleSender().sendMessage("§e[v4guard-plugin] (Spigot) Enabling...");
         try {
             new Metrics(this, 16218);
+        } catch (Exception ex){
+            this.getServer().getConsoleSender().sendMessage("§e[v4guard-plugin] (Spigot) Failed to connect with bStats [WARN]");
+        }
+        try {
             core = new v4GuardCore(v4GuardMode.SPIGOT);
             core.getCheckManager().addProcessor(new SpigotCheckProcessor());
         } catch (Exception e) {
