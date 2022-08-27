@@ -25,7 +25,7 @@ public class BungeeCheckProcessor implements CheckProcessor {
         String address = e.getConnection().getAddress().getAddress().getHostAddress();
         v4GuardBungee.getCoreInstance().getCheckManager().cleanupChecks(username);
 
-        final boolean wait = (boolean) v4GuardBungee.getCoreInstance().getBackendConnector().getSettings().get("waitResponse");
+        final boolean wait = (boolean) v4GuardBungee.getCoreInstance().getBackendConnector().getSettings().getOrDefault("waitResponse", false);
         if (wait) {
             e.registerIntent(v4GuardBungee.getV4Guard());
         }

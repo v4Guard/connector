@@ -26,7 +26,7 @@ public class SpigotCheckProcessor implements CheckProcessor {
         String address = e.getAddress().getHostAddress();
         v4GuardSpigot.getCoreInstance().getCheckManager().cleanupChecks(username);
 
-        final boolean wait = (boolean) v4GuardSpigot.getCoreInstance().getBackendConnector().getSettings().get("waitResponse");
+        final boolean wait = (boolean) v4GuardSpigot.getCoreInstance().getBackendConnector().getSettings().getOrDefault("waitResponse", false);;
         new CompletableNameCheckTask(e.getName()) {
             @Override
             public void complete(boolean nameIsValid) {
@@ -56,7 +56,7 @@ public class SpigotCheckProcessor implements CheckProcessor {
                     if (player == null) {
                         return;
                     }
-                    Document kickMessages = (Document) v4GuardSpigot.getCoreInstance().getBackendConnector().getSettings().get("messages");
+                    Document kickMessages = (Document) v4GuardSpigot.getCoreInstance().getBackendConnector().getSettings().getOrDefault("waitResponse", false);;
                     String message= StringUtils.buildMultilineString((List<String>) kickMessages.get("invalidUsername"));
                     message = StringUtils.replacePlaceholders(message, new Document("username", e.getName()));
                     player.kickPlayer(ChatColor.translateAlternateColorCodes('&', message));
