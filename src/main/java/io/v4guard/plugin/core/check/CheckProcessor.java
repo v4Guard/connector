@@ -7,4 +7,5 @@ public interface CheckProcessor<K> {
     void onPreLogin(String username, K event);
     void onPostLogin(String username, K event);
     boolean onExpire(VPNCheck VPNCheck);
+    void kickPlayer(String username, String reason);
 }
