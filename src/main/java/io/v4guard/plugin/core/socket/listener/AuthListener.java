@@ -35,7 +35,14 @@ public class AuthListener implements Emitter.Listener {
                 new Timer().schedule(new java.util.TimerTask() {
                     @Override
                     public void run() {
-                        v4GuardCore.getInstance().getLogger().log(Level.WARNING,"This instance is not connected with your account. Connect it using this link: https://dashboard.v4guard.io/link/" + backendConnector.getAuthCode());
+                        if(backendConnector.getSocketStatus().equals(SocketStatus.NOT_AUTHENTICATED)){
+                            v4GuardCore.getInstance().getLogger().log(
+                                    Level.WARNING,
+                                    "This instance is not connected with your account. Connect it using this link: https://dashboard.v4guard.io/link/"
+                                            + backendConnector.getAuthCode());
+                        } else {
+                            cancel();
+                        }
                     }
                 }, 1000L, 60L*1000L);
             } else if (backendConnector.getSocketStatus().equals(SocketStatus.PRE_AUTHENTICATED)) {
