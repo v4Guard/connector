@@ -21,12 +21,14 @@ import java.util.logging.Level;
 import java.util.stream.Stream;
 
 public class BackendConnector {
+
     private Socket socket;
     private IO.Options options;
     private SocketStatus socketStatus = SocketStatus.DISCONNECTED;
     private final Runtime runtime = Runtime.getRuntime();
     private HashMap<String, Object> settings;
     private boolean reconnected = false;
+    private String authCode;
 
     private HashMap<String, Emitter.Listener> registeredListeners = new HashMap<>();
 
@@ -128,6 +130,14 @@ public class BackendConnector {
 
     public void setReconnected(boolean reconnected) {
         this.reconnected = reconnected;
+    }
+
+    public String getAuthCode() {
+        return authCode;
+    }
+
+    public void setAuthCode(String authCode) {
+        this.authCode = authCode;
     }
 
     public Runtime getRuntime() {

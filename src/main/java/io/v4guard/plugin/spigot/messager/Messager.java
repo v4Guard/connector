@@ -19,4 +19,11 @@ public class Messager {
         }
     }
 
+    public void sendToPlayer(String message, String username){
+        Player player = Bukkit.getServer().getPlayer(username);
+        if(player != null){
+            player.sendMessage(message);
+        }
+    }
+
 }

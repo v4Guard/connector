@@ -20,4 +20,11 @@ public class Messager {
         }
     }
 
+    public void sendToPlayer(String message, String username){
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(username);
+        if(player != null){
+            player.sendMessage(new ComponentBuilder(message).create());
+        }
+    }
+
 }

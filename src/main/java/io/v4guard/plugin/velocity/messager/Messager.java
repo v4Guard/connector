@@ -2,9 +2,10 @@ package io.v4guard.plugin.velocity.messager;
 
 
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.ProxyServer;
 import io.v4guard.plugin.velocity.v4GuardVelocity;
 import net.kyori.adventure.text.Component;
+
+import java.util.Optional;
 
 public class Messager {
 
@@ -19,6 +20,13 @@ public class Messager {
                     player.sendMessage(Component.text(message));
                 }
             }
+        }
+    }
+
+    public void sendToPlayer(String message, String username){
+        Optional<Player> player = v4GuardVelocity.getV4Guard().getServer().getPlayer(username);
+        if(player.isPresent()){
+            player.get().sendMessage(Component.text(message));
         }
     }
 

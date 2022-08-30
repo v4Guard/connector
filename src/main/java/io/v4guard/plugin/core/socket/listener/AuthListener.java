@@ -1,10 +1,10 @@
 package io.v4guard.plugin.core.socket.listener;
 
-import io.v4guard.plugin.core.v4GuardCore;
-import io.v4guard.plugin.core.socket.BackendConnector;
-import io.v4guard.plugin.core.socket.SocketStatus;
 import io.socket.client.IO;
 import io.socket.emitter.Emitter;
+import io.v4guard.plugin.core.socket.BackendConnector;
+import io.v4guard.plugin.core.socket.SocketStatus;
+import io.v4guard.plugin.core.v4GuardCore;
 import org.bson.Document;
 
 import java.io.File;
@@ -14,8 +14,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Timer;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class AuthListener implements Emitter.Listener {
     
@@ -28,10 +28,16 @@ public class AuthListener implements Emitter.Listener {
     @Override
     public void call(Object... args) {
         Document doc = Document.parse(args[0].toString());
+        backendConnector.setAuthCode(doc.getString("code"));
         try {
             backendConnector.setSocketStatus(SocketStatus.valueOf(doc.getString("status")));
             if (backendConnector.getSocketStatus().equals(SocketStatus.NOT_AUTHENTICATED)) {
-                v4GuardCore.getInstance().getLogger().log(Level.WARNING,"This instance is not connected with your account. Connect it using this link: https://dashboard.v4guard.io/link/" + doc.getString("code"));
+                new Timer().schedule(new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        v4GuardCore.getInstance().getLogger().log(Level.WARNING,"This instance is not connected with your account. Connect it using this link: https://dashboard.v4guard.io/link/" + backendConnector.getAuthCode());
+                    }
+                }, 1000L, 60L*1000L);
             } else if (backendConnector.getSocketStatus().equals(SocketStatus.PRE_AUTHENTICATED)) {
                 File secrets;
                 if (!v4GuardCore.getInstance().getDataFolder().exists()) {
