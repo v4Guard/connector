@@ -1,11 +1,15 @@
 package io.v4guard.plugin.core.socket.listener;
 
+import io.socket.emitter.Emitter;
 import io.v4guard.plugin.bungee.v4GuardBungee;
 import io.v4guard.plugin.core.socket.BackendConnector;
 import io.v4guard.plugin.core.v4GuardCore;
 import io.v4guard.plugin.spigot.v4GuardSpigot;
-import io.socket.emitter.Emitter;
+import io.v4guard.plugin.velocity.v4GuardVelocity;
 import org.bson.Document;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MessageListener implements Emitter.Listener {
 
@@ -19,13 +23,34 @@ public class MessageListener implements Emitter.Listener {
     public void call(Object... args) {
         Document doc = Document.parse(args[0].toString());
         String permission = doc.getOrDefault("permission", "*").toString();
+        List<String> players = (List<String>) doc.getOrDefault("players", new ArrayList<>());
+        String message = (String) doc.getOrDefault("message", "Disconnected");
         switch (v4GuardCore.getInstance().getPluginMode()){
-            case BUNGEE:
-                v4GuardBungee.getV4Guard().getMessager().broadcastWithPermission(doc.getString("message"), permission);
+            case BUNGEE: {
+                List<String> broadcasted = v4GuardBungee.getV4Guard().getMessager().broadcastWithPermission(message, permission);
+                players.removeAll(broadcasted);
+                for(String player : players){
+                    v4GuardBungee.getV4Guard().getMessager().sendToPlayer(message, player);
+                }
                 break;
-            case SPIGOT:
-                v4GuardSpigot.getV4Guard().getMessager().broadcastWithPermission(doc.getString("message"), permission);
+            }
+            case SPIGOT: {
+                List<String> broadcasted = v4GuardSpigot.getV4Guard().getMessager().broadcastWithPermission(message, permission);
+                players.removeAll(broadcasted);
+                for(String player : players){
+                    v4GuardSpigot.getV4Guard().getMessager().sendToPlayer(message, player);
+                }
                 break;
+            }
+
+            case VELOCITY: {
+                List<String> broadcasted = v4GuardVelocity.getV4Guard().getMessager().broadcastWithPermission(message, permission);
+                players.removeAll(broadcasted);
+                for(String player : players){
+                    v4GuardVelocity.getV4Guard().getMessager().sendToPlayer(message, player);
+                }
+                break;
+            }
 
         }
 

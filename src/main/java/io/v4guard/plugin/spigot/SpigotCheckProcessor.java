@@ -95,4 +95,12 @@ public class SpigotCheckProcessor implements CheckProcessor {
         }
         return false;
     }
+
+    @Override
+    public void kickPlayer(String username, String reason){
+       Player player = Bukkit.getPlayer(username);
+        if (player != null) {
+            player.kickPlayer(reason);
+        }
+    }
 }

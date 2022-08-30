@@ -68,6 +68,14 @@ public class VelocityCheckProcessor implements CheckProcessor {
         return false;
     }
 
+    @Override
+    public void kickPlayer(String username, String reason){
+        Optional<Player> pp = v4GuardVelocity.getV4Guard().getServer().getPlayer(username);
+        if(pp.isPresent()) {
+            pp.get().disconnect(Component.text(reason));
+        }
+    }
+
     private void doChecks(PreLoginEvent e, Continuation continuation) {
         new CompletableNameCheckTask(e.getUsername()) {
             @Override
