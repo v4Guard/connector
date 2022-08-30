@@ -17,7 +17,7 @@ public class KickListener implements Emitter.Listener {
         String formattedReason = "", sep = "";
         for (String s : reason) {
             formattedReason += sep + s;
-            sep = "\\n";
+            sep = "\n";
         }
         for(CheckProcessor cp : v4GuardCore.getInstance().getCheckManager().getProcessors()){
             cp.kickPlayer(username, formattedReason);
