@@ -26,24 +26,32 @@ public class MessageListener implements Emitter.Listener {
         List<String> players = (List<String>) doc.getOrDefault("players", new ArrayList<>());
         String message = (String) doc.getOrDefault("message", "Disconnected");
         switch (v4GuardCore.getInstance().getPluginMode()){
-            case BUNGEE:
-                v4GuardBungee.getV4Guard().getMessager().broadcastWithPermission(message, permission);
+            case BUNGEE: {
+                List<String> broadcasted = v4GuardBungee.getV4Guard().getMessager().broadcastWithPermission(message, permission);
+                players.removeAll(broadcasted);
                 for(String player : players){
                     v4GuardBungee.getV4Guard().getMessager().sendToPlayer(message, player);
                 }
                 break;
-            case SPIGOT:
+            }
+            case SPIGOT: {
+                List<String> broadcasted = v4GuardSpigot.getV4Guard().getMessager().broadcastWithPermission(message, permission);
+                players.removeAll(broadcasted);
                 for(String player : players){
                     v4GuardSpigot.getV4Guard().getMessager().sendToPlayer(message, player);
                 }
-                v4GuardSpigot.getV4Guard().getMessager().broadcastWithPermission(message, permission);
                 break;
-            case VELOCITY:
+            }
+
+            case VELOCITY: {
+                List<String> broadcasted = v4GuardVelocity.getV4Guard().getMessager().broadcastWithPermission(message, permission);
+                players.removeAll(broadcasted);
                 for(String player : players){
                     v4GuardVelocity.getV4Guard().getMessager().sendToPlayer(message, player);
                 }
-                v4GuardVelocity.getV4Guard().getMessager().broadcastWithPermission(message, permission);
                 break;
+            }
+
         }
 
     }
