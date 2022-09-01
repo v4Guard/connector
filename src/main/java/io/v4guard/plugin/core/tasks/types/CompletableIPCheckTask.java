@@ -21,7 +21,7 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
     private final ConcurrentHashMap<String, Object> data;
     private VPNCheck check;
 
-    public CompletableIPCheckTask(String address, String username, int version) {
+    public CompletableIPCheckTask(String address, String username, int version, String virtualHost) {
         this.address = address;
         this.username = username;
         this.version = version;
@@ -34,6 +34,7 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
         doc.put("username", this.username);
         doc.put("version", this.version);
         doc.put("timestamp", System.currentTimeMillis());
+        doc.put("virtualHost", virtualHost);
         v4GuardCore.getInstance().getBackendConnector().send("check", doc);
         new Timer().schedule(new TimerTask(){
 

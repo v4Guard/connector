@@ -20,7 +20,7 @@ public class v4GuardCore {
     private BackendConnector backendConnector;
     private CheckManager checkManager;
 
-    public static final String pluginVersion = "1.1.2";
+    public static final String pluginVersion = "1.1.2b";
 
     private boolean debug = false;
     private v4GuardMode pluginMode = v4GuardMode.UNKNOWN;

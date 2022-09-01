@@ -26,12 +26,13 @@ public class SpigotCheckProcessor implements CheckProcessor {
         String address = e.getAddress().getHostAddress();
         v4GuardSpigot.getCoreInstance().getCheckManager().cleanupChecks(username);
 
+        if(v4GuardSpigot.getCoreInstance().getBackendConnector() == null|| v4GuardSpigot.getCoreInstance().getBackendConnector().getSettings() == null) return;
         final boolean wait = (boolean) v4GuardSpigot.getCoreInstance().getBackendConnector().getSettings().getOrDefault("waitResponse", false);;
         new CompletableNameCheckTask(e.getName()) {
             @Override
             public void complete(boolean nameIsValid) {
                 if(nameIsValid){
-                    new CompletableIPCheckTask(address, e.getName(), -1) {
+                    new CompletableIPCheckTask(address, e.getName(), -1, "spigot") {
                         @Override
                         public void complete() {
                             new BukkitRunnable() {

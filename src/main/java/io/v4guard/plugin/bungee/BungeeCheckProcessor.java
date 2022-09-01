@@ -25,6 +25,7 @@ public class BungeeCheckProcessor implements CheckProcessor {
         String address = e.getConnection().getAddress().getAddress().getHostAddress();
         v4GuardBungee.getCoreInstance().getCheckManager().cleanupChecks(username);
 
+        if(v4GuardBungee.getCoreInstance().getBackendConnector() == null|| v4GuardBungee.getCoreInstance().getBackendConnector().getSettings() == null) return;
         final boolean wait = (boolean) v4GuardBungee.getCoreInstance().getBackendConnector().getSettings().getOrDefault("waitResponse", false);
         if (wait) {
             e.registerIntent(v4GuardBungee.getV4Guard());
@@ -33,7 +34,7 @@ public class BungeeCheckProcessor implements CheckProcessor {
             @Override
             public void complete(boolean nameIsValid) {
                 if(nameIsValid){
-                    new CompletableIPCheckTask(address, e.getConnection().getName(), e.getConnection().getVersion()){
+                    new CompletableIPCheckTask(address, e.getConnection().getName(), e.getConnection().getVersion(), e.getConnection().getVirtualHost().getHostString()){
                         @Override
                         public void complete() {
                             VPNCheck check = this.getCheck();

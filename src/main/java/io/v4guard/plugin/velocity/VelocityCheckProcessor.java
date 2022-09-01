@@ -25,7 +25,8 @@ public class VelocityCheckProcessor implements CheckProcessor {
         String address = e.getConnection().getRemoteAddress().getAddress().getHostAddress();
         v4GuardVelocity.getCoreInstance().getCheckManager().cleanupChecks(e.getUsername());
 
-        final boolean wait = (boolean) v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings().getOrDefault("waitResponse", false);;
+        if(v4GuardVelocity.getCoreInstance().getBackendConnector() == null|| v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings() == null) return;
+        final boolean wait = (boolean) v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings().getOrDefault("waitResponse", false);
         if (!wait) {
             if(continuation != null) continuation.resume();
             return;
@@ -41,6 +42,7 @@ public class VelocityCheckProcessor implements CheckProcessor {
         String address = e.getConnection().getRemoteAddress().getAddress().getHostAddress();
         v4GuardVelocity.getCoreInstance().getCheckManager().cleanupChecks(e.getUsername());
 
+        if(v4GuardVelocity.getCoreInstance().getBackendConnector() == null|| v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings() == null) return;
         final boolean wait = (boolean) v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings().getOrDefault("waitResponse", false);;
         if(wait) return;
         doChecks(e, null);
@@ -81,7 +83,8 @@ public class VelocityCheckProcessor implements CheckProcessor {
             @Override
             public void complete(boolean nameIsValid) {
                 if(nameIsValid){
-                    new CompletableIPCheckTask(e.getConnection().getRemoteAddress().getAddress().getHostAddress(), e.getUsername(), e.getConnection().getProtocolVersion().getProtocol()){
+                    new CompletableIPCheckTask(e.getConnection().getRemoteAddress().getAddress().getHostAddress(), e.getUsername(), e.getConnection().getProtocolVersion().getProtocol(),
+                            e.getConnection().getVirtualHost().isPresent() ? e.getConnection().getVirtualHost().get().getHostString() : "notFound") {
                         @Override
                         public void complete() {
                             VPNCheck check = this.getCheck();
