@@ -83,7 +83,8 @@ public class VelocityCheckProcessor implements CheckProcessor {
             @Override
             public void complete(boolean nameIsValid) {
                 if(nameIsValid){
-                    new CompletableIPCheckTask(e.getConnection().getRemoteAddress().getAddress().getHostAddress(), e.getUsername(), e.getConnection().getProtocolVersion().getProtocol()){
+                    new CompletableIPCheckTask(e.getConnection().getRemoteAddress().getAddress().getHostAddress(), e.getUsername(), e.getConnection().getProtocolVersion().getProtocol(),
+                            e.getConnection().getVirtualHost().isPresent() ? e.getConnection().getVirtualHost().get().getHostString() : "notFound") {
                         @Override
                         public void complete() {
                             VPNCheck check = this.getCheck();
