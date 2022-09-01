@@ -6,6 +6,7 @@ import io.v4guard.plugin.core.check.common.VPNCheck;
 import io.v4guard.plugin.core.tasks.types.CompletableIPCheckTask;
 import io.v4guard.plugin.core.tasks.types.CompletableNameCheckTask;
 import io.v4guard.plugin.core.utils.StringUtils;
+import io.v4guard.plugin.velocity.v4GuardVelocity;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -25,6 +26,7 @@ public class BungeeCheckProcessor implements CheckProcessor {
         String address = e.getConnection().getAddress().getAddress().getHostAddress();
         v4GuardBungee.getCoreInstance().getCheckManager().cleanupChecks(username);
 
+        if(v4GuardVelocity.getCoreInstance().getBackendConnector() == null|| v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings() == null) return;
         final boolean wait = (boolean) v4GuardBungee.getCoreInstance().getBackendConnector().getSettings().getOrDefault("waitResponse", false);
         if (wait) {
             e.registerIntent(v4GuardBungee.getV4Guard());

@@ -6,6 +6,7 @@ import io.v4guard.plugin.core.check.common.VPNCheck;
 import io.v4guard.plugin.core.tasks.types.CompletableIPCheckTask;
 import io.v4guard.plugin.core.tasks.types.CompletableNameCheckTask;
 import io.v4guard.plugin.core.utils.StringUtils;
+import io.v4guard.plugin.velocity.v4GuardVelocity;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -26,6 +27,7 @@ public class SpigotCheckProcessor implements CheckProcessor {
         String address = e.getAddress().getHostAddress();
         v4GuardSpigot.getCoreInstance().getCheckManager().cleanupChecks(username);
 
+        if(v4GuardVelocity.getCoreInstance().getBackendConnector() == null|| v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings() == null) return;
         final boolean wait = (boolean) v4GuardSpigot.getCoreInstance().getBackendConnector().getSettings().getOrDefault("waitResponse", false);;
         new CompletableNameCheckTask(e.getName()) {
             @Override
