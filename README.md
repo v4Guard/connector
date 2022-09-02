@@ -12,8 +12,8 @@ v4Guard Plugin releases can be found [here](https://github.com/v4Guard/v4guard-p
 ## Using v4Guard Plugin in your server
 
 #### Minimum requirements
-- A Minecraft Servers with Spigot or BungeeCord installed
-- A v4Guard Account. ¿Don't have one? Click [here](https://v4guard.io) to create your account.
+- A Minecraft Server with Spigot, BungeeCord (and forks) or Velocity installed
+- A v4Guard account. Don't have one? Click [here](https://v4guard.io) to create your account.
 
 #### Installation steps
 - Download the latest version of the plugin from the [releases page](https://github.com/v4Guard/v4guard-plugin/releases).
