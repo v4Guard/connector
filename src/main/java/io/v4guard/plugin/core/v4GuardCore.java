@@ -23,7 +23,7 @@ public class v4GuardCore {
     public static final String pluginVersion = "1.1.2b";
 
     private boolean debug = false;
-    private v4GuardMode pluginMode = v4GuardMode.UNKNOWN;
+    private v4GuardMode pluginMode;
     private Logger logger;
 
     public v4GuardCore(v4GuardMode mode) throws IOException, URISyntaxException {
@@ -37,7 +37,7 @@ public class v4GuardCore {
 
         String debugProperty = System.getProperty("v4guardDebug", "false");
         if(debugProperty.equalsIgnoreCase("true") || debugProperty.equalsIgnoreCase("false")){
-            this.debug = Boolean.valueOf(debugProperty);
+            this.debug = Boolean.parseBoolean(debugProperty);
             if(this.isDebugEnabled()){
                 logger.log(Level.WARNING,"Debugging mode has been activated via java arguments");
             }
