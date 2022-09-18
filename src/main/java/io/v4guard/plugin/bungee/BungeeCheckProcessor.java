@@ -22,7 +22,7 @@ public class BungeeCheckProcessor implements CheckProcessor {
         PreLoginEvent e = (PreLoginEvent) event;
 
         //Clear other checks if player changes his address
-        String address = e.getConnection().getAddress().getAddress().getHostAddress();
+        String address = e.getConnection().getSocketAddress().toString();
         v4GuardBungee.getCoreInstance().getCheckManager().cleanupChecks(username);
 
         if(v4GuardBungee.getCoreInstance().getBackendConnector() == null|| v4GuardBungee.getCoreInstance().getBackendConnector().getSettings() == null) return;
