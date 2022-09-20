@@ -1,4 +1,4 @@
-# v4Guard Suite Plugin
+# v4Guard Suite Plugin 
 ![v4Guard VPN/Proxy Protection minimalist background](https://cdn.v4guard.io/Header.png)
 Today there are many servers that have zero protection against fraud, vpn, proxies and peer-to-peer networks. v4Guard has come to the Minecraft communities to change this and offer a quality solution at an affordable price.
 
@@ -42,3 +42,7 @@ The installation of the plugin is very simple, just drag the .jar file to the pl
 
 ## 📝 License
 v4Guard is open source software under the GNU General Public License v3.0. You can find a copy of the license in the GitHub repository.
+
+<a href="https://v4guard.io/discord">
+         <img alt="v4Guard Discord" src="https://discordapp.com/api/guilds/996842633416683702/widget.png?style=shield">
+</a>
