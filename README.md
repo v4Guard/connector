@@ -6,8 +6,6 @@ Today there are many servers that have zero protection against fraud, vpn, proxi
 v4Guard is a boutique service with expertise in VPN/Proxy detection and p2p networks such as Mysterium VPN or SoftEther VPN Project.
 
 ## 💨 Why v4Guard?
-La fiabilidad forma parte del proceso de elección y en v4Guard nos tomamos muy enserio nuestro trabajo con más de 6 años de experiencia en el sector y formado por un equipo comprometido con la seguridad y la privacidad de los usuarios.
-
 Reliability is part of the selection process and at v4Guard we take our work very seriously, with more than 6 years of experience in the industry and a team committed to the security and privacy of users.
 
     ✅ Unified and updated information.
