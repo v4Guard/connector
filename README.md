@@ -20,10 +20,10 @@ Reliability is part of the selection process and at v4Guard we take our work ver
 
     📝 Documentation: https://docs.v4guard.io
     📊 Statistics: https://stats.v4guard.io
-    📧 Contact: [support@v4guard.io](mailto:support@gv4guard.io)
+    📧 Contact: support@v4guard.io
     📞 Support: https://v4guard.io/discord
     📄 Changelog: https://github.com/v4Guard/v4guard-plugin/commits/
-    📄 Contributors: [Ismael Hernández](https://google.com), [Samuel Hernández](https://google.com) y [Alex Gheorghe](https://google.com)
+    📄 Contributors: Ismael Hernández, Samuel Fernández y Alex Gheorghe
 
 ## 📌 Compatibility
 v4Guard has been developed to be compatible with most Minecraft servers, however, we cannot guarantee it will work in all cases. If you have any problems with compatibility, please contact our support team.
