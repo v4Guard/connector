@@ -1,38 +1,46 @@
-# v4Guard Plugin for Minecraft Servers [![flujo de trabajo de ejemplo](https://github.com/v4Guard/v4guard-plugin/actions/workflows/maven.yml/badge.svg)](https://github.com/v4Guard/v4guard-plugin/actions/workflows/maven.yml)
+# v4Guard Suite Plugin
+![v4Guard VPN/Proxy Protection minimalist background](https://cdn.v4guard.io/Header.png)
+Today there are many servers that have zero protection against fraud, vpn, proxies and peer-to-peer networks. v4Guard has come to the Minecraft communities to change this and offer a quality solution at an affordable price.
 
-[<img src="https://discordapp.com/assets/e4923594e694a21542a489471ecffa50.svg" alt="" height="55" />](https://v4guard.io/discord)
+## 🍿 What is v4Guard?
+v4Guard is a boutique service with expertise in VPN/Proxy detection and p2p networks such as Mysterium VPN or SoftEther VPN Project.
 
-This plugin is an integration of the v4Guard fraud prevention system and bot protection tools developed by the DigitalSynware team. 
-You need to have a v4Guard account to use this. Start protecting your applications by clicking [here](https://v4guard.io).
+## 💨 Why v4Guard?
+La fiabilidad forma parte del proceso de elección y en v4Guard nos tomamos muy enserio nuestro trabajo con más de 6 años de experiencia en el sector y formado por un equipo comprometido con la seguridad y la privacidad de los usuarios.
 
-#### Releases
+Reliability is part of the selection process and at v4Guard we take our work very seriously, with more than 6 years of experience in the industry and a team committed to the security and privacy of users.
 
-v4Guard Plugin releases can be found [here](https://github.com/v4Guard/v4guard-plugin/releases).
+    ✅ Unified and updated information.
+    ✅ Detection of VPN/Proxy and p2p networks.
+    ✅ Usage, detection and traffic statistics.
+    ✅ 24/7 support in a multitude of languages.
+    ✅ Multitude of configuration options.
+    ✅ Support for multiple platforms.
+    ✅ A false positive rate reduced to a minimum.
 
-## Using v4Guard Plugin in your server
+## ⚙️ Useful sites
 
-#### Minimum requirements
-- A Minecraft Server with Spigot, BungeeCord (and forks) or Velocity installed
-- A v4Guard account. Don't have one? Click [here](https://v4guard.io) to create your account.
+    📝 Documentation: https://docs.v4guard.io
+    📊 Statistics: https://stats.v4guard.io
+    📧 Contact: [support@v4guard.io](mailto:support@gv4guard.io)
+    📞 Support: https://v4guard.io/discord
+    📄 Changelog: https://github.com/v4Guard/v4guard-plugin/commits/
+    📄 Contributors: [Ismael Hernández](https://google.com), [Samuel Hernández](https://google.com) y [Alex Gheorghe](https://google.com)
 
-#### Installation steps
-- Download the latest version of the plugin from the [releases page](https://github.com/v4Guard/v4guard-plugin/releases).
-- Drag and drop the jar file into your server plugins folder
-- Turn on the server for the first time.
-- Open the URL that will be displayed in console to authenticate your account within the server.
-- Once the account has been authenticated, you will be able to use v4Guard without any problems.
+## 📌 Compatibility
+v4Guard has been developed to be compatible with most Minecraft servers, however, we cannot guarantee it will work in all cases. If you have any problems with compatibility, please contact our support team.
 
---
+    ✅ Spigot/Paper 1.8.8 - 1.19.2
+    ✅ BungeeCord/Waterfall 1.8.8 - 1.19.2
+    ✅ Velocity 1.7.2 - 1.19.2
 
+## 📦 Installation and download
+You can download the latest version of v4Guard from our official website or from the GitHub repository. All the source code of the plugin is available in this same repository in a public and transparent way for all our customers.
 
-Thanks to:
- * All contributors who actively maintain v4Guard and are part of the DigitalSywnare team:
- * [samfces](https://github.com/samfces). Integration contributor and Project Owner.
- * [alexeses](https://github.com/alexeses). Project Manager and Owner
- * [ismhdez](https://github.com/ismhdez). Large Full Stack Contributor & Maintainer.
- 
-## YourKit
+    📦 Download: https://v4guard.io/download
+    📦 Source code: https://v4guard.io/code
 
-YourKit supports open source projects with innovative and intelligent tools for monitoring and profiling Java and .NET applications. YourKit is the creator of [YourKit Java Profiler](https://www.yourkit.com/java/profiler/), [YourKit .NET Profiler](https://www.yourkit.com/.net/profiler/) and [YourKit YouMonitor](https://www.yourkit.com/youmonitor/).
+The installation of the plugin is very simple, just drag the .jar file to the plugins directory of your server and restart the server. It is necessary that the Java version is 8 or higher and have a valid license to use the plugin).
 
-![YourKit](https://www.yourkit.com/images/yklogo.png)
+## 📝 License
+v4Guard is open source software under the GNU General Public License v3.0. You can find a copy of the license in the GitHub repository.
