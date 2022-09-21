@@ -16,7 +16,7 @@ public class ConnectListener implements Emitter.Listener {
     @Override
     public void call(Object... args) {
         //v4GuardCore.getInstance().getLogger().log(Level.INFO,"socket.on(connect)");
-        backendConnector.setSettings(new HashMap());
+        backendConnector.setSettings(new HashMap<>());
         backendConnector.handleEvents();
     }
 }

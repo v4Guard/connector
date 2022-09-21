@@ -10,6 +10,7 @@ public class AntiVPNListener implements Listener {
 
     @EventHandler(priority = Byte.MIN_VALUE)
     public void onPreLogin(PreLoginEvent e) {
+        if(e.getConnection() == null) return;
        v4GuardBungee.getCoreInstance().getCheckManager().runPreLoginCheck(e.getConnection().getName(), e);
     }
 
