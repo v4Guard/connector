@@ -8,4 +8,7 @@ public interface CheckProcessor<K> {
     void onPostLogin(String username, K event);
     boolean onExpire(VPNCheck VPNCheck);
     void kickPlayer(String username, String reason);
+    boolean isPlayerOnline(String username);
+    String getPlayerServer(String username);
+
 }

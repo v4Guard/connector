@@ -80,10 +80,11 @@ public class BackendConnector {
         registerListener("setting", new SettingListener(this));
         registerListener("console", new ConsoleListener());
         //registerListener("ipset", new IPSetListener(this));
-        registerListener("cleancache", new CleanCacheListener(this));
         registerListener("check", new CheckListener());
         registerListener("message", new MessageListener(this));
         registerListener("kick", new KickListener());
+        registerListener("cleancache", new CleanCacheListener(this));
+        registerListener("find", new FindListener(this));
     }
 
     public void registerListener(String event, Emitter.Listener listener){

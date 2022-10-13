@@ -78,6 +78,17 @@ public class VelocityCheckProcessor implements CheckProcessor {
         }
     }
 
+    @Override
+    public boolean isPlayerOnline(String username){
+        return v4GuardVelocity.getV4Guard().getServer().getPlayer(username).isPresent();
+    }
+
+    @Override
+    public String getPlayerServer(String username) {
+        if(!isPlayerOnline(username)) return null;
+        return v4GuardVelocity.getV4Guard().getServer().getPlayer(username).get().getCurrentServer().get().getServerInfo().getName();
+    }
+
     private void doChecks(PreLoginEvent e, Continuation continuation) {
         new CompletableNameCheckTask(e.getUsername()) {
             @Override
