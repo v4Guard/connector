@@ -1,8 +1,8 @@
 package io.v4guard.plugin.core.tasks.types;
 
 import io.v4guard.plugin.core.check.common.CheckStatus;
-import io.v4guard.plugin.core.tasks.common.CompletableTask;
 import io.v4guard.plugin.core.check.common.VPNCheck;
+import io.v4guard.plugin.core.tasks.common.CompletableTask;
 import io.v4guard.plugin.core.utils.StringUtils;
 import io.v4guard.plugin.core.v4GuardCore;
 import org.bson.Document;
@@ -10,7 +10,6 @@ import org.bson.Document;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class CompletableIPCheckTask implements CompletableTask {
@@ -18,7 +17,7 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
     private final String address;
     private final String username;
     private int version;
-    private final ConcurrentHashMap<String, Object> data;
+    private Document data;
     private VPNCheck check;
 
     public CompletableIPCheckTask(String address, String username, int version, String virtualHost) {
@@ -26,7 +25,7 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
         this.username = username;
         this.version = version;
         this.taskID = UUID.randomUUID().toString();
-        this.data = new ConcurrentHashMap();
+        this.data = new Document();
         v4GuardCore.getInstance().getCompletableTaskManager().getTasks().put(this.taskID, this);
         Document doc = new Document();
         doc.put("taskID", this.taskID);
@@ -86,11 +85,11 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
         return this.data.size() > 0;
     }
 
-    public void addData(Object object) {
-        this.data.put("result", object);
+    public void addData(Document doc) {
+        this.data = doc;
     }
 
-    public ConcurrentHashMap<String, Object> getData() {
+    public Document getData() {
         return this.data;
     }
 
@@ -107,7 +106,6 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
     }
 
     public void replacePlaceholders(VPNCheck status){
-        Document data = (Document) this.getData().get("result");
-        status.setReason(StringUtils.replacePlaceholders(status.getReason(), (Document) data.get("variables")));
+        status.setReason(StringUtils.replacePlaceholders(status.getReason(), (Document) getData().get("variables")));
     }
 }
