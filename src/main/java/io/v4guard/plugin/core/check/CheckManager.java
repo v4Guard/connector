@@ -26,9 +26,7 @@ public class CheckManager {
             @Override
             public void run() {
                 try {
-                    Iterator<Map.Entry<String, VPNCheck>> it = checkStatusMap.entrySet().iterator();
-                    while (it.hasNext()) {
-                        Map.Entry<String, VPNCheck> entry = it.next();
+                    for (Map.Entry<String, VPNCheck> entry : checkStatusMap.entrySet()) {
                         VPNCheck check = entry.getValue();
                         if (check != null && (check.hasExpired() || check.hasPostExpired())) {
                             check.performActionOnExpire();
@@ -89,11 +87,9 @@ public class CheckManager {
     }
 
     public void cleanupChecks(String username){
-        Iterator<Map.Entry<String, VPNCheck>> it = checkStatusMap.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, VPNCheck> entry = it.next();
+        for (Map.Entry<String, VPNCheck> entry : checkStatusMap.entrySet()) {
             VPNCheck check = entry.getValue();
-            if(check.getName().equals(username)){
+            if (check.getName().equals(username)) {
                 check.setStatus(CheckStatus.FINISHED);
                 checkStatusMap.remove(entry.getKey());
             }

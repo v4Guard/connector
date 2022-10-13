@@ -16,11 +16,11 @@ public class StringUtils {
     }
 
     public static String buildMultilineString(List<String> message){
-        String messageString = "";
+        StringBuilder messageString = new StringBuilder();
         for (String s : message) {
-            messageString += s + "\n";
+            messageString.append(s).append("\n");
         }
-        return messageString;
+        return messageString.toString();
     }
 
 }

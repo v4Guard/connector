@@ -70,7 +70,7 @@ public class BackendConnector {
     @NotNull
     private Map<String, String> getSecretKey() throws IOException {
         if (new File(v4GuardCore.getInstance().getDataFolder(), "vpn.key").exists()){
-            return Collections.singletonMap("secret_key", Files.readAllLines(Paths.get(v4GuardCore.getInstance().getDataFolder() + "/vpn.key", new String[0])).get(0));
+            return Collections.singletonMap("secret_key", Files.readAllLines(Paths.get(v4GuardCore.getInstance().getDataFolder() + "/vpn.key")).get(0));
         } else {
             return Collections.singletonMap("secret_key", null);
         }

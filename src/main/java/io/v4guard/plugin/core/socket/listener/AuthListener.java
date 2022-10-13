@@ -67,7 +67,7 @@ public class AuthListener implements Emitter.Listener {
                 backendConnector.getOptions().auth = Collections.singletonMap(
                         "secret_key",
                         new File(v4GuardCore.getInstance().getDataFolder(), "vpn.key").exists()
-                                ? Files.readAllLines(Paths.get(v4GuardCore.getInstance().getDataFolder() + "/vpn.key", new String[0])).get(0)
+                                ? Files.readAllLines(Paths.get(v4GuardCore.getInstance().getDataFolder() + "/vpn.key")).get(0)
                                 : null
                 );
                 backendConnector.setSocket(IO.socket("wss://connector.v4guard.io/minecraft", backendConnector.getOptions()));
