@@ -7,6 +7,7 @@ import io.v4guard.plugin.core.utils.StringUtils;
 import io.v4guard.plugin.core.v4GuardCore;
 import org.bson.Document;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -56,12 +57,11 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
 
     private boolean isBlocked() {
         if (!this.isCompleted()) throw new UnsupportedOperationException("Task is not completed yet");
-        Document result = (Document)this.data.get("result");
-        return result.getBoolean("block");
+        return getData().getBoolean("block");
     }
 
     public String translateVariables(String reason) {
-        Document variables = ((Document)this.data.get("result")).get("variables", Document.class);
+        Document variables = getData().get("variables", Document.class);
         AtomicReference<String> result = new AtomicReference<>(reason);
         for (String key : variables.keySet()) {
             String value = variables.getString(key);
@@ -73,7 +73,7 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
     public void check() {
         if (this.isCompleted()) {
             this.check = v4GuardCore.getInstance().getCheckManager().buildCheckStatus(this.getUsername(), this.getAddress());
-            this.replacePlaceholders(check);
+            this.prepareReason(check);
             check.setStatus(isBlocked() ? CheckStatus.USER_DENIED : CheckStatus.USER_ALLOWED);
             v4GuardCore.getInstance().getCheckManager().getCheckStatusMap().put(username, check);
             this.complete();
@@ -82,7 +82,7 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
     }
 
     public boolean isCompleted() {
-        return this.data.size() > 0;
+        return getData().size() > 0;
     }
 
     public void addData(Document doc) {
@@ -105,7 +105,12 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
         return check;
     }
 
-    public void replacePlaceholders(VPNCheck status){
+    public void prepareReason(VPNCheck status){
+        if(getData().containsKey("message")){
+            String reason = StringUtils.buildMultilineString(getData().get("message", List.class));
+            status.setReason(StringUtils.replacePlaceholders(reason, (Document) getData().get("variables")));
+            return;
+        }
         status.setReason(StringUtils.replacePlaceholders(status.getReason(), (Document) getData().get("variables")));
     }
 }
