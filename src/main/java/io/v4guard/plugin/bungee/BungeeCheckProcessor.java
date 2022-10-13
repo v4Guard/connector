@@ -93,4 +93,19 @@ public class BungeeCheckProcessor implements CheckProcessor {
             player.disconnect(TextComponent.fromLegacyText(reason));
         }
     }
+
+    @Override
+    public boolean isPlayerOnline(String username) {
+        return ProxyServer.getInstance().getPlayer(username) != null;
+    }
+
+    @Override
+    public String getPlayerServer(String username) {
+        if(!isPlayerOnline(username)) return null;
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(username);
+        if (player != null) {
+            return player.getServer().getInfo().getName();
+        }
+        return null;
+    }
 }

@@ -31,6 +31,9 @@ public class AuthListener implements Emitter.Listener {
         backendConnector.setAuthCode(doc.getString("code"));
         try {
             backendConnector.setSocketStatus(SocketStatus.valueOf(doc.getString("status")));
+
+            if (backendConnector.getSocketStatus().equals(SocketStatus.BLOCKED_AUTHENTICATION)) return;
+
             if (backendConnector.getSocketStatus().equals(SocketStatus.NOT_AUTHENTICATED)) {
                 new Timer().schedule(new java.util.TimerTask() {
                     @Override

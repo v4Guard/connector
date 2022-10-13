@@ -104,4 +104,15 @@ public class SpigotCheckProcessor implements CheckProcessor {
             player.kickPlayer(reason);
         }
     }
+
+    @Override
+    public boolean isPlayerOnline(String username){
+        return Bukkit.getPlayer(username) != null;
+    }
+
+    @Override
+    public String getPlayerServer(String username) {
+        if(!isPlayerOnline(username)) return null;
+        return "spigot";
+    }
 }

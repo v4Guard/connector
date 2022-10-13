@@ -5,6 +5,7 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 import io.v4guard.plugin.core.socket.listener.*;
+import io.v4guard.plugin.core.utils.HashCalculator;
 import io.v4guard.plugin.core.v4GuardCore;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
@@ -39,6 +40,7 @@ public class BackendConnector {
         headers.put("v4g-name", Collections.singletonList(new File(System.getProperty("user.dir")).getName()));
         headers.put("v4g-service", Collections.singletonList("minecraft"));
         headers.put("v4g-mode", Collections.singletonList(v4GuardCore.getInstance().getPluginMode().name()));
+        headers.put("v4g-integrity", Collections.singletonList(HashCalculator.calculateHash()));
         this.options = IO.Options.builder()
                 .setForceNew(false)
                 .setMultiplex(true)
@@ -83,6 +85,8 @@ public class BackendConnector {
         registerListener("check", new CheckListener());
         registerListener("message", new MessageListener(this));
         registerListener("kick", new KickListener());
+        registerListener("cleancache", new CleanCacheListener(this));
+        registerListener("find", new FindListener(this));
     }
 
     public void registerListener(String event, Emitter.Listener listener){
