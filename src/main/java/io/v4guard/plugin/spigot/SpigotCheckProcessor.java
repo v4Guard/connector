@@ -94,6 +94,7 @@ public class SpigotCheckProcessor implements CheckProcessor {
             }.runTask(v4GuardSpigot.getV4Guard());
             return true;
         }
+
         return false;
     }
 
