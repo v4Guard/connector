@@ -3,7 +3,6 @@ package io.v4guard.plugin.bungee.accounts;
 import io.v4guard.plugin.core.accounts.auth.Authentication;
 import io.v4guard.plugin.core.accounts.messaging.MessageReceiver;
 import io.v4guard.plugin.core.v4GuardCore;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -20,9 +19,6 @@ public class BungeeMessageReceiver extends MessageReceiver implements Listener {
         plugin.getProxy().getPluginManager().registerListener(plugin, this);
         if(!MessageReceiver.CHANNEL.equals("BungeeCord")) {
             plugin.getProxy().registerChannel(MessageReceiver.CHANNEL);
-        }
-        for(String s : ProxyServer.getInstance().getChannels()) {
-            System.out.println(s);
         }
     }
 
