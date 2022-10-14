@@ -1,5 +1,6 @@
 package io.v4guard.plugin.core;
 
+import io.v4guard.plugin.core.accounts.AccountShieldManager;
 import io.v4guard.plugin.core.check.CheckManager;
 import io.v4guard.plugin.core.mode.v4GuardMode;
 import io.v4guard.plugin.core.socket.BackendConnector;
@@ -19,6 +20,7 @@ public class v4GuardCore {
     private CompletableTaskManager completableTaskManager;
     private BackendConnector backendConnector;
     private CheckManager checkManager;
+    private AccountShieldManager accountShieldManager;
 
     public static final String pluginVersion = "1.1.3";
 
@@ -85,6 +87,14 @@ public class v4GuardCore {
 
     public boolean isDebugEnabled() {
         return debug;
+    }
+
+    public AccountShieldManager getAccountShieldManager() {
+        return accountShieldManager;
+    }
+
+    public void setAccountShieldManager(AccountShieldManager accountShieldManager) {
+        this.accountShieldManager = accountShieldManager;
     }
 
     public void initializeLogger(){

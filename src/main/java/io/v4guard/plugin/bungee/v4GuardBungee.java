@@ -1,7 +1,9 @@
 package io.v4guard.plugin.bungee;
 
+import io.v4guard.plugin.bungee.accounts.BungeeMessageReceiver;
 import io.v4guard.plugin.bungee.listener.AntiVPNListener;
 import io.v4guard.plugin.bungee.messager.Messager;
+import io.v4guard.plugin.core.accounts.AccountShieldManager;
 import io.v4guard.plugin.core.mode.v4GuardMode;
 import io.v4guard.plugin.core.v4GuardCore;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -30,6 +32,7 @@ public class v4GuardBungee extends Plugin {
         try {
             core = new v4GuardCore(v4GuardMode.BUNGEE);
             core.getCheckManager().addProcessor(new BungeeCheckProcessor());
+            core.setAccountShieldManager(new AccountShieldManager(new BungeeMessageReceiver(this)));
         }
         catch (Exception e) {
             this.getProxy().getConsole().sendMessage(
