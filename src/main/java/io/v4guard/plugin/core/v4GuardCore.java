@@ -1,6 +1,7 @@
 package io.v4guard.plugin.core;
 
 import io.v4guard.plugin.core.accounts.AccountShieldManager;
+import io.v4guard.plugin.core.chatfilter.ChatFilterManager;
 import io.v4guard.plugin.core.check.CheckManager;
 import io.v4guard.plugin.core.mode.v4GuardMode;
 import io.v4guard.plugin.core.socket.BackendConnector;
@@ -21,6 +22,7 @@ public class v4GuardCore {
     private BackendConnector backendConnector;
     private CheckManager checkManager;
     private AccountShieldManager accountShieldManager;
+    private ChatFilterManager chatFilterManager;
 
     public static final String pluginVersion = "1.1.3b";
 
@@ -50,6 +52,7 @@ public class v4GuardCore {
         this.completableTaskManager = new CompletableTaskManager();
         this.backendConnector = new BackendConnector();
         this.checkManager = new CheckManager();
+        this.chatFilterManager = new ChatFilterManager();
 
     }
 
@@ -59,6 +62,10 @@ public class v4GuardCore {
 
     public File getDataFolder() {
         return folder;
+    }
+
+    public ChatFilterManager getChatFilterManager() {
+        return chatFilterManager;
     }
 
     public CompletableTaskManager getCompletableTaskManager() {
