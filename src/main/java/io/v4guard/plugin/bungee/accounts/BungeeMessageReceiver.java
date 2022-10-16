@@ -33,9 +33,7 @@ public class BungeeMessageReceiver extends MessageReceiver implements Listener {
             Document doc = Document.parse(data);
             Authentication auth = Authentication.deserialize(doc);
             v4GuardCore.getInstance().getAccountShieldManager().sendSocketMessage(auth);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
+        } catch (Exception ex) {}
     }
 
 }
