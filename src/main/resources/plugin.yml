@@ -2,3 +2,5 @@ name: v4guard-plugin
 version: ${project.version}
 main: io.v4guard.plugin.spigot.v4GuardSpigot
 author: DigitalSynware
+softdepend:
+  - v4guard-account-shield
