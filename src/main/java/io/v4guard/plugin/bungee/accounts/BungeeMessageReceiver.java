@@ -43,7 +43,7 @@ public class BungeeMessageReceiver extends MessageReceiver implements Listener {
         if(!v4GuardCore.getInstance().isAccountShieldFound()) {
             ProxiedPlayer player = e.getPlayer();
             if (player.getPendingConnection().isOnlineMode()) {
-                Authentication auth = new Authentication(player.getName(), AuthType.LOGIN);
+                Authentication auth = new Authentication(player.getName(), AuthType.MOJANG);
                 v4GuardCore.getInstance().getAccountShieldManager().sendSocketMessage(auth);
             }
         }
