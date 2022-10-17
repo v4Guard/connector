@@ -3,14 +3,17 @@ package io.v4guard.plugin.velocity.accounts;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
+import com.velocitypowered.api.event.connection.PostLoginEvent;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.messages.LegacyChannelIdentifier;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
+import io.v4guard.plugin.core.accounts.auth.AuthType;
 import io.v4guard.plugin.core.accounts.auth.Authentication;
 import io.v4guard.plugin.core.accounts.messaging.MessageReceiver;
 import io.v4guard.plugin.core.v4GuardCore;
 import io.v4guard.plugin.velocity.v4GuardVelocity;
-import net.md_5.bungee.api.plugin.Listener;
 import org.bson.Document;
+import org.bukkit.event.Listener;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -36,6 +39,17 @@ public class VelocityMessageReceiver extends MessageReceiver implements Listener
             Authentication auth = Authentication.deserialize(doc);
             v4GuardCore.getInstance().getAccountShieldManager().sendSocketMessage(auth);
         } catch (IOException ex) {}
+    }
+
+    @Subscribe(order = PostOrder.LAST)
+    public void onPostLogin(PostLoginEvent e) {
+        if(!v4GuardCore.getInstance().isAccountShieldFound()) {
+            Player player = e.getPlayer();
+            if (player.isOnlineMode()) {
+                Authentication auth = new Authentication(player.getUsername(), AuthType.LOGIN);
+                v4GuardCore.getInstance().getAccountShieldManager().sendSocketMessage(auth);
+            }
+        }
     }
 
 }

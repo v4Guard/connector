@@ -69,6 +69,7 @@ public class v4GuardVelocity {
         server.getEventManager().register(this, new AntiVPNListener());
         server.getConsoleCommandSource().sendMessage(Component.text("§e[v4guard-plugin] (Velocity) Enabling... [DONE]"));
         this.messager = new Messager();
+        getCoreInstance().setAccountShieldFound(this.getServer().getPluginManager().isLoaded("v4guard-account-shield"));
     }
 
     public ProxyServer getServer() {
