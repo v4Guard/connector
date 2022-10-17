@@ -22,7 +22,7 @@ public class v4GuardCore {
     private CheckManager checkManager;
     private AccountShieldManager accountShieldManager;
 
-    public static final String pluginVersion = "1.1.3b";
+    public static final String pluginVersion = "1.1.4";
 
     private boolean debug = false;
     private boolean accountShieldFound = false;
