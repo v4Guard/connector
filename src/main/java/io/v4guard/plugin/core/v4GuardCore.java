@@ -27,6 +27,7 @@ public class v4GuardCore {
     public static final String pluginVersion = "1.1.3b";
 
     private boolean debug = false;
+    private boolean accountShieldFound = false;
     private v4GuardMode pluginMode;
     private Logger logger;
 
@@ -54,6 +55,14 @@ public class v4GuardCore {
         this.checkManager = new CheckManager();
         this.chatFilterManager = new ChatFilterManager();
 
+    }
+
+    public boolean isAccountShieldFound() {
+        return accountShieldFound;
+    }
+
+    public void setAccountShieldFound(boolean accountShieldFound) {
+        this.accountShieldFound = accountShieldFound;
     }
 
     public Logger getLogger() {
