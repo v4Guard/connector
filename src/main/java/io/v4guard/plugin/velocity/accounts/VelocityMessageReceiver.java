@@ -46,7 +46,7 @@ public class VelocityMessageReceiver extends MessageReceiver implements Listener
         if(!v4GuardCore.getInstance().isAccountShieldFound()) {
             Player player = e.getPlayer();
             if (player.isOnlineMode()) {
-                Authentication auth = new Authentication(player.getUsername(), AuthType.LOGIN);
+                Authentication auth = new Authentication(player.getUsername(), AuthType.MOJANG);
                 v4GuardCore.getInstance().getAccountShieldManager().sendSocketMessage(auth);
             }
         }
