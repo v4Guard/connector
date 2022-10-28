@@ -13,7 +13,6 @@ import io.v4guard.plugin.core.accounts.messaging.MessageReceiver;
 import io.v4guard.plugin.core.v4GuardCore;
 import io.v4guard.plugin.velocity.v4GuardVelocity;
 import org.bson.Document;
-import org.bukkit.event.Listener;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -23,13 +22,13 @@ public class VelocityMessageReceiver extends MessageReceiver implements Listener
 
     public VelocityMessageReceiver(v4GuardVelocity plugin) {
         plugin.getServer().getEventManager().register(plugin, this);
-        plugin.getServer().getChannelRegistrar().register(new LegacyChannelIdentifier(MessageReceiver.CHANNEL));
-        plugin.getServer().getChannelRegistrar().register(MinecraftChannelIdentifier.from(MessageReceiver.CHANNEL));
+        plugin.getServer().getChannelRegistrar().register(new LegacyChannelIdentifier(MessageReceiver.VELOCITY_CHANNEL));
+        plugin.getServer().getChannelRegistrar().register(MinecraftChannelIdentifier.from(MessageReceiver.VELOCITY_CHANNEL));
     }
 
     @Subscribe(order = PostOrder.FIRST)
     public void onMessage(PluginMessageEvent e){
-        if (!e.getIdentifier().getId().equals(MessageReceiver.CHANNEL)) {
+        if (!e.getIdentifier().getId().equals(MessageReceiver.VELOCITY_CHANNEL)) {
             return;
         }
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(e.getData()));

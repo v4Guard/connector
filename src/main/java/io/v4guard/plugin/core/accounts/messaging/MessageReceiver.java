@@ -8,5 +8,6 @@ public abstract class MessageReceiver {
 //    protected static final String CHANNEL = "v4guard:accountshield";
 
     protected static final String CHANNEL = "BungeeCord";
+    protected static final String VELOCITY_CHANNEL = "bungeecord:main";
 
 }
