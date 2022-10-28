@@ -23,13 +23,8 @@ public class AccountShieldManager {
         boolean shieldEnabled = (boolean) shieldSettings.getOrDefault("accshield", false);
         if(!shieldEnabled) return;
 
-        String location = v4GuardCore.getInstance().getCheckManager().getProcessors().get(0).getPlayerServer(auth.getUsername());
-        if(location != null){
-            location = "not-connected";
-        }
         Document finalDocument = new Document("username", auth.getUsername())
-                .append("type", auth.getAuthType().toString())
-                .append("location", location);
+                .append("type", auth.getAuthType().toString());
         v4GuardCore.getInstance().getBackendConnector().getSocket().emit("accshield:login", finalDocument.toJson());
     }
 }

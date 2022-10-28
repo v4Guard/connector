@@ -3,6 +3,7 @@ package io.v4guard.plugin.velocity;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 import io.v4guard.plugin.core.accounts.AccountShieldManager;
@@ -16,8 +17,18 @@ import org.bstats.velocity.Metrics;
 
 import java.util.logging.Logger;
 
-@Plugin(id = "v4guard-plugin", name = "v4Guard Plugin", version = v4GuardCore.pluginVersion,
-        url = "https://v4guard.io", description = "v4Guard Plugin for Minecraft Servers", authors = {"DigitalSynware"})
+@Plugin(
+        id = "v4guard-plugin",
+        name = "v4Guard Plugin",
+        version = v4GuardCore.pluginVersion,
+        url = "https://v4guard.io",
+        description = "v4Guard Plugin for Minecraft Servers",
+        authors = {"DigitalSynware"},
+        dependencies = {
+                @Dependency(id = "v4guard-account-shield", optional = true)
+        }
+
+)
 public class v4GuardVelocity {
 
     private static v4GuardCore core;
@@ -58,6 +69,7 @@ public class v4GuardVelocity {
         server.getEventManager().register(this, new AntiVPNListener());
         server.getConsoleCommandSource().sendMessage(Component.text("§e[v4guard-plugin] (Velocity) Enabling... [DONE]"));
         this.messager = new Messager();
+        getCoreInstance().setAccountShieldFound(this.getServer().getPluginManager().isLoaded("v4guard-account-shield"));
     }
 
     public ProxyServer getServer() {

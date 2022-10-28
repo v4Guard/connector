@@ -50,6 +50,9 @@ public class v4GuardBungee extends Plugin {
                 new TextComponent("§e[v4guard-plugin] (Bungee) Enabling... [DONE]")
         );
         this.messager = new Messager();
+        getCoreInstance().setAccountShieldFound(
+                this.getProxy().getPluginManager().getPlugin("v4guard-account-shield") != null
+        );
     }
 
     public Messager getMessager() {

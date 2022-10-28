@@ -35,6 +35,8 @@ public class v4GuardSpigot extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new AntiVPNListener(), this);
         this.getServer().getConsoleSender().sendMessage("§e[v4guard-plugin] (Spigot) Enabling... [DONE]");
         this.messager = new Messager();
+
+        getCoreInstance().setAccountShieldFound(this.getServer().getPluginManager().isPluginEnabled("v4guard-account-shield"));
     }
 
     public Messager getMessager() {
