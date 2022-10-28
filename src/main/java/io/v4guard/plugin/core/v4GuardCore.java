@@ -53,7 +53,7 @@ public class v4GuardCore {
         this.completableTaskManager = new CompletableTaskManager();
         this.backendConnector = new BackendConnector();
         this.checkManager = new CheckManager();
-        this.chatFilterManager = new ChatFilterManager();
+        //this.chatFilterManager = new ChatFilterManager();
 
     }
 
