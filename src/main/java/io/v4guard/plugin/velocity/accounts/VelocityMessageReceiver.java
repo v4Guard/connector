@@ -18,7 +18,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public class VelocityMessageReceiver extends MessageReceiver implements Listener {
+public class VelocityMessageReceiver extends MessageReceiver {
 
     public VelocityMessageReceiver(v4GuardVelocity plugin) {
         plugin.getServer().getEventManager().register(plugin, this);
