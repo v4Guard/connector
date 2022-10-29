@@ -50,7 +50,7 @@ public class v4GuardBungee extends Plugin {
         this.getProxy().getPluginManager().registerListener(this, new AntiVPNListener());
         this.getProxy().getConsole().sendMessage(
                 new ComponentBuilder("[v4guard-plugin] (Bungee) Enabling... [DONE]")
-                        .color(ChatColor.RED).create()
+                        .color(ChatColor.YELLOW).create()
         );
         this.messager = new Messager();
         getCoreInstance().setAccountShieldFound(
