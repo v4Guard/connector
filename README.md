@@ -28,8 +28,7 @@ Reliability is part of the selection process and at v4Guard we take our work ver
 ## 📌 Compatibility
 v4Guard has been developed to be compatible with most Minecraft servers, however, we cannot guarantee it will work in all cases. If you have any problems with compatibility, please contact our support team.
 
-    ✅ Spigot/Paper 1.8.8 - 1.19.2
-    ✅ BungeeCord/Waterfall 1.8.8 - 1.19.2
+    ✅ BungeeCord (+forks) 1.8.8 - 1.19.2
     ✅ Velocity 1.7.2 - 1.19.2
 
 ## 📦 Installation and download
