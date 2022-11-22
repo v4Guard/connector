@@ -57,6 +57,20 @@ public class v4GuardBungee extends Plugin {
         );
     }
 
+    @Override
+    public void onDisable() {
+        this.getProxy().getConsole().sendMessage(
+                new TextComponent("[v4guard-plugin] (Bungee) Disabling...")
+        );
+        this.getProxy().getConsole().sendMessage(
+                new TextComponent("[v4guard-plugin] (Bungee) Disconnecting from the backend...")
+        );
+        core.getBackendConnector().getSocket().disconnect();
+        this.getProxy().getConsole().sendMessage(
+                new TextComponent("[v4guard-plugin] (Bungee) Disabling... [DONE]")
+        );
+    }
+
     public Messager getMessager() {
         return messager;
     }
