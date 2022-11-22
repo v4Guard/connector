@@ -101,14 +101,18 @@ public class VelocityCheckProcessor implements CheckProcessor {
                     Document privacySettings = (Document) v4GuardBungee.getCoreInstance().getBackendConnector().getSettings().getOrDefault("privacy", new Document());
                     boolean anonVirtualHost = privacySettings.getBoolean("anonVirtualHost", true);
 
-                    String address = e.getConnection().getRemoteAddress().getAddress().getHostAddress();
-                    String playerName = e.getUsername();
-                    int version = e.getConnection().getProtocolVersion().getProtocol();
                     String virtualHost = "notFound";
                     if(e.getConnection().getVirtualHost().isPresent()){
                         virtualHost = e.getConnection().getVirtualHost().get().getHostString();
-                        if(anonVirtualHost) virtualHost = "***." + InternetDomainName.from(virtualHost).topPrivateDomain();
+                        String mainHost = InternetDomainName.from(virtualHost).topPrivateDomain().toString();
+                        if(anonVirtualHost && !mainHost.equals(virtualHost)){
+                            virtualHost = "***." + InternetDomainName.from(virtualHost).topPrivateDomain();
+                        }
                     }
+
+                    String address = e.getConnection().getRemoteAddress().getAddress().getHostAddress();
+                    String playerName = e.getUsername();
+                    int version = e.getConnection().getProtocolVersion().getProtocol();
 
                     new CompletableIPCheckTask(address, playerName, version, virtualHost) {
                         @Override

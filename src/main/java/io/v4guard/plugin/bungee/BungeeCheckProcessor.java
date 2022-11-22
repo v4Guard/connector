@@ -39,10 +39,14 @@ public class BungeeCheckProcessor implements CheckProcessor {
                     Document privacySettings = (Document) v4GuardBungee.getCoreInstance().getBackendConnector().getSettings().getOrDefault("privacy", new Document());
                     boolean anonVirtualHost = privacySettings.getBoolean("anonVirtualHost", true);
 
+                    String virtualHost = e.getConnection().getVirtualHost().getHostString();
+                    String mainHost = InternetDomainName.from(virtualHost).topPrivateDomain().toString();
+                    if(anonVirtualHost && !mainHost.equals(virtualHost)){
+                        virtualHost = "***." + InternetDomainName.from(virtualHost).topPrivateDomain();
+                    }
+
                     String playerName = e.getConnection().getName();
                     int version = e.getConnection().getVersion();
-                    String virtualHost = e.getConnection().getVirtualHost().getHostString();
-                    if(anonVirtualHost) virtualHost = "***." + InternetDomainName.from(virtualHost).topPrivateDomain();
 
                     new CompletableIPCheckTask(address, playerName, version, virtualHost){
                         @Override
