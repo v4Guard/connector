@@ -2,11 +2,11 @@ package io.v4guard.plugin.core.socket.listener;
 
 import io.socket.emitter.Emitter;
 import io.v4guard.plugin.core.check.CheckProcessor;
+import io.v4guard.plugin.core.utils.StringUtils;
 import io.v4guard.plugin.core.v4GuardCore;
 import org.bson.Document;
 
 import java.util.List;
-import java.util.StringJoiner;
 
 public class KickListener implements Emitter.Listener {
 
@@ -14,14 +14,11 @@ public class KickListener implements Emitter.Listener {
     public void call(Object... args) {
         Document doc = Document.parse(args[0].toString());
         String username = doc.getString("username");
-        List<String> reason = doc.get("message", List.class);
-        StringJoiner formattedReason = new StringJoiner("\n");
-        for (String line : reason) {
-            formattedReason.add(line);
-        }
+        List<String> rawReason = doc.get("message", List.class);
+        String reason = StringUtils.buildMultilineString(rawReason);
 
         for(CheckProcessor cp : v4GuardCore.getInstance().getCheckManager().getProcessors()){
-            cp.kickPlayer(username, formattedReason.toString());
+            cp.kickPlayer(username, reason);
         }
     }
 }
