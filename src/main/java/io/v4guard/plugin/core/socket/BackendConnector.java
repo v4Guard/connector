@@ -161,6 +161,11 @@ public class BackendConnector {
         }
     }
 
+    /*
+        DISCLAIMER: this method may trigger a malware warning for "Checking Debug Environment" for
+        reading system information from the /proc filesystem. -- This could always trigger the warning
+        because WE DO CHECK if it's on a virtual machine or not.
+    */
     public static Boolean isRunningInsideDocker() {
         try (Stream<String> stream = Files.lines(Paths.get("/proc/1/cgroup"))) {
             return stream.anyMatch(line -> line.contains("/docker"));
