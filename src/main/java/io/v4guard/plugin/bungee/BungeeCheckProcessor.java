@@ -1,5 +1,6 @@
 package io.v4guard.plugin.bungee;
 
+import com.google.common.net.InternetDomainName;
 import io.v4guard.plugin.core.check.CheckProcessor;
 import io.v4guard.plugin.core.check.common.CheckStatus;
 import io.v4guard.plugin.core.check.common.VPNCheck;
@@ -34,7 +35,16 @@ public class BungeeCheckProcessor implements CheckProcessor {
             @Override
             public void complete(boolean nameIsValid) {
                 if(nameIsValid){
-                    new CompletableIPCheckTask(address, e.getConnection().getName(), e.getConnection().getVersion(), e.getConnection().getVirtualHost().getHostString()){
+
+                    Document privacySettings = (Document) v4GuardBungee.getCoreInstance().getBackendConnector().getSettings().getOrDefault("privacy", new Document());
+                    boolean anonVirtualHost = privacySettings.getBoolean("anonVirtualHost", true);
+
+                    String playerName = e.getConnection().getName();
+                    int version = e.getConnection().getVersion();
+                    String virtualHost = e.getConnection().getVirtualHost().getHostString();
+                    if(anonVirtualHost) virtualHost = "***." + InternetDomainName.from(virtualHost).topPrivateDomain();
+
+                    new CompletableIPCheckTask(address, playerName, version, virtualHost){
                         @Override
                         public void complete() {
                             VPNCheck check = this.getCheck();
