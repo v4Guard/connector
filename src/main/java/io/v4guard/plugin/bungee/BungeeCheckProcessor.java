@@ -40,7 +40,10 @@ public class BungeeCheckProcessor implements CheckProcessor {
                     boolean anonVirtualHost = privacySettings.getBoolean("anonVirtualHost", true);
 
                     String virtualHost = e.getConnection().getVirtualHost().getHostString();
-                    String mainHost = InternetDomainName.from(virtualHost).topPrivateDomain().toString();
+                    String mainHost = virtualHost;
+                    try {
+                        mainHost = InternetDomainName.from(virtualHost).topPrivateDomain().toString();
+                    } catch (Exception ex) { /**fails if is not a domain**/ }
                     if(anonVirtualHost && !mainHost.equals(virtualHost)){
                         virtualHost = "***." + InternetDomainName.from(virtualHost).topPrivateDomain();
                     }

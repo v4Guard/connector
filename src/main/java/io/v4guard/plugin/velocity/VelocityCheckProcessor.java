@@ -104,7 +104,10 @@ public class VelocityCheckProcessor implements CheckProcessor {
                     String virtualHost = "notFound";
                     if(e.getConnection().getVirtualHost().isPresent()){
                         virtualHost = e.getConnection().getVirtualHost().get().getHostString();
-                        String mainHost = InternetDomainName.from(virtualHost).topPrivateDomain().toString();
+                        String mainHost = virtualHost;
+                        try {
+                            mainHost = InternetDomainName.from(virtualHost).topPrivateDomain().toString();
+                        } catch (Exception ex) { /**fails if is not a domain**/ }
                         if(anonVirtualHost && !mainHost.equals(virtualHost)){
                             virtualHost = "***." + InternetDomainName.from(virtualHost).topPrivateDomain();
                         }
