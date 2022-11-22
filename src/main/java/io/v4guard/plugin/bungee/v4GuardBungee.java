@@ -2,6 +2,7 @@ package io.v4guard.plugin.bungee;
 
 import io.v4guard.plugin.bungee.accounts.BungeeMessageReceiver;
 import io.v4guard.plugin.bungee.listener.AntiVPNListener;
+import io.v4guard.plugin.bungee.listener.PluginMessagingListener;
 import io.v4guard.plugin.bungee.messager.Messager;
 import io.v4guard.plugin.core.accounts.AccountShieldManager;
 import io.v4guard.plugin.core.mode.v4GuardMode;
@@ -46,6 +47,7 @@ public class v4GuardBungee extends Plugin {
         }
         v4GuardBungee = this;
         this.getProxy().getPluginManager().registerListener(this, new AntiVPNListener());
+        this.getProxy().getPluginManager().registerListener(this, new PluginMessagingListener());
         this.getProxy().getConsole().sendMessage(
                 new TextComponent("§e[v4guard-plugin] (Bungee) Enabling... [DONE]")
         );
