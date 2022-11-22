@@ -86,14 +86,22 @@ public class v4GuardVelocity {
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
         server.getConsoleCommandSource().sendMessage(
-                Component.text("[v4guard-plugin] (Velocity) Disabling...")
+                Component.text("§e[v4guard-plugin] (Velocity) Disabling...")
         );
         server.getConsoleCommandSource().sendMessage(
-                Component.text("[v4guard-plugin] (Velocity) Disconnecting from the backend...")
+                Component.text("§e[v4guard-plugin] (Velocity) Disconnecting from the backend...")
         );
-        core.getBackendConnector().getSocket().disconnect();
+        try {
+            core.getBackendConnector().getSocket().disconnect();
+        } catch (Exception exception) {
+            server.getConsoleCommandSource().sendMessage(
+                    Component.text("§c[v4guard-plugin] (Velocity) Disabling... [ERROR]")
+            );
+            exception.printStackTrace();
+            return;
+        }
         server.getConsoleCommandSource().sendMessage(
-                Component.text("[v4guard-plugin] (Velocity) Disabling... [DONE]")
+                Component.text("§e[v4guard-plugin] (Velocity) Disabling... [DONE]")
         );
     }
 
