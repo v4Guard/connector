@@ -3,6 +3,7 @@ package io.v4guard.plugin.velocity;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -11,6 +12,7 @@ import io.v4guard.plugin.core.mode.v4GuardMode;
 import io.v4guard.plugin.core.v4GuardCore;
 import io.v4guard.plugin.velocity.accounts.VelocityMessageReceiver;
 import io.v4guard.plugin.velocity.listener.AntiVPNListener;
+import io.v4guard.plugin.velocity.listener.PluginMessagingListener;
 import io.v4guard.plugin.velocity.messager.Messager;
 import net.kyori.adventure.text.Component;
 import org.bstats.velocity.Metrics;
@@ -53,23 +55,54 @@ public class v4GuardVelocity {
         try {
             metricsFactory.make(this, 16220);
         } catch (Exception ex) {
-            server.getConsoleCommandSource().sendMessage(Component.text("§e[v4guard-plugin] (Velocity) Failed to connect with bStats [WARN]"));
+            server.getConsoleCommandSource().sendMessage(
+                    Component.text("§e[v4guard-plugin] (Velocity) Failed to connect with bStats [WARN]"
+                    ));
         }
         try {
             core = new v4GuardCore(v4GuardMode.VELOCITY);
             core.getCheckManager().addProcessor(new VelocityCheckProcessor());
             core.setAccountShieldManager(new AccountShieldManager(new VelocityMessageReceiver(this)));
         } catch (Exception e) {
-            server.getConsoleCommandSource().sendMessage(Component.text("§c[v4guard-plugin] (Velocity) Enabling... [ERROR]"));
-            server.getConsoleCommandSource().sendMessage(Component.text("§cPlease check the console for more information and report this error."));
+            server.getConsoleCommandSource().sendMessage(
+                    Component.text("§c[v4guard-plugin] (Velocity) Enabling... [ERROR]")
+            );
+            server.getConsoleCommandSource().sendMessage(
+                    Component.text("§cPlease check the console for more information and report this error.")
+            );
             e.printStackTrace();
             return;
         }
         v4GuardVelocity = this;
         server.getEventManager().register(this, new AntiVPNListener());
-        server.getConsoleCommandSource().sendMessage(Component.text("§e[v4guard-plugin] (Velocity) Enabling... [DONE]"));
+        server.getEventManager().register(this, new PluginMessagingListener());
+        server.getConsoleCommandSource().sendMessage(
+                Component.text("§e[v4guard-plugin] (Velocity) Enabling... [DONE]")
+        );
         this.messager = new Messager();
         getCoreInstance().setAccountShieldFound(this.getServer().getPluginManager().isLoaded("v4guard-account-shield"));
+    }
+
+    @Subscribe
+    public void onProxyShutdown(ProxyShutdownEvent event) {
+        server.getConsoleCommandSource().sendMessage(
+                Component.text("§e[v4guard-plugin] (Velocity) Disabling...")
+        );
+        server.getConsoleCommandSource().sendMessage(
+                Component.text("§e[v4guard-plugin] (Velocity) Disconnecting from the backend...")
+        );
+        try {
+            core.getBackendConnector().getSocket().disconnect();
+        } catch (Exception exception) {
+            server.getConsoleCommandSource().sendMessage(
+                    Component.text("§c[v4guard-plugin] (Velocity) Disabling... [ERROR]")
+            );
+            exception.printStackTrace();
+            return;
+        }
+        server.getConsoleCommandSource().sendMessage(
+                Component.text("§e[v4guard-plugin] (Velocity) Disabling... [DONE]")
+        );
     }
 
     public ProxyServer getServer() {

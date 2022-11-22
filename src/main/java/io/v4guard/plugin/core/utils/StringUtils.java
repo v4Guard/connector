@@ -2,8 +2,8 @@ package io.v4guard.plugin.core.utils;
 
 import org.bson.Document;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.StringJoiner;
 
 public class StringUtils {
 
@@ -15,12 +15,14 @@ public class StringUtils {
         return message;
     }
 
-    public static String buildMultilineString(List<String> message){
-        StringBuilder messageString = new StringBuilder();
-        for (String s : message) {
-            messageString.append(s).append("\n");
+    public static String buildMultilineString(List<String> lines) {
+        StringJoiner message = new StringJoiner("\n");
+
+        for (String line : lines) {
+            message.add(line);
         }
-        return messageString.toString();
+
+        return message.toString();
     }
 
 }

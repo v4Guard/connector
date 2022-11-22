@@ -1,9 +1,11 @@
 package io.v4guard.plugin.velocity;
 
+import com.google.common.net.InternetDomainName;
 import com.velocitypowered.api.event.Continuation;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.proxy.Player;
+import io.v4guard.plugin.bungee.v4GuardBungee;
 import io.v4guard.plugin.core.check.CheckProcessor;
 import io.v4guard.plugin.core.check.common.CheckStatus;
 import io.v4guard.plugin.core.check.common.VPNCheck;
@@ -94,8 +96,28 @@ public class VelocityCheckProcessor implements CheckProcessor {
             @Override
             public void complete(boolean nameIsValid) {
                 if(nameIsValid){
-                    new CompletableIPCheckTask(e.getConnection().getRemoteAddress().getAddress().getHostAddress(), e.getUsername(), e.getConnection().getProtocolVersion().getProtocol(),
-                            e.getConnection().getVirtualHost().isPresent() ? e.getConnection().getVirtualHost().get().getHostString() : "notFound") {
+
+
+                    Document privacySettings = (Document) v4GuardBungee.getCoreInstance().getBackendConnector().getSettings().getOrDefault("privacy", new Document());
+                    boolean anonVirtualHost = privacySettings.getBoolean("anonVirtualHost", true);
+
+                    String virtualHost = "notFound";
+                    if(e.getConnection().getVirtualHost().isPresent()){
+                        virtualHost = e.getConnection().getVirtualHost().get().getHostString();
+                        String mainHost = virtualHost;
+                        try {
+                            mainHost = InternetDomainName.from(virtualHost).topPrivateDomain().toString();
+                        } catch (Exception ex) { /**fails if is not a domain**/ }
+                        if(anonVirtualHost && !mainHost.equals(virtualHost)){
+                            virtualHost = "***." + InternetDomainName.from(virtualHost).topPrivateDomain();
+                        }
+                    }
+
+                    String address = e.getConnection().getRemoteAddress().getAddress().getHostAddress();
+                    String playerName = e.getUsername();
+                    int version = e.getConnection().getProtocolVersion().getProtocol();
+
+                    new CompletableIPCheckTask(address, playerName, version, virtualHost) {
                         @Override
                         public void complete() {
                             VPNCheck check = this.getCheck();

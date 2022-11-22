@@ -1,5 +1,6 @@
 package io.v4guard.plugin.bungee.accounts;
 
+import io.v4guard.plugin.bungee.v4GuardBungee;
 import io.v4guard.plugin.core.accounts.auth.AuthType;
 import io.v4guard.plugin.core.accounts.auth.Authentication;
 import io.v4guard.plugin.core.accounts.messaging.MessageReceiver;
@@ -26,6 +27,8 @@ public class BungeeMessageReceiver extends MessageReceiver implements Listener {
 
     @EventHandler
     public void onMessage(PluginMessageEvent e){
+        boolean invalidatedCache = (boolean) v4GuardBungee.getCoreInstance().getBackendConnector().getSettings().getOrDefault("invalidateCache", false);
+        if(invalidatedCache) return;
         if (!e.getTag().equals(MessageReceiver.CHANNEL)) {
             return;
         }

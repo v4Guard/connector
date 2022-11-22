@@ -2,6 +2,7 @@ package io.v4guard.plugin.bungee;
 
 import io.v4guard.plugin.bungee.accounts.BungeeMessageReceiver;
 import io.v4guard.plugin.bungee.listener.AntiVPNListener;
+import io.v4guard.plugin.bungee.listener.PluginMessagingListener;
 import io.v4guard.plugin.bungee.messager.Messager;
 import io.v4guard.plugin.core.accounts.AccountShieldManager;
 import io.v4guard.plugin.core.mode.v4GuardMode;
@@ -48,6 +49,7 @@ public class v4GuardBungee extends Plugin {
         }
         v4GuardBungee = this;
         this.getProxy().getPluginManager().registerListener(this, new AntiVPNListener());
+        this.getProxy().getPluginManager().registerListener(this, new PluginMessagingListener());
         this.getProxy().getConsole().sendMessage(
                 new ComponentBuilder("[v4guard-plugin] (Bungee) Enabling... [DONE]")
                         .color(ChatColor.YELLOW).create()
@@ -55,6 +57,28 @@ public class v4GuardBungee extends Plugin {
         this.messager = new Messager();
         getCoreInstance().setAccountShieldFound(
                 this.getProxy().getPluginManager().getPlugin("v4guard-account-shield") != null
+        );
+    }
+
+    @Override
+    public void onDisable() {
+        this.getProxy().getConsole().sendMessage(
+                new TextComponent("§e[v4guard-plugin] (Bungee) Disabling...")
+        );
+        this.getProxy().getConsole().sendMessage(
+                new TextComponent("§e[v4guard-plugin] (Bungee) Disconnecting from the backend...")
+        );
+        try {
+            core.getBackendConnector().getSocket().disconnect();
+        } catch (Exception exception) {
+            this.getProxy().getConsole().sendMessage(
+                    new TextComponent("§c[v4guard-plugin] (Bungee) Disabling... [ERROR]")
+            );
+            exception.printStackTrace();
+            return;
+        }
+        this.getProxy().getConsole().sendMessage(
+                new TextComponent("§e[v4guard-plugin] (Bungee) Disabling... [DONE]")
         );
     }
 

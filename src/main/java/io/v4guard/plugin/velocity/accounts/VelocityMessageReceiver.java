@@ -7,29 +7,31 @@ import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.messages.LegacyChannelIdentifier;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
+import io.v4guard.plugin.bungee.v4GuardBungee;
 import io.v4guard.plugin.core.accounts.auth.AuthType;
 import io.v4guard.plugin.core.accounts.auth.Authentication;
 import io.v4guard.plugin.core.accounts.messaging.MessageReceiver;
 import io.v4guard.plugin.core.v4GuardCore;
 import io.v4guard.plugin.velocity.v4GuardVelocity;
 import org.bson.Document;
-import org.bukkit.event.Listener;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public class VelocityMessageReceiver extends MessageReceiver implements Listener {
+public class VelocityMessageReceiver extends MessageReceiver {
 
     public VelocityMessageReceiver(v4GuardVelocity plugin) {
         plugin.getServer().getEventManager().register(plugin, this);
-        plugin.getServer().getChannelRegistrar().register(new LegacyChannelIdentifier(MessageReceiver.CHANNEL));
-        plugin.getServer().getChannelRegistrar().register(MinecraftChannelIdentifier.from(MessageReceiver.CHANNEL));
+        plugin.getServer().getChannelRegistrar().register(new LegacyChannelIdentifier(MessageReceiver.VELOCITY_CHANNEL));
+        plugin.getServer().getChannelRegistrar().register(MinecraftChannelIdentifier.from(MessageReceiver.VELOCITY_CHANNEL));
     }
 
     @Subscribe(order = PostOrder.FIRST)
     public void onMessage(PluginMessageEvent e){
-        if (!e.getIdentifier().getId().equals(MessageReceiver.CHANNEL)) {
+        boolean invalidatedCache = (boolean) v4GuardBungee.getCoreInstance().getBackendConnector().getSettings().getOrDefault("invalidateCache", false);
+        if(invalidatedCache) return;
+        if (!e.getIdentifier().getId().equals(MessageReceiver.VELOCITY_CHANNEL)) {
             return;
         }
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(e.getData()));

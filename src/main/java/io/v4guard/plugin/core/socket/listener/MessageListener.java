@@ -4,7 +4,6 @@ import io.socket.emitter.Emitter;
 import io.v4guard.plugin.bungee.v4GuardBungee;
 import io.v4guard.plugin.core.socket.BackendConnector;
 import io.v4guard.plugin.core.v4GuardCore;
-import io.v4guard.plugin.spigot.v4GuardSpigot;
 import io.v4guard.plugin.velocity.v4GuardVelocity;
 import org.bson.Document;
 
@@ -31,14 +30,6 @@ public class MessageListener implements Emitter.Listener {
                 players.removeAll(broadcasted);
                 for(String player : players){
                     v4GuardBungee.getV4Guard().getMessager().sendToPlayer(message, player);
-                }
-                break;
-            }
-            case SPIGOT: {
-                List<String> broadcasted = v4GuardSpigot.getV4Guard().getMessager().broadcastWithPermission(message, permission);
-                players.removeAll(broadcasted);
-                for(String player : players){
-                    v4GuardSpigot.getV4Guard().getMessager().sendToPlayer(message, player);
                 }
                 break;
             }
