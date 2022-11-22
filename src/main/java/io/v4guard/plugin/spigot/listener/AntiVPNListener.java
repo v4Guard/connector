@@ -11,6 +11,7 @@ public class AntiVPNListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPreLogin(final AsyncPlayerPreLoginEvent e) {
+        if(e.getAddress() == null) return;
         v4GuardSpigot.getCoreInstance().getCheckManager().runPreLoginCheck(e.getName(), e);
     }
 
