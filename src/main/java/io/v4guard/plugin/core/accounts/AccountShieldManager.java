@@ -23,8 +23,7 @@ public class AccountShieldManager {
         boolean shieldEnabled = (boolean) shieldSettings.getOrDefault("accshield", false);
         if(!shieldEnabled) return;
 
-        Document finalDocument = new Document("username", auth.getUsername())
-                .append("type", auth.getAuthType().toString());
+        Document finalDocument = auth.serialize();
         v4GuardCore.getInstance().getBackendConnector().getSocket().emit("accshield:login", finalDocument.toJson());
     }
 }

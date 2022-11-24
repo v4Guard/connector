@@ -24,7 +24,7 @@ public class v4GuardCore {
     private AccountShieldManager accountShieldManager;
     private ChatFilterManager chatFilterManager;
 
-    public static final String pluginVersion = "1.1.3c";
+    public static final String pluginVersion = "1.1.4";
 
     private boolean debug = false;
     private boolean accountShieldFound = false;
