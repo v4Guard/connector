@@ -7,7 +7,6 @@ import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.messages.LegacyChannelIdentifier;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
-import io.v4guard.plugin.bungee.v4GuardBungee;
 import io.v4guard.plugin.core.accounts.auth.AuthType;
 import io.v4guard.plugin.core.accounts.auth.Authentication;
 import io.v4guard.plugin.core.accounts.messaging.MessageReceiver;
@@ -29,7 +28,7 @@ public class VelocityMessageReceiver extends MessageReceiver {
 
     @Subscribe(order = PostOrder.FIRST)
     public void onMessage(PluginMessageEvent e){
-        boolean invalidatedCache = (boolean) v4GuardBungee.getCoreInstance().getBackendConnector().getSettings().getOrDefault("invalidateCache", false);
+        boolean invalidatedCache = (boolean) v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings().getOrDefault("invalidateCache", false);
         if(invalidatedCache) return;
         if (!e.getIdentifier().getId().equals(MessageReceiver.VELOCITY_CHANNEL)) {
             return;

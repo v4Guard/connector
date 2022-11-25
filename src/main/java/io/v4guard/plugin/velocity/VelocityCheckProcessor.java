@@ -5,7 +5,6 @@ import com.velocitypowered.api.event.Continuation;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.proxy.Player;
-import io.v4guard.plugin.bungee.v4GuardBungee;
 import io.v4guard.plugin.core.check.CheckProcessor;
 import io.v4guard.plugin.core.check.common.CheckStatus;
 import io.v4guard.plugin.core.check.common.VPNCheck;
@@ -98,7 +97,7 @@ public class VelocityCheckProcessor implements CheckProcessor {
                 if(nameIsValid){
 
 
-                    Document privacySettings = (Document) v4GuardBungee.getCoreInstance().getBackendConnector().getSettings().getOrDefault("privacy", new Document());
+                    Document privacySettings = (Document) v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings().getOrDefault("privacy", new Document());
                     boolean anonVirtualHost = privacySettings.getBoolean("anonVirtualHost", true);
 
                     String virtualHost = "notFound";
