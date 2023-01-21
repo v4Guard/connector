@@ -3,15 +3,38 @@ package io.v4guard.plugin.velocity.listener;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
+import com.velocitypowered.api.event.player.PlayerClientBrandEvent;
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.messages.LegacyChannelIdentifier;
+import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.v4guard.plugin.core.tasks.types.CompletableMCBrandTask;
 import io.v4guard.plugin.core.utils.StringUtils;
+import io.v4guard.plugin.core.v4GuardCore;
 import io.v4guard.plugin.velocity.v4GuardVelocity;
 import org.bson.Document;
 
+
 public class PluginMessagingListener {
+
+    public PluginMessagingListener() {
+        v4GuardVelocity.getV4Guard().getServer().getChannelRegistrar().register(MinecraftChannelIdentifier.from("labymod3:main"));
+        v4GuardVelocity.getV4Guard().getServer().getChannelRegistrar().register(new LegacyChannelIdentifier("LMC"));
+    }
+
+    @Subscribe(order = PostOrder.FIRST)
+    public void onPostLogin(PlayerClientBrandEvent e) {
+        v4GuardCore.getInstance().getCheckManager().runPostLoginCheck(e.getPlayer().getUsername(), e);
+        Document privacySettings = (Document) v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings().getOrDefault("privacy", new Document());
+        boolean invalidatedCache = (boolean) v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings().getOrDefault("invalidateCache", false);
+        if(!invalidatedCache && privacySettings.getBoolean("collectMCBrand", true)){
+            Player player = e.getPlayer();
+            CompletableMCBrandTask task = v4GuardVelocity.getCoreInstance().getCompletableTaskManager().getBrandTask(player.getUsername());
+            if(task == null) task = new CompletableMCBrandTask(player.getUsername());
+            task.addData(e.getPlayer().getClientBrand());
+        }
+    }
 
     @Subscribe(order = PostOrder.FIRST)
     public void onMessage(PluginMessageEvent e){
@@ -19,12 +42,7 @@ public class PluginMessagingListener {
         boolean invalidatedCache = (boolean) v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings().getOrDefault("invalidateCache", false);
         if(!invalidatedCache && privacySettings.getBoolean("collectMCBrand", true)){
             if(e.getSource() instanceof Player){
-                if(e.getIdentifier().getId().equals("MC|Brand") || e.getIdentifier().getId().equals("minecraft:brand")){
-                    Player player = (Player) e.getSource();
-                    CompletableMCBrandTask task = v4GuardVelocity.getCoreInstance().getCompletableTaskManager().getBrandTask(player.getUsername());
-                    if(task == null) task = new CompletableMCBrandTask(player.getUsername());
-                    task.addData(new String(e.getData()));
-                } else if (e.getIdentifier().getId().equals("LMC") || e.getIdentifier().getId().equals("labymod3:main")){
+                if (e.getIdentifier().getId().equals("labymod3:main") || e.getIdentifier().getId().equals("LMC")){
                     Player player = (Player) e.getSource();
                     CompletableMCBrandTask task = v4GuardVelocity.getCoreInstance().getCompletableTaskManager().getBrandTask(player.getUsername());
                     if(task == null) task = new CompletableMCBrandTask(player.getUsername());
