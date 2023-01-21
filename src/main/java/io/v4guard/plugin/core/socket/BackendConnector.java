@@ -5,6 +5,7 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 import io.v4guard.plugin.core.socket.listener.*;
+import io.v4guard.plugin.core.socket.listener.messaging.MessageListener;
 import io.v4guard.plugin.core.utils.HashCalculator;
 import io.v4guard.plugin.core.v4GuardCore;
 import org.bson.Document;
