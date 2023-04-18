@@ -1,27 +1,24 @@
 package io.v4guard.plugin.velocity.listener;
 
+import com.velocitypowered.api.event.Continuation;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.connection.PluginMessageEvent;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.player.PlayerClientBrandEvent;
 import com.velocitypowered.api.proxy.Player;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.v4guard.plugin.core.socket.SocketStatus;
 import io.v4guard.plugin.core.tasks.types.CompletableMCBrandTask;
-import io.v4guard.plugin.core.utils.StringUtils;
+import io.v4guard.plugin.core.v4GuardCore;
 import io.v4guard.plugin.velocity.v4GuardVelocity;
 import org.bson.Document;
 
-public class PluginMessagingListener {
+public class PlayerBrandListener {
 
     @Subscribe(order = PostOrder.FIRST)
-    public void onMessage(PluginMessageEvent e){
-        if (v4GuardVelocity.getCoreInstance().getBackendConnector().getSocketStatus() != SocketStatus.AUTHENTICATED) return;
-        if (!(e.getSource() instanceof Player)) return;
+    public void onPlayerServerBrand(PlayerClientBrandEvent e, Continuation continuation) {
+        if (e.getBrand().equalsIgnoreCase("labbymod")) return;
 
-        Player player = (Player) e.getSource();
+        Player player = e.getPlayer();
         if (v4GuardVelocity.getCoreInstance().getBrandCheckManager().isPlayerAlreadyChecked(player.getUniqueId())) return;
-        if (!(e.getIdentifier().getId().equals("LMC") || e.getIdentifier().getId().equals("labymod3:main"))) return;
 
         Document privacySettings = (Document) v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings().getOrDefault("privacy", new Document());
         boolean invalidatedCache = (boolean) v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings().getOrDefault("invalidateCache", false);
@@ -31,16 +28,14 @@ public class PluginMessagingListener {
         CompletableMCBrandTask task = v4GuardVelocity.getCoreInstance().getCompletableTaskManager().getBrandTask(player.getUsername());
         if(task == null) task = new CompletableMCBrandTask(player.getUsername());
 
-        ByteBuf buf = Unpooled.wrappedBuffer(e.getData());
-        String key = StringUtils.readString(buf, Short.MAX_VALUE);
-        if(!key.equals("INFO")){
-            return;
-        }
-
-        String json = StringUtils.readString(buf, Short.MAX_VALUE);
-        Document data = Document.parse(json);
-        String version = data == null ? "unknown" : (String) data.getOrDefault("version", "unknown");
-        task.addData("labymod:" + version);
+        task.addData(e.getBrand());
         v4GuardVelocity.getCoreInstance().getBrandCheckManager().addPlayer(player.getUniqueId());
+        continuation.resume();
+    }
+
+
+    @Subscribe(order = PostOrder.FIRST)
+    public void onPlayerQuit(DisconnectEvent e) {
+        v4GuardCore.getInstance().getBrandCheckManager().removePlayer(e.getPlayer().getUniqueId());
     }
 }

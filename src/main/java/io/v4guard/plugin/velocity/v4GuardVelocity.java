@@ -12,6 +12,7 @@ import io.v4guard.plugin.core.mode.v4GuardMode;
 import io.v4guard.plugin.core.v4GuardCore;
 import io.v4guard.plugin.velocity.accounts.VelocityMessageReceiver;
 import io.v4guard.plugin.velocity.listener.AntiVPNListener;
+import io.v4guard.plugin.velocity.listener.PlayerBrandListener;
 import io.v4guard.plugin.velocity.listener.PluginMessagingListener;
 import io.v4guard.plugin.velocity.messager.Messager;
 import net.kyori.adventure.text.Component;
@@ -76,6 +77,7 @@ public class v4GuardVelocity {
         v4GuardVelocity = this;
         server.getEventManager().register(this, new AntiVPNListener());
         server.getEventManager().register(this, new PluginMessagingListener());
+        server.getEventManager().register(this, new PlayerBrandListener());
         server.getConsoleCommandSource().sendMessage(
                 Component.text("§e[v4guard-plugin] (Velocity) Enabling... [DONE]")
         );
