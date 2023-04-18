@@ -1,6 +1,5 @@
 package io.v4guard.plugin.core.tasks.types;
 
-import io.v4guard.plugin.bungee.v4GuardBungee;
 import io.v4guard.plugin.core.tasks.common.CompletableTask;
 import io.v4guard.plugin.core.v4GuardCore;
 import org.bson.Document;
@@ -31,7 +30,7 @@ public class CompletableMCBrandTask implements CompletableTask {
         Document data = new Document();
         data.put("username", username);
         data.put("brand", brands);
-        v4GuardBungee.getCoreInstance().getBackendConnector().getSocket().emit("mc:brand", data.toJson());
+        v4GuardCore.getInstance().getBackendConnector().getSocket().emit("mc:brand", data.toJson());
         v4GuardCore.getInstance().getCompletableTaskManager().getTasks().remove(taskID);
     }
 
