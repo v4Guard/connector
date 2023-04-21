@@ -7,6 +7,7 @@ import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import io.v4guard.plugin.core.accounts.AccountShieldManager;
 import io.v4guard.plugin.core.mode.v4GuardMode;
 import io.v4guard.plugin.core.v4GuardCore;
@@ -75,6 +76,10 @@ public class v4GuardVelocity {
             return;
         }
         v4GuardVelocity = this;
+
+        server.getChannelRegistrar().register(MinecraftChannelIdentifier.from("labymod3:main"));
+        server.getChannelRegistrar().register(MinecraftChannelIdentifier.create("labymod3", "main"));
+
         server.getEventManager().register(this, new AntiVPNListener());
         server.getEventManager().register(this, new PluginMessagingListener());
         server.getEventManager().register(this, new PlayerBrandListener());
