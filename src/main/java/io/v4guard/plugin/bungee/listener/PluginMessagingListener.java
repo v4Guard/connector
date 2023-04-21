@@ -8,7 +8,9 @@ import io.v4guard.plugin.bungee.v4GuardBungee;
 import io.v4guard.plugin.core.socket.SocketStatus;
 import io.v4guard.plugin.core.tasks.types.CompletableMCBrandTask;
 import io.v4guard.plugin.core.utils.StringUtils;
+import io.v4guard.plugin.core.v4GuardCore;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -65,5 +67,10 @@ public class PluginMessagingListener implements Listener {
             TEMP_CACHE.put(player.getUniqueId(), System.currentTimeMillis());
             v4GuardBungee.getCoreInstance().getBrandCheckManager().addPlayer(player.getUniqueId());
         }
+    }
+
+    @EventHandler
+    public void onPlayerDisconnect(PlayerDisconnectEvent event) {
+        v4GuardCore.getInstance().getBrandCheckManager().removePlayer(event.getPlayer().getUniqueId());
     }
 }
