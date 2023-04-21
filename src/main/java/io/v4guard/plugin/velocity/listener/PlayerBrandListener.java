@@ -15,8 +15,8 @@ public class PlayerBrandListener {
 
     @Subscribe(order = PostOrder.FIRST)
     public void onPlayerServerBrand(PlayerClientBrandEvent e, Continuation continuation) {
-        if (e.getBrand().equalsIgnoreCase("labbymod")) return;
-
+        if (e.getBrand().equalsIgnoreCase("labymod")) return;
+        
         Player player = e.getPlayer();
         if (v4GuardVelocity.getCoreInstance().getBrandCheckManager().isPlayerAlreadyChecked(player.getUniqueId())) return;
 
