@@ -4,12 +4,14 @@ import io.v4guard.plugin.core.tasks.common.CompletableTask;
 import io.v4guard.plugin.core.tasks.types.CompletableMCBrandTask;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CompletableTaskManager {
 
-    private HashMap<String, CompletableTask> tasks = new HashMap<>();
+    private final Map<String, CompletableTask> tasks = new ConcurrentHashMap<>();
 
-    public HashMap<String, CompletableTask> getTasks() {
+    public Map<String, CompletableTask> getTasks() {
         return this.tasks;
     }
 
