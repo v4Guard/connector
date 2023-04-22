@@ -3,7 +3,6 @@ package io.v4guard.plugin.core.tasks;
 import io.v4guard.plugin.core.tasks.common.CompletableTask;
 import io.v4guard.plugin.core.tasks.types.CompletableMCBrandTask;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
