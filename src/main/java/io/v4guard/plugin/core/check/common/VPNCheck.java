@@ -16,7 +16,7 @@ public class VPNCheck {
 
     private CheckStatus status;
 
-    public VPNCheck(String name, String hostname, String reason, boolean blocked) {
+    public VPNCheck(String name, String hostname, String reason) {
         this.createdAt = System.currentTimeMillis();
         this.name = name;
         this.hostname = hostname;
