@@ -31,6 +31,6 @@ public class v4GuardPostCheckEvent implements ResultedEvent<ResultedEvent.Generi
 
     @Override
     public void setResult(GenericResult genericResult) {
-        this.result = Objects.requireNonNull(result);
+        this.result = Objects.requireNonNull(genericResult);
     }
 }
