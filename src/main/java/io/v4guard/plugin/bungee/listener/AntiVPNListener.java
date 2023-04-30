@@ -19,6 +19,7 @@ public class AntiVPNListener implements Listener {
         v4GuardCore.getInstance().getCheckManager().runPostLoginCheck(e.getPlayer().getName(), e);
     }
 
+
 //    @EventHandler(priority = Byte.MIN_VALUE)
 //    public void onChat(ChatEvent e) {
 //        if(v4GuardCore.getInstance().getChatFilterManager().canLookupMessage(e.getMessage())){

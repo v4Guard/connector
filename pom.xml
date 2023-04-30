@@ -19,7 +19,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.1-SNAPSHOT</version>
+                <version>3.4.1</version>
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <artifactSet>
@@ -33,6 +33,7 @@
                             <include>org.jetbrains.kotlin:kotlin-stdlib</include>
                             <include>org.jetbrains.kotlin:kotlin-stdlib-common</include>
                             <include>org.bstats:*</include>
+                            <include>com.github.ben-manes.caffeine:caffeine</include>
                         </includes>
                     </artifactSet>
                     <relocations>
@@ -63,6 +64,10 @@
                         <relocation>
                             <pattern>org.bstats</pattern>
                             <shadedPattern>io.v4guard.shaded.org.bstats</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.github.ben-manes.caffeine</pattern>
+                            <shadedPattern>io.v4guard.shaded.com.github.ben-manes.caffeine</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -106,7 +111,7 @@
         <dependency>
             <groupId>com.velocitypowered</groupId>
             <artifactId>velocity-api</artifactId>
-            <version>3.0.1</version>
+            <version>3.2.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -162,6 +167,10 @@
             <version>3.0.0</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>3.1.6</version>
+        </dependency>
     </dependencies>
-
 </project>

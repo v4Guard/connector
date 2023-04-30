@@ -1,7 +1,7 @@
 package io.v4guard.plugin.core;
 
 import io.v4guard.plugin.core.accounts.AccountShieldManager;
-import io.v4guard.plugin.core.chatfilter.ChatFilterManager;
+import io.v4guard.plugin.core.brand.BrandCheckManager;
 import io.v4guard.plugin.core.check.CheckManager;
 import io.v4guard.plugin.core.mode.v4GuardMode;
 import io.v4guard.plugin.core.socket.BackendConnector;
@@ -18,11 +18,11 @@ public class v4GuardCore {
     private static v4GuardCore INSTANCE;
     private final File folder;
 
-    private CompletableTaskManager completableTaskManager;
-    private BackendConnector backendConnector;
-    private CheckManager checkManager;
+    private final CompletableTaskManager completableTaskManager;
+    private final BackendConnector backendConnector;
+    private final CheckManager checkManager;
+    private final BrandCheckManager brandCheckManager;
     private AccountShieldManager accountShieldManager;
-    private ChatFilterManager chatFilterManager;
 
     public static final String pluginVersion = "1.1.4";
 
@@ -53,8 +53,7 @@ public class v4GuardCore {
         this.completableTaskManager = new CompletableTaskManager();
         this.backendConnector = new BackendConnector();
         this.checkManager = new CheckManager();
-        //this.chatFilterManager = new ChatFilterManager();
-
+        this.brandCheckManager = new BrandCheckManager();
     }
 
     public boolean isAccountShieldFound() {
@@ -73,10 +72,6 @@ public class v4GuardCore {
         return folder;
     }
 
-    public ChatFilterManager getChatFilterManager() {
-        return chatFilterManager;
-    }
-
     public CompletableTaskManager getCompletableTaskManager() {
         return completableTaskManager;
     }
@@ -88,6 +83,8 @@ public class v4GuardCore {
     public CheckManager getCheckManager() {
         return checkManager;
     }
+
+    public BrandCheckManager getBrandCheckManager() { return brandCheckManager; }
 
     public static v4GuardCore getInstance() {
         return INSTANCE;
