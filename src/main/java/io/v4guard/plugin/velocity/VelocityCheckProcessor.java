@@ -11,6 +11,7 @@ import io.v4guard.plugin.core.check.common.VPNCheck;
 import io.v4guard.plugin.core.tasks.types.CompletableIPCheckTask;
 import io.v4guard.plugin.core.tasks.types.CompletableNameCheckTask;
 import io.v4guard.plugin.core.utils.StringUtils;
+import io.v4guard.plugin.velocity.integration.v4GuardPostCheckEvent;
 import net.kyori.adventure.text.Component;
 import org.bson.Document;
 
@@ -120,11 +121,18 @@ public class VelocityCheckProcessor implements CheckProcessor {
                         @Override
                         public void complete() {
                             VPNCheck check = this.getCheck();
-                            if (check.getStatus() == CheckStatus.USER_DENIED) {
-                                if(onExpire(check)) return;
-                                e.setResult(PreLoginEvent.PreLoginComponentResult.denied(Component.text(check.getReason())));
-                            }
-                            if(continuation != null) continuation.resume();
+                            v4GuardPostCheckEvent event = new v4GuardPostCheckEvent(check.getName(), check.getBlockReason());
+                            v4GuardVelocity.getV4Guard().getServer().getEventManager().fire(event).thenAccept((v) -> {
+                                if(!v.getResult().isAllowed()){
+                                    check.setStatus(CheckStatus.USER_ALLOWED);
+                                    return;
+                                }
+                                if (check.getStatus() == CheckStatus.USER_DENIED) {
+                                    if(onExpire(check)) return;
+                                    e.setResult(PreLoginEvent.PreLoginComponentResult.denied(Component.text(check.getReason())));
+                                }
+                                if(continuation != null) continuation.resume();
+                            });
                         }
                     };
                 } else {
