@@ -24,7 +24,7 @@ public class v4GuardCore {
     private final BrandCheckManager brandCheckManager;
     private AccountShieldManager accountShieldManager;
 
-    public static final String pluginVersion = "1.1.4";
+    public static final String pluginVersion = "1.1.4b";
 
     private boolean debug = false;
     private boolean accountShieldFound = false;
