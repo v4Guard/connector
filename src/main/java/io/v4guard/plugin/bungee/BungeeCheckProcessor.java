@@ -1,6 +1,7 @@
 package io.v4guard.plugin.bungee;
 
 import com.google.common.net.InternetDomainName;
+import io.v4guard.plugin.bungee.integrations.v4GuardPostCheckEvent;
 import io.v4guard.plugin.core.check.CheckProcessor;
 import io.v4guard.plugin.core.check.common.CheckStatus;
 import io.v4guard.plugin.core.check.common.VPNCheck;
@@ -55,6 +56,14 @@ public class BungeeCheckProcessor implements CheckProcessor {
                         @Override
                         public void complete() {
                             VPNCheck check = this.getCheck();
+
+                            v4GuardPostCheckEvent postCheckEvent = new v4GuardPostCheckEvent(check.getName(), check.getBlockReason());
+                            ProxyServer.getInstance().getPluginManager().callEvent(postCheckEvent);
+                            if (postCheckEvent.isCancelled()) {
+                                check.setStatus(CheckStatus.USER_ALLOWED);
+                                return;
+                            }
+
                             if (wait) {
                                 if (check.getStatus() == CheckStatus.USER_DENIED) {
                                     e.setCancelled(true);

@@ -13,6 +13,7 @@ public class VPNCheck {
     private final String name;
     private final String hostname;
     private String reason;
+    private BlockReason blockReason = BlockReason.NONE;
 
     private CheckStatus status;
 
@@ -28,10 +29,17 @@ public class VPNCheck {
         return hostname;
     }
 
+    public BlockReason getBlockReason() {
+        return blockReason;
+    }
+
+    public void setBlockReason(BlockReason blockReason) {
+        this.blockReason = blockReason;
+    }
+
     public void setStatus(CheckStatus status) {
         this.status = status;
     }
-
 
     public CheckStatus getStatus() {
         return status;

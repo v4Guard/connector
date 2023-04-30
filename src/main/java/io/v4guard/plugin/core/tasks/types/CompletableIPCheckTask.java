@@ -1,5 +1,6 @@
 package io.v4guard.plugin.core.tasks.types;
 
+import io.v4guard.plugin.core.check.common.BlockReason;
 import io.v4guard.plugin.core.check.common.CheckStatus;
 import io.v4guard.plugin.core.check.common.VPNCheck;
 import io.v4guard.plugin.core.tasks.common.CompletableTask;
@@ -60,14 +61,9 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
         return getData().getBoolean("block");
     }
 
-    public String translateVariables(String reason) {
-        Document variables = getData().get("variables", Document.class);
-        AtomicReference<String> result = new AtomicReference<>(reason);
-        for (String key : variables.keySet()) {
-            String value = variables.getString(key);
-            result.set(result.get().replaceAll("\\{" + key + "}", value));
-        }
-        return result.get();
+    private BlockReason getBlockReason(){
+        if (!getData().containsKey("blockReason")) return BlockReason.NONE;
+        return BlockReason.valueOf(getData().getString("blockReason"));
     }
 
     public void check() {
@@ -75,6 +71,7 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
             this.check = v4GuardCore.getInstance().getCheckManager().buildCheckStatus(this.getUsername(), this.getAddress());
             this.prepareReason(check);
             check.setStatus(isBlocked() ? CheckStatus.USER_DENIED : CheckStatus.USER_ALLOWED);
+            check.setBlockReason(getBlockReason());
             v4GuardCore.getInstance().getCheckManager().getCheckStatusMap().put(username, check);
             this.complete();
             v4GuardCore.getInstance().getCompletableTaskManager().getTasks().remove(this.getTaskID());
@@ -104,6 +101,7 @@ public abstract class CompletableIPCheckTask implements CompletableTask {
     public VPNCheck getCheck() {
         return check;
     }
+
 
     public void prepareReason(VPNCheck status){
         if(getData().containsKey("message")){

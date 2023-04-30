@@ -83,7 +83,7 @@ public class CheckManager {
     public VPNCheck buildCheckStatus(String username, String hostname){
         Document kickMessages = (Document) v4GuardCore.getInstance().getBackendConnector().getSettings().get("messages");
         String kickReasonMessage = StringUtils.buildMultilineString((List<String>) kickMessages.get("kick"));
-        return new VPNCheck(username, hostname, kickReasonMessage, false);
+        return new VPNCheck(username, hostname, kickReasonMessage);
     }
 
     public void cleanupChecks(String username){
