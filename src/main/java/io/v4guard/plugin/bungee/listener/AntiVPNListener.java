@@ -6,10 +6,11 @@ import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.PreLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.event.EventPriority;
 
 public class AntiVPNListener implements Listener {
 
-    @EventHandler(priority = Byte.MIN_VALUE)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPreLogin(PreLoginEvent e) {
         if(e.isCancelled()) return;
         if(e.getConnection() == null) return;
@@ -17,7 +18,7 @@ public class AntiVPNListener implements Listener {
         v4GuardCore.getInstance().getCheckManager().runPreLoginCheck(e.getConnection().getName(), e);
     }
 
-    @EventHandler(priority = Byte.MIN_VALUE)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPostLogin(PostLoginEvent e) {
         v4GuardCore.getInstance().getCheckManager().runPostLoginCheck(e.getPlayer().getName(), e);
     }

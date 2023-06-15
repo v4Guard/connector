@@ -11,7 +11,7 @@ import io.v4guard.plugin.velocity.v4GuardVelocity;
 
 public class AntiVPNListener {
 
-    @Subscribe(order = PostOrder.FIRST)
+    @Subscribe(order = PostOrder.EARLY)
     public void onAsyncPreLogin(PreLoginEvent e, Continuation continuation) {
         if(!e.getResult().isAllowed()) return;
         if(v4GuardVelocity.getV4Guard().getServer().getPlayer(e.getUsername()).isPresent()) return;
@@ -19,8 +19,9 @@ public class AntiVPNListener {
         pr.onPreLoginWithContinuation(e, continuation);
     }
 
-    @Subscribe(order = PostOrder.FIRST)
+    @Subscribe(order = PostOrder.EARLY)
     public void onPreLogin(PreLoginEvent e) {
+        if(!e.getResult().isAllowed()) return;
         v4GuardCore.getInstance().getCheckManager().runPreLoginCheck(e.getUsername(), e);
     }
 
