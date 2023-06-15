@@ -7,14 +7,16 @@ import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import io.v4guard.plugin.core.v4GuardCore;
 import io.v4guard.plugin.velocity.VelocityCheckProcessor;
+import io.v4guard.plugin.velocity.v4GuardVelocity;
 
 public class AntiVPNListener {
 
     @Subscribe(order = PostOrder.FIRST)
     public void onAsyncPreLogin(PreLoginEvent e, Continuation continuation) {
+        if(!e.getResult().isAllowed()) return;
+        if(v4GuardVelocity.getV4Guard().getServer().getPlayer(e.getUsername()).isPresent()) return;
         VelocityCheckProcessor pr = (VelocityCheckProcessor) v4GuardCore.getInstance().getCheckManager().getProcessorByClass(VelocityCheckProcessor.class);
         pr.onPreLoginWithContinuation(e, continuation);
-
     }
 
     @Subscribe(order = PostOrder.FIRST)

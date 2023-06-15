@@ -1,6 +1,7 @@
 package io.v4guard.plugin.bungee.listener;
 
 import io.v4guard.plugin.core.v4GuardCore;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.PreLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -10,7 +11,9 @@ public class AntiVPNListener implements Listener {
 
     @EventHandler(priority = Byte.MIN_VALUE)
     public void onPreLogin(PreLoginEvent e) {
+        if(e.isCancelled()) return;
         if(e.getConnection() == null) return;
+        if(ProxyServer.getInstance().getPlayer(e.getConnection().getName()) != null) return;
         v4GuardCore.getInstance().getCheckManager().runPreLoginCheck(e.getConnection().getName(), e);
     }
 
