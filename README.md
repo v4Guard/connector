@@ -33,7 +33,7 @@ You can download the latest version of v4Guard from our official website or from
     📦 Download: https://v4guard.io/go/latest
     📦 Source code: (this repo)
 
-The installation of the plugin is very simple, just drag the .jar file to the plugins directory of your server and restart the server. It is necessary that the Java version is 8 or higher and have a valid license to use the plugin).
+The installation of the plugin is very simple, just drag the .jar file to the plugins directory of your server and restart the server. It is necessary that the Java version is 11 or higher and have a valid license to use the plugin).
 
 ## 📝 License
 v4Guard is open source software under the GNU General Public License v3.0. You can find a copy of the license in the GitHub repository.
