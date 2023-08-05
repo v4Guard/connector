@@ -32,7 +32,7 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
     @Override
     public void onEnable() {
         getLogger().info("(Bungee) Enabling...");
-        getLogger().warning("(Bungee) Remember to allow Metrics on your firewall");
+        getLogger().warning("(Bungee) Remember to allow Metrics on your firewall.");
 
         new Metrics(this, 16219);
 
