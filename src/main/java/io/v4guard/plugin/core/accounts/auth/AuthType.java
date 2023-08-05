@@ -5,3 +5,4 @@ public enum AuthType {
     LOGIN, REGISTER, MOJANG, UNKNOWN;
 
 }
+

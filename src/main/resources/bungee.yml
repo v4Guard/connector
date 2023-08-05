@@ -1,6 +1,4 @@
 name: v4guard-plugin
 version: ${project.version}
-main: io.v4guard.plugin.bungee.v4GuardBungee
-author: DigitalSynware
-softDepends:
-  - v4guard-account-shield
+main: io.v4guard.plugin.bungee.BungeeInstance
+author: v4Guard

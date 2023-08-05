@@ -5,51 +5,48 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.messages.LegacyChannelIdentifier;
-import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
+import com.velocitypowered.api.proxy.ServerConnection;
+import io.v4guard.plugin.core.CoreInstance;
+import io.v4guard.plugin.core.accounts.MessageReceiver;
 import io.v4guard.plugin.core.accounts.auth.AuthType;
 import io.v4guard.plugin.core.accounts.auth.Authentication;
-import io.v4guard.plugin.core.accounts.messaging.MessageReceiver;
-import io.v4guard.plugin.core.v4GuardCore;
-import io.v4guard.plugin.velocity.v4GuardVelocity;
-import org.bson.Document;
-
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import io.v4guard.plugin.core.constants.ShieldChannels;
 
 public class VelocityMessageReceiver extends MessageReceiver {
 
-    public VelocityMessageReceiver(v4GuardVelocity plugin) {
-        plugin.getServer().getEventManager().register(plugin, this);
-        plugin.getServer().getChannelRegistrar().register(new LegacyChannelIdentifier(MessageReceiver.VELOCITY_CHANNEL));
-        plugin.getServer().getChannelRegistrar().register(MinecraftChannelIdentifier.from(MessageReceiver.VELOCITY_CHANNEL));
-    }
-
     @Subscribe(order = PostOrder.FIRST)
-    public void onMessage(PluginMessageEvent e){
-        boolean invalidatedCache = (boolean) v4GuardVelocity.getCoreInstance().getBackendConnector().getSettings().getOrDefault("invalidateCache", false);
-        if(invalidatedCache) return;
-        if (!e.getIdentifier().getId().equals(MessageReceiver.VELOCITY_CHANNEL)) {
+    public void onMessage(PluginMessageEvent event) {
+        if (!ShieldChannels.VELOCITY_CHANNEL.equals(event.getIdentifier().getId())) {
             return;
         }
-        DataInputStream in = new DataInputStream(new ByteArrayInputStream(e.getData()));
-        try {
-            String data = in.readUTF();
-            Document doc = Document.parse(data);
-            Authentication auth = Authentication.deserialize(doc);
-            v4GuardCore.getInstance().getAccountShieldManager().sendSocketMessage(auth);
-        } catch (IOException ex) {}
+
+        //event.setResult(PluginMessageEvent.ForwardResult.handled());
+
+        if (!(event.getSource() instanceof ServerConnection)) {
+            return;
+        }
+
+        processPluginMessage(event.getData());
+
     }
 
     @Subscribe(order = PostOrder.LAST)
-    public void onPostLogin(PostLoginEvent e) {
-        if(!v4GuardCore.getInstance().isAccountShieldFound()) {
-            Player player = e.getPlayer();
-            if (player.isOnlineMode()) {
-                Authentication auth = new Authentication(player.getUsername(), AuthType.MOJANG, player.hasPermission("v4guard.accshield"));
-                v4GuardCore.getInstance().getAccountShieldManager().sendSocketMessage(auth);
-            }
+    public void onPostLogin(PostLoginEvent event) {
+        if (CoreInstance.get().isAccountShieldFound()) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+
+        if (player.isOnlineMode()) {
+            Authentication auth = new Authentication(
+                    player.getUsername()
+                    , player.getUniqueId()
+                    , AuthType.MOJANG
+                    , player.hasPermission("v4guard.accshield")
+            );
+
+            CoreInstance.get().getAccountShieldSender().sendSocketMessage(auth);
         }
     }
 
