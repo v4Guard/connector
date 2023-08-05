@@ -1,6 +1,6 @@
 package io.v4guard.plugin.bungee;
 
-import io.v4guard.plugin.bungee.acounts.BungeeMessageReceiver;
+import io.v4guard.plugin.bungee.accounts.BungeeMessageReceiver;
 import io.v4guard.plugin.bungee.adapter.BungeeMessenger;
 import io.v4guard.plugin.bungee.check.BungeeCheckProcessor;
 import io.v4guard.plugin.bungee.listener.AntiVPNListener;

@@ -34,7 +34,7 @@ public class BungeeCheckProcessor extends CheckProcessor<LoginEvent> {
 
         checkData.whenCompleted((exception) -> {
             if (exception != null) {
-                plugin.getLogger().log(Level.SEVERE, "An exception has occurred while checking player '" + username + "'.", exception);
+                plugin.getLogger().log(Level.SEVERE, "An exception has occurred while checking player '" + username + "'", exception);
             } else {
                 PostCheckEvent apiEvent = new PostCheckEvent(username, checkData.getBlockReason());
 

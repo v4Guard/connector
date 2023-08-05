@@ -1,4 +1,4 @@
-package io.v4guard.plugin.bungee.acounts;
+package io.v4guard.plugin.bungee.accounts;
 
 import io.v4guard.plugin.core.CoreInstance;
 import io.v4guard.plugin.core.accounts.MessageReceiver;
