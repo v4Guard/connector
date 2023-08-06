@@ -79,7 +79,6 @@ public class PlayerCheckData {
         }
 
         this.futureCallbackTasks.clear();
-        CoreInstance.get().getChecksCache().cleanupChecks(this.username);
 
         this.started = false;
 
