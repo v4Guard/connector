@@ -28,7 +28,7 @@ public class PlayerCheckData {
         this.address = address;
         this.version = version;
         this.virtualHost = virtualHost;
-        this.waitMode = /*waitMode*/true;
+        this.waitMode = waitMode;
         this.kickReason = "Disconnected";
         this.blockReason = BlockReason.NONE;
         this.checkStatus = CheckStatus.WAITING;
