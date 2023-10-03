@@ -65,10 +65,10 @@
                             <pattern>org.bstats</pattern>
                             <shadedPattern>io.v4guard.shaded.org.bstats</shadedPattern>
                         </relocation>
-<!--                        <relocation>-->
-<!--                            <pattern>com.github.ben-manes.caffeine</pattern>-->
-<!--                            <shadedPattern>io.v4guard.shaded.com.github.ben-manes.caffeine</shadedPattern>-->
-<!--                        </relocation>-->
+                        <relocation>
+                            <pattern>com.github.ben-manes.caffeine</pattern>
+                            <shadedPattern>io.v4guard.shaded.com.github.ben-manes.caffeine</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
@@ -167,10 +167,10 @@
             <version>3.0.0</version>
             <scope>compile</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.github.ben-manes.caffeine</groupId>-->
-<!--            <artifactId>caffeine</artifactId>-->
-<!--            <version>3.1.6</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>3.1.6</version>
+        </dependency>
     </dependencies>
 </project>

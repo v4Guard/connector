@@ -16,6 +16,8 @@ public class NicknameCallbackTask extends CallbackTask {
     }
 
     public void start() {
+        super.start();
+
         Document nameValidator = RemoteSettings.get(SettingsKeys.NAME_VALIDATOR);
 
         if (nameValidator.getBoolean("isEnabled")) {

@@ -2,15 +2,18 @@ package io.v4guard.plugin.bungee;
 
 import io.v4guard.plugin.bungee.accounts.BungeeMessageReceiver;
 import io.v4guard.plugin.bungee.adapter.BungeeMessenger;
+import io.v4guard.plugin.bungee.cache.BungeeCheckDataCache;
 import io.v4guard.plugin.bungee.check.BungeeCheckProcessor;
-import io.v4guard.plugin.bungee.listener.AntiVPNListener;
+import io.v4guard.plugin.bungee.listener.PlayerListener;
 import io.v4guard.plugin.bungee.listener.PluginMessagingListener;
 import io.v4guard.plugin.core.CoreInstance;
 import io.v4guard.plugin.core.accounts.MessageReceiver;
+import io.v4guard.plugin.core.cache.CheckDataCache;
 import io.v4guard.plugin.core.check.brand.BrandCheckProcessor;
 import io.v4guard.plugin.core.compatibility.PlayerFetchResult;
 import io.v4guard.plugin.core.compatibility.ServerPlatform;
 import io.v4guard.plugin.core.compatibility.UniversalPlugin;
+import io.v4guard.plugin.core.compatibility.UniversalTask;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
@@ -24,6 +27,7 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
 
     private static BungeeInstance instance;
     private BungeeMessenger messenger;
+    private BungeeCheckDataCache checkDataCache;
     private BungeeMessageReceiver messageReceiver;
     private BungeeCheckProcessor checkProcessor;
     private PluginMessagingListener brandCheckProcessor;
@@ -38,23 +42,24 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
 
         instance = this;
 
+        this.checkProcessor = new BungeeCheckProcessor(this);
+        this.brandCheckProcessor = new PluginMessagingListener();
+        this.messenger = new BungeeMessenger();
+        this.checkDataCache = new BungeeCheckDataCache();
+        this.messageReceiver = new BungeeMessageReceiver();
+
         try {
-            coreInstance = new CoreInstance(ServerPlatform.BUNGEE, this);
-            coreInstance.initialize();
+            this.coreInstance = new CoreInstance(ServerPlatform.BUNGEE, this);
+            this.coreInstance.initialize();
         } catch (Exception exception) {
             getLogger().log(Level.SEVERE, "(Bungee) Enabling... [ERROR]", exception);
             return;
         }
 
-        this.checkProcessor = new BungeeCheckProcessor(this);
-        this.brandCheckProcessor = new PluginMessagingListener();
-        this.messenger = new BungeeMessenger();
-        this.messageReceiver = new BungeeMessageReceiver();
-
         //this.getProxy().registerChannel(MessageReceiver.CHANNEL);
         this.getProxy().getPluginManager().registerListener(this, this.messageReceiver);
         this.getProxy().getPluginManager().registerListener(this, this.brandCheckProcessor);
-        this.getProxy().getPluginManager().registerListener(this, new AntiVPNListener(this));
+        this.getProxy().getPluginManager().registerListener(this, new PlayerListener(this));
 
         getLogger().info("(Bungee) Enabling... [DONE]");
     }
@@ -65,7 +70,7 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
         getLogger().info("(Bungee) Disconnecting from the backend...");
 
         try {
-            coreInstance.getBackend().getSocket().disconnect();
+            this.coreInstance.getBackend().getSocket().disconnect();
         } catch (Exception exception) {
             getLogger().log(Level.SEVERE, "(Bungee) Disabling... [ERROR]", exception);
             return;
@@ -74,30 +79,8 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
         getLogger().info("(Bungee) Disabling... [DONE]");
     }
 
-    public CoreInstance getCoreInstance() {
-        return coreInstance;
-    }
-
     public static BungeeInstance get() {
         return instance;
-    }
-
-    public BungeeMessenger getMessenger() {
-        return messenger;
-    }
-
-    @Override
-    public MessageReceiver getMessageReceiver() {
-        return messageReceiver;
-    }
-
-    public BungeeCheckProcessor getCheckProcessor() {
-        return checkProcessor;
-    }
-
-    @Override
-    public BrandCheckProcessor getBrandCheckProcessor() {
-        return brandCheckProcessor;
     }
 
     public String getPluginName() {
@@ -109,27 +92,20 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
     }
 
     @Override
-    public String getPlayerServer(String playerName) {
-        PlayerFetchResult<ProxiedPlayer> fetchedPlayer = fetchPlayer(playerName);
-
-        if (!fetchedPlayer.isOnline()) {
-            return null;
-        }
-
-        Server server = fetchedPlayer.getPlayer().getServer();
-
-        if (server == null) {
-            return null;
-        }
-
-        return server.getInfo().getName();
-    }
-
-    @Override
     public PlayerFetchResult<ProxiedPlayer> fetchPlayer(String playerName) {
         ProxiedPlayer player = getProxy().getPlayer(playerName);
 
-        return new PlayerFetchResult<>(player, player != null);
+        if (player == null) {
+            return new PlayerFetchResult<>(null, null, false);
+        }
+
+        Server server = player.getServer();
+
+        return new PlayerFetchResult<>(
+                player
+                , server == null ? null : server.getInfo().getName()
+                , true
+        );
     }
 
     public void kickPlayer(String playerName, String reason) {
@@ -141,13 +117,33 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
     }
 
     @Override
-    public int schedule(Runnable runnable, long delay, long period, TimeUnit timeUnit) {
-        return getProxy().getScheduler().schedule(this, runnable, delay, period, timeUnit).getId();
+    public UniversalTask schedule(Runnable runnable, long delay, long period, TimeUnit timeUnit) {
+        return new BungeeTask(getProxy().getScheduler().schedule(this, runnable, delay, period, timeUnit));
     }
 
     @Override
-    public void cancelTask(int taskId) {
-        getProxy().getScheduler().cancel(taskId);
+    public BungeeMessenger getMessenger() {
+        return messenger;
+    }
+
+    @Override
+    public BungeeCheckDataCache getCheckDataCache() {
+        return checkDataCache;
+    }
+
+    @Override
+    public MessageReceiver getMessageReceiver() {
+        return messageReceiver;
+    }
+
+    @Override
+    public BungeeCheckProcessor getCheckProcessor() {
+        return checkProcessor;
+    }
+
+    @Override
+    public BrandCheckProcessor getBrandCheckProcessor() {
+        return brandCheckProcessor;
     }
 
 }

@@ -1,32 +1,31 @@
 package io.v4guard.plugin.core.check.brand;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.RemovalCause;
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteStreams;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.v4guard.plugin.core.CoreInstance;
 import io.v4guard.plugin.core.check.PlayerCheckData;
 import io.v4guard.plugin.core.constants.SettingsKeys;
 import io.v4guard.plugin.core.socket.RemoteSettings;
+import io.v4guard.plugin.core.utils.ProtocolUtils;
 import org.bson.Document;
 
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class BrandCheckProcessor {
 
-    private final Cache<UUID, BrandCallbackTask> PENDING_CHECKS = CacheBuilder
+    public static final List<String> MODERN_LABYMOD_CHANNELS = List.of("labymod3:main", "labymod:neo");
+    public static final String LEGACY_LABYMOD_CHANNEL = "LMC";
+
+    private final Cache<UUID, BrandCallbackTask> PENDING_CHECKS = Caffeine
             .newBuilder()
             .expireAfterWrite(1, TimeUnit.SECONDS)
-            .removalListener((entry) -> {
-                if (entry.getCause() != RemovalCause.EXPIRED) {
-                    return;
-                }
-
-                BrandCheckProcessor.this.FINALLY_CHECKED.add((UUID) entry.getKey());
-                ((BrandCallbackTask)entry.getValue()).complete();
+            .removalListener((key, value, cause) -> {
+                BrandCheckProcessor.this.FINALLY_CHECKED.add((UUID) key);
+                ((BrandCallbackTask)value).complete();
             })
             .build();
 
@@ -52,7 +51,7 @@ public class BrandCheckProcessor {
             return;
         }
 
-        PlayerCheckData checkData = CoreInstance.get().getChecksCache().get(username);
+        PlayerCheckData checkData = CoreInstance.get().getCheckDataCache().get(username);
 
         if (checkData == null) {
             return;
@@ -62,26 +61,29 @@ public class BrandCheckProcessor {
 
         if (task == null) {
             task = new BrandCallbackTask(username, checkData);
+            task.start();
             PENDING_CHECKS.put(playerUUID, task);
         }
 
         if (isLabyMod(channel)) {
-            ByteArrayDataInput dataInput = ByteStreams.newDataInput(bytes);
-            String key = dataInput.readUTF();
+            String brand = "labymod:";
 
             try {
-                Document parsedInfo;
+                ByteBuf buf = Unpooled.wrappedBuffer(bytes);
+                String key = ProtocolUtils.readString(buf);
 
                 if (key.equals("INFO")) {
-                    parsedInfo = Document.parse(dataInput.readUTF());
+                    String json = ProtocolUtils.readString(buf);
+                    Document parsedInfo = Document.parse(json);
+                    brand += parsedInfo.getOrDefault("version", "unknown");
                 } else {
-                    parsedInfo = Document.parse(key);
+                    return;
                 }
-
-                task.addBrand("labymod:" + parsedInfo.getOrDefault("version", "unknown"));
             } catch (Exception exception) {
-                task.addBrand("labymod:unknown");
+                brand += "unknown";
             }
+
+            task.addBrand(brand);
         } else {
             task.addBrand(new String(bytes));
         }
@@ -90,7 +92,6 @@ public class BrandCheckProcessor {
     public void onPlayerDisconnect(UUID playerUUID) {
         PENDING_CHECKS.invalidate(playerUUID);
         FINALLY_CHECKED.remove(playerUUID);
-        //CoreInstance.get().getPendingTasks().remove(username);
     }
 
     public boolean isAllowed(String channel) {
@@ -98,10 +99,10 @@ public class BrandCheckProcessor {
     }
 
     public boolean isLabyMod(String channel) {
-        return channel.equals("labymod3:main") || channel.equals("labymod:neo") || channel.equals("LMC");
+        return MODERN_LABYMOD_CHANNELS.contains(channel) || LEGACY_LABYMOD_CHANNEL.equals(channel);
     }
 
-    public void actualize() {
+    public void handleTick() {
         PENDING_CHECKS.cleanUp();
     }
 

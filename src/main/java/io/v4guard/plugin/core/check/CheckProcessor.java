@@ -1,6 +1,7 @@
 package io.v4guard.plugin.core.check;
 
 import io.v4guard.plugin.core.CoreInstance;
+import io.v4guard.plugin.core.UnifiedLogger;
 import io.v4guard.plugin.core.check.nickname.NicknameCallbackTask;
 import io.v4guard.plugin.core.check.vpn.VPNCallbackTask;
 import io.v4guard.plugin.core.constants.SettingsKeys;
@@ -14,7 +15,7 @@ public abstract class CheckProcessor<E> {
 
     }
     public void forceComplete(PlayerCheckData checkData) {
-        checkData.handleWhenCompleted(null);
+        checkData.handleWhenCompleted();
     }
 
     public PlayerCheckData prepareCheckData(String username, String address, int version, String virtualHostTemp) {
@@ -23,8 +24,6 @@ public abstract class CheckProcessor<E> {
         boolean waitMode = RemoteSettings.getOrDefault(SettingsKeys.WAIT_RESPONSE, false);
         String virtualHost = HostnameUtils.detectVirtualHost(virtualHostTemp, anonVirtualHost);
         PlayerCheckData checkData = new PlayerCheckData(username, address, version, virtualHost, waitMode);
-
-        CoreInstance.get().getChecksCache().cache(username, checkData);
 
         checkData.addTask(new NicknameCallbackTask(checkData));
         checkData.addTask(new VPNCallbackTask(checkData));

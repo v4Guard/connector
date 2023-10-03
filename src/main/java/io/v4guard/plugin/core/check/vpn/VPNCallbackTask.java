@@ -14,22 +14,21 @@ import java.util.ArrayList;
 
 public class VPNCallbackTask extends CallbackTask {
     private Document data;
-    private final long startedAt;
 
     public VPNCallbackTask(PlayerCheckData playerCheckData) {
         super(playerCheckData);
-
-        this.startedAt = System.currentTimeMillis();
     }
 
     public void start() {
+        super.start();
+
         Document doc = new Document();
 
         doc.append(VPNCheckConstants.TASK_ID, this.taskID)
                 .append(VPNCheckConstants.IP, this.checkData.getAddress())
                 .append(VPNCheckConstants.USERNAME, this.checkData.getUsername())
                 .append(VPNCheckConstants.VERSION, this.checkData.getVersion())
-                .append(VPNCheckConstants.TIMESTAMP, this.startedAt)
+                .append(VPNCheckConstants.TIMESTAMP, super.startedAt)
                 .append(VPNCheckConstants.VIRTUAL_HOST, this.checkData.getVirtualHost());
 
         CoreInstance.get().getPendingTasks().assign(this.taskID, this);
@@ -46,14 +45,10 @@ public class VPNCallbackTask extends CallbackTask {
 
     private boolean isBlocked() {
         if (!this.hasData()) {
-            throw new UnsupportedOperationException("Task is not completed yet");
+            throw new IllegalStateException("Task is not completed yet");
         }
 
         return this.data.getBoolean(VPNCheckConstants.BLOCK);
-    }
-
-    public long getStartedAt() {
-        return this.startedAt;
     }
 
     @Override

@@ -12,29 +12,30 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.messages.LegacyChannelIdentifier;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
-import com.velocitypowered.api.scheduler.ScheduledTask;
 import com.velocitypowered.api.scheduler.Scheduler;
 import io.v4guard.plugin.core.CoreInstance;
 import io.v4guard.plugin.core.accounts.MessageReceiver;
+import io.v4guard.plugin.core.cache.CheckDataCache;
 import io.v4guard.plugin.core.check.brand.BrandCheckProcessor;
 import io.v4guard.plugin.core.compatibility.PlayerFetchResult;
 import io.v4guard.plugin.core.compatibility.ServerPlatform;
 import io.v4guard.plugin.core.compatibility.UniversalPlugin;
+import io.v4guard.plugin.core.compatibility.UniversalTask;
 import io.v4guard.plugin.core.constants.ShieldChannels;
 import io.v4guard.plugin.velocity.accounts.VelocityMessageReceiver;
 import io.v4guard.plugin.velocity.adapter.VelocityMessenger;
 import io.v4guard.plugin.velocity.check.VelocityCheckProcessor;
-import io.v4guard.plugin.velocity.listener.AntiVPNListener;
+import io.v4guard.plugin.velocity.listener.PlayerListener;
 import io.v4guard.plugin.velocity.listener.PluginMessagingListener;
 import net.kyori.adventure.text.Component;
 import org.bstats.velocity.Metrics;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,9 +57,8 @@ public class VelocityInstance implements UniversalPlugin {
     private Metrics.Factory metricsFactory;
     private Path dataDirectory;
     private PluginDescription pluginDescription;
-    private ConcurrentHashMap<Integer, ScheduledTask> idToTaskMap;
-    private AtomicInteger nextTaskId;
     private VelocityMessenger messenger;
+    private CheckDataCache checkDataCache;
     private MessageReceiver messageReceiver;
     private VelocityCheckProcessor checkProcessor;
     private PluginMessagingListener brandCheckProcessor;
@@ -76,8 +76,6 @@ public class VelocityInstance implements UniversalPlugin {
         this.logger = logger;
         this.dataDirectory = dataDirectory;
         this.pluginDescription = pluginDescription;
-        this.idToTaskMap = new ConcurrentHashMap<>();
-        this.nextTaskId = new AtomicInteger(0);
         this.metricsFactory = metricsFactory;
     }
 
@@ -92,6 +90,12 @@ public class VelocityInstance implements UniversalPlugin {
             this.logger.warning("(Velocity) Failed to connect with bStats [WARN]");
         }
 
+        this.checkProcessor = new VelocityCheckProcessor(this);
+        this.brandCheckProcessor = new PluginMessagingListener();
+        this.messenger = new VelocityMessenger();
+        this.checkDataCache = new CheckDataCache();
+        this.messageReceiver = new VelocityMessageReceiver();
+
         try {
             coreInstance = new CoreInstance(ServerPlatform.VELOCITY, this);
             coreInstance.initialize();
@@ -100,17 +104,18 @@ public class VelocityInstance implements UniversalPlugin {
             return;
         }
 
-        this.checkProcessor = new VelocityCheckProcessor(this);
-        this.brandCheckProcessor = new PluginMessagingListener();
-        this.messenger = new VelocityMessenger();
-        this.messageReceiver = new VelocityMessageReceiver();
-
         //TODO: Why is legacy channel needs to be registered, it's identical to modern.
         this.server.getChannelRegistrar().register(new LegacyChannelIdentifier(ShieldChannels.VELOCITY_CHANNEL));
         this.server.getChannelRegistrar().register(MinecraftChannelIdentifier.from(ShieldChannels.VELOCITY_CHANNEL));
+
+        for (String channel : BrandCheckProcessor.MODERN_LABYMOD_CHANNELS) {
+            this.server.getChannelRegistrar().register(MinecraftChannelIdentifier.from(channel));
+        }
+        this.server.getChannelRegistrar().register(new LegacyChannelIdentifier(BrandCheckProcessor.LEGACY_LABYMOD_CHANNEL));
+
         this.server.getEventManager().register(this, this.messageReceiver);
         this.server.getEventManager().register(this, this.brandCheckProcessor);
-        this.server.getEventManager().register(this, new AntiVPNListener());
+        this.server.getEventManager().register(this, new PlayerListener(this));
 
         this.logger.info("(Velocity) Enabling... [DONE]");
     }
@@ -158,25 +163,20 @@ public class VelocityInstance implements UniversalPlugin {
     }
 
     @Override
-    public String getPlayerServer(String playerName) {
-        PlayerFetchResult<Player> fetchedPlayer = fetchPlayer(playerName);
-
-        if (fetchedPlayer.isOnline()) {
-            Optional<ServerConnection> server = fetchedPlayer.getPlayer().getCurrentServer();
-
-            if (server.isPresent()) {
-                return server.get().getServerInfo().getName();
-            }
-        }
-
-        return null;
-    }
-
-    @Override
     public PlayerFetchResult<Player> fetchPlayer(String playerName) {
         Optional<Player> player = this.server.getPlayer(playerName);
 
-        return new PlayerFetchResult<>(player.orElse(null), player.isPresent());
+        if (player.isEmpty()) {
+            return new PlayerFetchResult<>(null, null, false);
+        }
+
+        Optional<ServerConnection> server = player.get().getCurrentServer();
+
+        return new PlayerFetchResult<>(
+                player.get()
+                , server.map(serverConnection -> serverConnection.getServerInfo().getName()).orElse(null)
+                , true
+        );
     }
 
     @Override
@@ -189,8 +189,23 @@ public class VelocityInstance implements UniversalPlugin {
     }
 
     @Override
+    public UniversalTask schedule(Runnable runnable, long delay, long period, TimeUnit timeUnit) {
+        Scheduler.TaskBuilder taskBuilder = server.getScheduler()
+                .buildTask(this, runnable)
+                .delay(delay, timeUnit)
+                .repeat(period, timeUnit);
+
+        return new VelocityTask(taskBuilder.schedule());
+    }
+
+    @Override
     public VelocityMessenger getMessenger() {
         return messenger;
+    }
+
+    @Override
+    public CheckDataCache getCheckDataCache() {
+        return checkDataCache;
     }
 
     @Override
@@ -206,23 +221,5 @@ public class VelocityInstance implements UniversalPlugin {
     @Override
     public BrandCheckProcessor getBrandCheckProcessor() {
         return this.brandCheckProcessor;
-    }
-
-    @Override
-    public int schedule(Runnable runnable, long delay, long period, TimeUnit timeUnit) {
-        int taskId = nextTaskId.getAndIncrement();
-        Scheduler.TaskBuilder taskBuilder = server.getScheduler()
-                .buildTask(this, runnable)
-                .delay(delay, timeUnit)
-                .repeat(period, timeUnit);
-
-        idToTaskMap.put(taskId, taskBuilder.schedule());
-
-        return taskId;
-    }
-
-    @Override
-    public void cancelTask(int taskId) {
-        idToTaskMap.remove(taskId).cancel();
     }
 }

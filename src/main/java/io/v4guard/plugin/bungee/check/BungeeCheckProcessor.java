@@ -1,12 +1,14 @@
 package io.v4guard.plugin.bungee.check;
 
 import io.v4guard.plugin.bungee.BungeeInstance;
+import io.v4guard.plugin.bungee.cache.BungeeCheckDataCache;
 import io.v4guard.plugin.bungee.event.PostCheckEvent;
+import io.v4guard.plugin.core.CoreInstance;
+import io.v4guard.plugin.core.UnifiedLogger;
 import io.v4guard.plugin.core.check.CheckProcessor;
 import io.v4guard.plugin.core.check.CheckStatus;
 import io.v4guard.plugin.core.check.PlayerCheckData;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.event.AsyncEvent;
 import net.md_5.bungee.api.event.LoginEvent;
 
 import java.util.logging.Level;
@@ -27,6 +29,8 @@ public class BungeeCheckProcessor extends CheckProcessor<LoginEvent> {
                 , event.getConnection().getVersion()
                 , event.getConnection().getVirtualHost().getHostString()
         );
+
+        plugin.getCheckDataCache().rememberLogin(username, checkData);
 
         if (checkData.isWaitMode()) {
             event.registerIntent(plugin);
@@ -50,16 +54,12 @@ public class BungeeCheckProcessor extends CheckProcessor<LoginEvent> {
                 }
             }
 
-            completeIntent(checkData.isWaitMode(), event);
+            if (checkData.isWaitMode()) {
+                event.completeIntent(plugin);
+            }
         });
 
         checkData.startChecking();
 
-    }
-
-    private void completeIntent(boolean wasWaiting, AsyncEvent<?> event) {
-        if (wasWaiting) {
-            event.completeIntent(plugin);
-        }
     }
 }

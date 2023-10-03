@@ -1,8 +1,9 @@
 package io.v4guard.plugin.velocity.check;
 
 import com.velocitypowered.api.event.Continuation;
-import com.velocitypowered.api.event.ResultedEvent;
+import com.velocitypowered.api.event.ResultedEvent.ComponentResult;
 import com.velocitypowered.api.event.connection.LoginEvent;
+import io.v4guard.plugin.core.CoreInstance;
 import io.v4guard.plugin.core.UnifiedLogger;
 import io.v4guard.plugin.core.check.CheckProcessor;
 import io.v4guard.plugin.core.check.CheckStatus;
@@ -35,6 +36,8 @@ public class VelocityCheckProcessor extends CheckProcessor<LoginEvent> {
 
         if (!checkData.isWaitMode()) {
             continuation.resume();
+        } else {
+            CoreInstance.get().getCheckDataCache().cache(username, checkData);
         }
 
         //long start = System.currentTimeMillis();
@@ -58,7 +61,7 @@ public class VelocityCheckProcessor extends CheckProcessor<LoginEvent> {
                 this.plugin.getServer().getEventManager().fire(apiEvent).thenAccept((resultEvent) -> {
                     if (checkData.getCheckStatus() == CheckStatus.USER_DENIED && resultEvent.getResult().isAllowed()) {
                         if (checkData.isWaitMode()) {
-                            event.setResult(ResultedEvent.ComponentResult.denied(Component.text(checkData.getKickReason())));
+                            event.setResult(ComponentResult.denied(Component.text(checkData.getKickReason())));
                         } else {
                             event.getPlayer().disconnect(Component.text(checkData.getKickReason()));
                         }
@@ -66,16 +69,16 @@ public class VelocityCheckProcessor extends CheckProcessor<LoginEvent> {
                 });
             }
 
-            continueEvent(checkData.isWaitMode(), continuation);
+            if (checkData.isWaitMode()) {
+                if (event.getPlayer().isActive()) {
+                    CoreInstance.get().getCheckDataCache().cache(username, checkData);
+                }
+
+                continuation.resume();
+            }
         });
 
         checkData.startChecking();
-    }
-
-    private void continueEvent(boolean wasWaiting, Continuation continuation) {
-        if (wasWaiting) {
-            continuation.resume();
-        }
     }
 
 }

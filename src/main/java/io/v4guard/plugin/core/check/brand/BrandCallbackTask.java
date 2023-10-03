@@ -22,7 +22,7 @@ public class BrandCallbackTask extends CallbackTask {
         CoreInstance.get().getBackend().getSocket().emit(
                 "mc:brand"
                 , new Document()
-                        .append("username", checkData.getUsername())
+                        .append("username", super.checkData.getUsername())
                         .append("brand", BRANDS)
                         .toJson()
         );

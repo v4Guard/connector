@@ -12,9 +12,9 @@ public class CleanCacheListener implements Emitter.Listener {
         Document doc = Document.parse(args[0].toString());
 
         if(doc.containsKey("username")) {
-            CoreInstance.get().getChecksCache().cleanupChecks(doc.getString("username"));
+            CoreInstance.get().getCheckDataCache().cleanup(doc.getString("username"));
         } else {
-            CoreInstance.get().getChecksCache().invalidateAllThatNot(CheckStatus.WAITING);
+            CoreInstance.get().getCheckDataCache().invalidateAllThatNot(CheckStatus.WAITING);
         }
     }
 

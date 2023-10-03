@@ -3,6 +3,7 @@ package io.v4guard.plugin.core.socket.listener;
 import io.socket.emitter.Emitter;
 import io.v4guard.plugin.core.CoreInstance;
 import io.v4guard.plugin.core.UnifiedLogger;
+import io.v4guard.plugin.core.compatibility.UniversalTask;
 import io.v4guard.plugin.core.constants.ListenersConstants;
 import io.v4guard.plugin.core.socket.Backend;
 import io.v4guard.plugin.core.socket.SocketStatus;
@@ -16,7 +17,7 @@ import java.util.logging.Level;
 public class AuthListener implements Emitter.Listener {
     
     private Backend backend;
-    private int notificationTaskId;
+    public UniversalTask notificationTask;
     private final long MAX_AUTH_CODE_LIFETIME = TimeUnit.MINUTES.toMillis(15);
     private long authCodeGotTimestamp;
 
@@ -34,11 +35,11 @@ public class AuthListener implements Emitter.Listener {
         switch (backend.getSocketStatus()) {
             case NOT_AUTHENTICATED:
                 authCodeGotTimestamp = System.currentTimeMillis();
-                notificationTaskId = CoreInstance.get().getPlugin().schedule(() -> {
+                notificationTask = CoreInstance.get().getPlugin().schedule(() -> {
                     if (backend.getSocketStatus() == SocketStatus.NOT_AUTHENTICATED) {
                         if (TimestampUtils.isExpired(authCodeGotTimestamp, MAX_AUTH_CODE_LIFETIME)) {
                             backend.reconnect();
-                            CoreInstance.get().getPlugin().cancelTask(notificationTaskId);
+                            notificationTask.cancel();
                             return;
                         }
 
@@ -47,7 +48,7 @@ public class AuthListener implements Emitter.Listener {
                                 "This instance is not connected with your account. Connect it using this link: https://dashboard.v4guard.io/link/"
                                         + backend.getAuthCode());
                     } else {
-                        CoreInstance.get().getPlugin().cancelTask(notificationTaskId);
+                        notificationTask.cancel();
                     }
                 }, 1, 60, TimeUnit.SECONDS);
                 break;

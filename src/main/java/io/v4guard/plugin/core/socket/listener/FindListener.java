@@ -2,6 +2,7 @@ package io.v4guard.plugin.core.socket.listener;
 
 import io.socket.emitter.Emitter;
 import io.v4guard.plugin.core.CoreInstance;
+import io.v4guard.plugin.core.compatibility.PlayerFetchResult;
 import io.v4guard.plugin.core.socket.Backend;
 import org.bson.Document;
 
@@ -20,13 +21,13 @@ public class FindListener implements Emitter.Listener {
         if (doc.containsKey("username")) {
             String taskID = doc.getString("taskID");
             String username = doc.getString("username");
-            String server = CoreInstance.get().getPlugin().getPlayerServer(username);
+            PlayerFetchResult<?> fetchResult = CoreInstance.get().getPlugin().fetchPlayer(username);
 
-            if (server != null) {
+            if (fetchResult.getServerName() != null) {
                 backend.getSocket().emit("find"
                         , new Document("taskID", taskID)
                                 .append("username", username)
-                                .append("location", server)
+                                .append("location", fetchResult.getServerName())
                                 .toJson()
                 );
             }

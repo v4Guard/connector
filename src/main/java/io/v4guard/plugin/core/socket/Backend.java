@@ -86,7 +86,7 @@ public class Backend {
             registerListener(ListenersConstants.EVENT_CONNECT, new ConnectListener(this));
             registerListener(ListenersConstants.EVENT_RECONNECT, new ReconnectListener(this));
 
-            if(coreInstance.isDebugEnabled()) {
+            if (coreInstance.isDebugEnabled()) {
                 registerListener(
                         ListenersConstants.EVENT_CONNECT_ERROR
                         , args -> UnifiedLogger.get().log(Level.SEVERE, "An error occurred while attempting to contact server: " + Arrays.toString(args))
@@ -181,14 +181,6 @@ public class Backend {
 
     public void setSocket(Socket socket) {
         this.socket = socket;
-    }
-
-    public IO.Options getOptions() {
-        return options;
-    }
-
-    public void setOptions(IO.Options options) {
-        this.options = options;
     }
 
     public boolean isReconnected() {

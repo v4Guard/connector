@@ -1,14 +1,13 @@
 package io.v4guard.plugin.core.check;
 
-import io.v4guard.plugin.core.CoreInstance;
-
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 
 public class PlayerCheckData {
     private ConcurrentLinkedQueue<CallbackTask> futureCallbackTasks;
+    private CallbackTask currentTask;
 
-    private Consumer<Exception>  whenCompleted;
+    private Consumer<Exception> whenCompleted;
 
     private CheckStatus checkStatus;
     private String username;
@@ -17,20 +16,23 @@ public class PlayerCheckData {
     private String virtualHost;
 
     private boolean waitMode;
-    private boolean started;
+    private boolean active;
 
     private String kickReason;
     private BlockReason blockReason;
+
+    private long createdAt;
 
     public PlayerCheckData(String username, String address, int version, String virtualHost, boolean waitMode) {
         this.username = username;
         this.address = address;
         this.version = version;
         this.virtualHost = virtualHost;
-        this.waitMode = waitMode;
+        this.waitMode = /*waitMode*/true;
         this.kickReason = "Disconnected";
         this.blockReason = BlockReason.NONE;
         this.checkStatus = CheckStatus.WAITING;
+        this.createdAt = System.currentTimeMillis();
         this.futureCallbackTasks = new ConcurrentLinkedQueue<>();
     }
 
@@ -43,7 +45,8 @@ public class PlayerCheckData {
             return;
         }
 
-        this.started = true;
+        this.currentTask = this.futureCallbackTasks.peek();
+        this.active = true;
 
         this.getCurrentTask().start();
     }
@@ -54,35 +57,44 @@ public class PlayerCheckData {
     }
 
     public void triggerTaskCompleted() {
-        CallbackTask currentTask = this.futureCallbackTasks.poll();
-
         if (this.checkStatus == CheckStatus.USER_DENIED) {
-            handleWhenCompleted(null);
-        } else if (currentTask != null) {
-            try {
-                currentTask.start();
-            } catch (Exception exception) {
-                handleWhenCompleted(exception);
-            }
+            handleWhenCompleted();
         } else {
-            handleWhenCompleted(null);
+            CallbackTask nextTask = this.futureCallbackTasks.poll();
+
+            if (nextTask != null) {
+                this.currentTask = nextTask;
+
+                try {
+                    nextTask.start();
+                } catch (Exception exception) {
+                    handleWhenCompleted(exception);
+                }
+            } else {
+                handleWhenCompleted();
+            }
         }
     }
 
-    private CallbackTask getCurrentTask() {
-        return this.futureCallbackTasks.peek();
+    public CallbackTask getCurrentTask() {
+        return this.currentTask;
     }
 
     public void handleWhenCompleted(Exception exception) {
-        if (!this.started) {
+        if (!this.active) {
             return;
         }
 
         this.futureCallbackTasks.clear();
 
-        this.started = false;
+        this.currentTask = null;
+        this.active = false;
 
         this.whenCompleted.accept(exception);
+    }
+
+    public void handleWhenCompleted() {
+        handleWhenCompleted(null);
     }
 
     public CheckStatus getCheckStatus() {
@@ -127,6 +139,14 @@ public class PlayerCheckData {
 
     public boolean isWaitMode() {
         return this.waitMode;
+    }
+
+    public boolean isActive() {
+        return this.active;
+    }
+
+    public long getCreatedAt() {
+        return this.createdAt;
     }
 
 

@@ -19,9 +19,4 @@ public class PluginMessagingListener extends BrandCheckProcessor implements List
 
         super.process(player.getName(), player.getUniqueId(), e.getTag(), e.getData());
     }
-
-    @EventHandler
-    public void onPlayerDisconnect(PlayerDisconnectEvent event) {
-        super.onPlayerDisconnect(event.getPlayer().getUniqueId());
-    }
 }
