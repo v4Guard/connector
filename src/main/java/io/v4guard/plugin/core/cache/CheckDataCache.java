@@ -2,7 +2,6 @@ package io.v4guard.plugin.core.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import io.v4guard.plugin.core.UnifiedLogger;
 import io.v4guard.plugin.core.check.CheckStatus;
 import io.v4guard.plugin.core.check.PlayerCheckData;
 
@@ -26,14 +25,7 @@ public class CheckDataCache {
 
     public void handleTick() {
         for (PlayerCheckData checkData : USERNAME_TO_DATA_CACHE.asMap().values()) {
-            if (!checkData.isActive()) {
-                continue;
-            }
-
-            if (checkData.getCurrentTask().isExpired()) {
-                checkData.setCheckStatus(CheckStatus.EXPIRED);
-                checkData.triggerTaskCompleted();
-            }
+            checkData.triggerCompletedIfExpired();
         }
     }
 

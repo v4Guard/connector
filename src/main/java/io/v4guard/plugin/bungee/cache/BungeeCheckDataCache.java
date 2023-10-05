@@ -17,7 +17,7 @@ public class BungeeCheckDataCache extends CheckDataCache {
     private final Cache<String, PlayerCheckData> TEMPORAL_CACHE = Caffeine
             .newBuilder()
             .expireAfterWrite(
-                    ProxyServer.getInstance().getConfig().getServerConnectTimeout()
+                    ProxyServer.getInstance().getConfig().getTimeout()
                     , TimeUnit.MILLISECONDS
             ).build();
 
@@ -32,6 +32,10 @@ public class BungeeCheckDataCache extends CheckDataCache {
     @Override
     public void handleTick() {
         TEMPORAL_CACHE.cleanUp();
+
+        for (PlayerCheckData checkData : TEMPORAL_CACHE.asMap().values()) {
+            checkData.triggerCompletedIfExpired();
+        }
 
         super.handleTick();
     }

@@ -14,9 +14,6 @@ public abstract class CheckProcessor<E> {
     public void onEvent(String username, E event) {
 
     }
-    public void forceComplete(PlayerCheckData checkData) {
-        checkData.handleWhenCompleted();
-    }
 
     public PlayerCheckData prepareCheckData(String username, String address, int version, String virtualHostTemp) {
         Document privacySettings = RemoteSettings.getOrDefault(SettingsKeys.PRIVACY, new Document());

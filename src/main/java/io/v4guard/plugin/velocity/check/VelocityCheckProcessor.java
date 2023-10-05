@@ -34,10 +34,10 @@ public class VelocityCheckProcessor extends CheckProcessor<LoginEvent> {
                 , virtualHost.isPresent() ? virtualHost.get().getHostString() : "notFound"
         );
 
+        CoreInstance.get().getCheckDataCache().cache(username, checkData);
+
         if (!checkData.isWaitMode()) {
             continuation.resume();
-        } else {
-            CoreInstance.get().getCheckDataCache().cache(username, checkData);
         }
 
         //long start = System.currentTimeMillis();
@@ -70,10 +70,6 @@ public class VelocityCheckProcessor extends CheckProcessor<LoginEvent> {
             }
 
             if (checkData.isWaitMode()) {
-                if (event.getPlayer().isActive()) {
-                    CoreInstance.get().getCheckDataCache().cache(username, checkData);
-                }
-
                 continuation.resume();
             }
         });

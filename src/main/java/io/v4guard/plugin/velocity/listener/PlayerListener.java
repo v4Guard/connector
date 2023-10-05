@@ -32,8 +32,7 @@ public class PlayerListener {
 
     @Subscribe(order = PostOrder.EARLY)
     public void onProxyDisconnect(DisconnectEvent event) {
-        if (event.getLoginStatus() == LoginStatus.SUCCESSFUL_LOGIN
-                || event.getLoginStatus() == LoginStatus.PRE_SERVER_JOIN) {
+        if (event.getLoginStatus() == LoginStatus.SUCCESSFUL_LOGIN) {
             CoreInstance.get().getCheckDataCache().cleanup(event.getPlayer().getUsername());
         }
     }

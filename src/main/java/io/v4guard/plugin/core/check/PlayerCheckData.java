@@ -80,7 +80,18 @@ public class PlayerCheckData {
         return this.currentTask;
     }
 
-    public void handleWhenCompleted(Exception exception) {
+    public void triggerCompletedIfExpired() {
+        if (!this.active) {
+            return;
+        }
+
+        if (this.currentTask.isExpired()) {
+            this.checkStatus = CheckStatus.EXPIRED;
+            triggerTaskCompleted();
+        }
+    }
+
+    private void handleWhenCompleted(Exception exception) {
         if (!this.active) {
             return;
         }
@@ -93,7 +104,7 @@ public class PlayerCheckData {
         this.whenCompleted.accept(exception);
     }
 
-    public void handleWhenCompleted() {
+    private void handleWhenCompleted() {
         handleWhenCompleted(null);
     }
 

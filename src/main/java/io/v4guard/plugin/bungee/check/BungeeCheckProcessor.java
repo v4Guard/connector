@@ -60,6 +60,5 @@ public class BungeeCheckProcessor extends CheckProcessor<LoginEvent> {
         });
 
         checkData.startChecking();
-
     }
 }
