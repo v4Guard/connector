@@ -1,20 +1,21 @@
 package io.v4guard.plugin.core.utils;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.DecoderException;
 import org.bson.Document;
 
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.StringJoiner;
 
 public class StringUtils {
 
     public static String replacePlaceholders(String message, Document placeholders){
-        if(placeholders == null) return message;
-        for(String var : placeholders.keySet()){
+        if(placeholders == null) {
+            return message;
+        }
+
+        for(String var : placeholders.keySet()) {
             message = message.replace("{" + var + "}", placeholders.get(var).toString());
         }
+
         return message;
     }
 
@@ -28,13 +29,13 @@ public class StringUtils {
         return message.toString();
     }
 
-    /**
+    /* *
      * Reads a varint from the given byte buffer
      *
      * @param buf the byte buffer the varint should be read from
      * @return the int read
      */
-    public static int readVarIntFromBuffer( ByteBuf buf ) {
+    /*public static int readVarIntFromBuffer( ByteBuf buf ) {
         int i = 0;
         int j = 0;
 
@@ -48,16 +49,16 @@ public class StringUtils {
         } while ( (b0 & 128) == 128 );
 
         return i;
-    }
+    }*/
 
-    /**
+    /* *
      * Reads a string from the given byte buffer
      *
      * @param buf       the byte buffer the string should be read from
      * @param maxLength the string's max-length
      * @return the string read
      */
-    public static String readString(ByteBuf buf, int maxLength ) {
+    /*public static String readString(ByteBuf buf, int maxLength ) {
         int i = readVarIntFromBuffer( buf );
 
         if ( i > maxLength * 4 ) {
@@ -68,14 +69,13 @@ public class StringUtils {
             byte[] bytes = new byte[i];
             buf.readBytes( bytes );
 
-            String s = new String( bytes, Charset.forName( "UTF-8" ) );
+            String s = new String( bytes, StandardCharsets.UTF_8);
             if ( s.length() > maxLength ) {
                 throw new DecoderException( "The received string length is longer than maximum allowed (" + i + " > " + maxLength + ")" );
             } else {
                 return s;
             }
         }
-    }
-
+    }*/
 
 }

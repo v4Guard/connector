@@ -1,54 +1,52 @@
 package io.v4guard.plugin.bungee.accounts;
 
-import io.v4guard.plugin.bungee.v4GuardBungee;
+import io.v4guard.plugin.core.CoreInstance;
+import io.v4guard.plugin.core.accounts.MessageReceiver;
 import io.v4guard.plugin.core.accounts.auth.AuthType;
 import io.v4guard.plugin.core.accounts.auth.Authentication;
-import io.v4guard.plugin.core.accounts.messaging.MessageReceiver;
-import io.v4guard.plugin.core.v4GuardCore;
+import io.v4guard.plugin.core.constants.ShieldChannels;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
-import org.bson.Document;
-
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
+import net.md_5.bungee.event.EventPriority;
 
 public class BungeeMessageReceiver extends MessageReceiver implements Listener {
 
-    public BungeeMessageReceiver(Plugin plugin) {
-        plugin.getProxy().getPluginManager().registerListener(plugin, this);
-        if(!MessageReceiver.CHANNEL.equals("BungeeCord")) {
-            plugin.getProxy().registerChannel(MessageReceiver.CHANNEL);
-        }
-    }
-
-    @EventHandler
-    public void onMessage(PluginMessageEvent e){
-        boolean invalidatedCache = (boolean) v4GuardBungee.getCoreInstance().getBackendConnector().getSettings().getOrDefault("invalidateCache", false);
-        if(invalidatedCache) return;
-        if (!e.getTag().equals(MessageReceiver.CHANNEL)) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onMessage(PluginMessageEvent event) {
+        if (!event.getTag().equals(ShieldChannels.BUNGEE_CHANNEL)) {
             return;
         }
-        DataInputStream in = new DataInputStream(new ByteArrayInputStream(e.getData()));
-        try {
-            String data = in.readUTF();
-            Document doc = Document.parse(data);
-            Authentication auth = Authentication.deserialize(doc);
-            v4GuardCore.getInstance().getAccountShieldManager().sendSocketMessage(auth);
-        } catch (Exception ex) {}
+
+        //event.setCancelled(true);
+
+        if (!(event.getSender() instanceof Server)) {
+            return;
+        }
+
+        super.processPluginMessage(event.getData());
     }
 
-    @EventHandler(priority = Byte.MAX_VALUE)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPostLogin(PostLoginEvent e) {
-        if(!v4GuardCore.getInstance().isAccountShieldFound()) {
-            ProxiedPlayer player = e.getPlayer();
-            if (player.getPendingConnection().isOnlineMode()) {
-                Authentication auth = new Authentication(player.getName(), AuthType.MOJANG, player.hasPermission("v4guard.accshield"));
-                v4GuardCore.getInstance().getAccountShieldManager().sendSocketMessage(auth);
-            }
+        if (CoreInstance.get().isAccountShieldFound()) {
+            return;
+        }
+
+        ProxiedPlayer player = e.getPlayer();
+
+        if (player.getPendingConnection().isOnlineMode()) {
+            Authentication auth = new Authentication(
+                    player.getName()
+                    , player.getUniqueId()
+                    , AuthType.MOJANG
+                    , player.hasPermission("v4guard.accshield")
+            );
+
+            CoreInstance.get().getAccountShieldSender().sendSocketMessage(auth);
         }
     }
 

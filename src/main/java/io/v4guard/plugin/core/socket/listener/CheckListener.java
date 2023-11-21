@@ -1,20 +1,22 @@
 package io.v4guard.plugin.core.socket.listener;
 
-import io.v4guard.plugin.core.v4GuardCore;
-import io.v4guard.plugin.core.tasks.types.CompletableIPCheckTask;
 import io.socket.emitter.Emitter;
+import io.v4guard.plugin.core.CoreInstance;
+import io.v4guard.plugin.core.check.vpn.VPNCallbackTask;
 import org.bson.Document;
+
+import java.util.concurrent.TimeUnit;
 
 public class CheckListener implements Emitter.Listener {
 
     @Override
     public void call(Object... args) {
         Document doc = Document.parse(args[0].toString());
-        CompletableIPCheckTask task = (CompletableIPCheckTask) v4GuardCore.getInstance().getCompletableTaskManager().getTasks().get(doc.getString("taskID"));
-        if (task == null) {
-            return;
+        VPNCallbackTask task = (VPNCallbackTask) CoreInstance.get().getPendingTasks().get(doc.getString("taskID"));
+
+        if (task != null) {
+            task.setData(doc);
+            task.complete();
         }
-        task.addData(doc);
-        task.check();
     }
 }

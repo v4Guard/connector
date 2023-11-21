@@ -6,7 +6,7 @@
 
     <groupId>io.v4guard</groupId>
     <artifactId>v4guard-plugin</artifactId>
-    <version>1.1.4b</version>
+    <version>1.2.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -95,7 +95,7 @@
     </build>
     <repositories>
         <repository>
-            <id>spigot-repo</id>
+                <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
         <repository>
@@ -104,7 +104,7 @@
         </repository>
         <repository>
             <id>papermc</id>
-            <url>	https://repo.papermc.io/repository/maven-public/</url>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
     </repositories>
     <dependencies>
@@ -140,7 +140,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20090211</version>
+            <version>20230227</version>
         </dependency>
 
         <dependency>

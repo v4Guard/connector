@@ -1,22 +1,19 @@
 package io.v4guard.plugin.core.socket.listener;
 
-import io.v4guard.plugin.core.socket.BackendConnector;
 import io.socket.emitter.Emitter;
-
-import java.util.HashMap;
+import io.v4guard.plugin.core.socket.Backend;
 
 public class ConnectListener implements Emitter.Listener {
 
-    BackendConnector backendConnector;
+    private Backend backend;
 
-    public ConnectListener(BackendConnector backendConnector) {
-        this.backendConnector = backendConnector;
+    public ConnectListener(Backend backend) {
+        this.backend = backend;
     }
 
     @Override
     public void call(Object... args) {
         //v4GuardCore.getInstance().getLogger().log(Level.INFO,"socket.on(connect)");
-        backendConnector.setSettings(new HashMap<>());
-        backendConnector.handleEvents();
+        backend.initializeListeners();
     }
 }
