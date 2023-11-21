@@ -1,15 +1,13 @@
 package io.v4guard.plugin.bungee.check;
 
 import io.v4guard.plugin.bungee.BungeeInstance;
-import io.v4guard.plugin.bungee.cache.BungeeCheckDataCache;
 import io.v4guard.plugin.bungee.event.PostCheckEvent;
-import io.v4guard.plugin.core.CoreInstance;
-import io.v4guard.plugin.core.UnifiedLogger;
 import io.v4guard.plugin.core.check.CheckProcessor;
 import io.v4guard.plugin.core.check.CheckStatus;
 import io.v4guard.plugin.core.check.PlayerCheckData;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.event.LoginEvent;
+import org.geysermc.floodgate.api.FloodgateApi;
 
 import java.util.logging.Level;
 
@@ -28,6 +26,7 @@ public class BungeeCheckProcessor extends CheckProcessor<LoginEvent> {
                 , event.getConnection().getSocketAddress().toString()
                 , event.getConnection().getVersion()
                 , event.getConnection().getVirtualHost().getHostString()
+                , plugin.isFloodGateFound() && FloodgateApi.getInstance().isFloodgatePlayer(event.getConnection().getUniqueId())
         );
 
         plugin.getCheckDataCache().rememberLogin(username, checkData);

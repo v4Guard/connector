@@ -32,9 +32,7 @@ import org.bstats.velocity.Metrics;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,6 +60,7 @@ public class VelocityInstance implements UniversalPlugin {
     private MessageReceiver messageReceiver;
     private VelocityCheckProcessor checkProcessor;
     private PluginMessagingListener brandCheckProcessor;
+    private boolean floodGateFound;
 
     @Inject
     public VelocityInstance(
@@ -102,6 +101,10 @@ public class VelocityInstance implements UniversalPlugin {
         } catch (Exception exception) {
             this.logger.log(Level.SEVERE, "(Velocity) Enabling... [ERROR]", exception);
             return;
+        }
+
+        if (isPluginEnabled("floodgate")) {
+            floodGateFound = true;
         }
 
         //TODO: Why is legacy channel needs to be registered, it's identical to modern.
@@ -221,5 +224,9 @@ public class VelocityInstance implements UniversalPlugin {
     @Override
     public BrandCheckProcessor getBrandCheckProcessor() {
         return this.brandCheckProcessor;
+    }
+
+    public boolean isFloodGateFound() {
+        return floodGateFound;
     }
 }

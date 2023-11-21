@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 public class CoreInstance {
 
-    public static final String PLUGIN_VERSION = "1.2.0";
+    public static final String PLUGIN_VERSION = "2.0.0";
 
     private static CoreInstance instance;
 

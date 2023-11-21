@@ -28,6 +28,7 @@ public class VPNCallbackTask extends CallbackTask {
                 .append(VPNCheckConstants.IP, this.checkData.getAddress())
                 .append(VPNCheckConstants.USERNAME, this.checkData.getUsername())
                 .append(VPNCheckConstants.VERSION, this.checkData.getVersion())
+                .append(VPNCheckConstants.BEDROCK, this.checkData.isBedrock())
                 .append(VPNCheckConstants.TIMESTAMP, super.startedAt)
                 .append(VPNCheckConstants.VIRTUAL_HOST, this.checkData.getVirtualHost());
 

@@ -4,13 +4,13 @@ import com.velocitypowered.api.event.Continuation;
 import com.velocitypowered.api.event.ResultedEvent.ComponentResult;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import io.v4guard.plugin.core.CoreInstance;
-import io.v4guard.plugin.core.UnifiedLogger;
 import io.v4guard.plugin.core.check.CheckProcessor;
 import io.v4guard.plugin.core.check.CheckStatus;
 import io.v4guard.plugin.core.check.PlayerCheckData;
 import io.v4guard.plugin.velocity.VelocityInstance;
 import io.v4guard.plugin.velocity.event.PostCheckEvent;
 import net.kyori.adventure.text.Component;
+import org.geysermc.floodgate.api.FloodgateApi;
 
 import java.net.InetSocketAddress;
 import java.util.Optional;
@@ -32,6 +32,7 @@ public class VelocityCheckProcessor extends CheckProcessor<LoginEvent> {
                 , event.getPlayer().getRemoteAddress().getAddress().getHostAddress()
                 , event.getPlayer().getProtocolVersion().getProtocol()
                 , virtualHost.isPresent() ? virtualHost.get().getHostString() : "notFound"
+                , plugin.isFloodGateFound() && FloodgateApi.getInstance().isFloodgatePlayer(event.getPlayer().getUniqueId())
         );
 
         CoreInstance.get().getCheckDataCache().cache(username, checkData);

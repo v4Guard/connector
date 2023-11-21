@@ -6,7 +6,7 @@
 
     <groupId>io.v4guard</groupId>
     <artifactId>v4guard-plugin</artifactId>
-    <version>1.2.0</version>
+    <version>2.0.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -106,8 +106,19 @@
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>floodgate</id>
+            <url>https://repo.opencollab.dev/main/</url>
+        </repository>
+
     </repositories>
     <dependencies>
+        <dependency>
+            <groupId>org.geysermc.floodgate</groupId>
+            <artifactId>api</artifactId>
+            <version>2.2.2-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.velocitypowered</groupId>
             <artifactId>velocity-api</artifactId>

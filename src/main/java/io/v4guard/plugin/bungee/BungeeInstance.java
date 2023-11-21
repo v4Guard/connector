@@ -19,6 +19,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.bstats.bungeecord.Metrics;
+import org.geysermc.floodgate.api.FloodgateApi;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -32,6 +33,7 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
     private BungeeCheckProcessor checkProcessor;
     private PluginMessagingListener brandCheckProcessor;
     private CoreInstance coreInstance;
+    private boolean floodGateFound;
 
     @Override
     public void onEnable() {
@@ -54,6 +56,10 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
         } catch (Exception exception) {
             getLogger().log(Level.SEVERE, "(Bungee) Enabling... [ERROR]", exception);
             return;
+        }
+
+        if (isPluginEnabled("floodgate")) {
+            floodGateFound = true;
         }
 
         //this.getProxy().registerChannel(MessageReceiver.CHANNEL);
@@ -146,4 +152,7 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
         return brandCheckProcessor;
     }
 
+    public boolean isFloodGateFound() {
+        return floodGateFound;
+    }
 }

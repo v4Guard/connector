@@ -15,12 +15,12 @@ public abstract class CheckProcessor<E> {
 
     }
 
-    public PlayerCheckData prepareCheckData(String username, String address, int version, String virtualHostTemp) {
+    public PlayerCheckData prepareCheckData(String username, String address, int version, String virtualHostTemp, boolean bedrock) {
         Document privacySettings = RemoteSettings.getOrDefault(SettingsKeys.PRIVACY, new Document());
         boolean anonVirtualHost = privacySettings.getBoolean(SettingsKeys.ANON_VIRTUAL_HOST, true);
         boolean waitMode = RemoteSettings.getOrDefault(SettingsKeys.WAIT_RESPONSE, false);
         String virtualHost = HostnameUtils.detectVirtualHost(virtualHostTemp, anonVirtualHost);
-        PlayerCheckData checkData = new PlayerCheckData(username, address, version, virtualHost, waitMode);
+        PlayerCheckData checkData = new PlayerCheckData(username, address, version, virtualHost, waitMode, bedrock);
 
         checkData.addTask(new NicknameCallbackTask(checkData));
         checkData.addTask(new VPNCallbackTask(checkData));

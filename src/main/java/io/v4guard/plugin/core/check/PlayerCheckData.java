@@ -17,18 +17,20 @@ public class PlayerCheckData {
 
     private boolean waitMode;
     private boolean active;
+    private boolean bedrock;
 
     private String kickReason;
     private BlockReason blockReason;
 
     private long createdAt;
 
-    public PlayerCheckData(String username, String address, int version, String virtualHost, boolean waitMode) {
+    public PlayerCheckData(String username, String address, int version, String virtualHost, boolean waitMode, boolean bedrock) {
         this.username = username;
         this.address = address;
         this.version = version;
         this.virtualHost = virtualHost;
         this.waitMode = waitMode;
+        this.bedrock = bedrock;
         this.kickReason = "Disconnected";
         this.blockReason = BlockReason.NONE;
         this.checkStatus = CheckStatus.WAITING;
@@ -154,6 +156,10 @@ public class PlayerCheckData {
 
     public boolean isActive() {
         return this.active;
+    }
+
+    public boolean isBedrock() {
+        return this.bedrock;
     }
 
     public long getCreatedAt() {

@@ -10,6 +10,7 @@ public class VPNCheckConstants {
     public static final String TIMESTAMP = "timestamp";
     public static final String VIRTUAL_HOST = "virtualHost";
     public static final String BLOCK = "block";
+    public static final String BEDROCK = "bedrock";
     public static final String CHECK_COMMAND = "check";
 
 }
