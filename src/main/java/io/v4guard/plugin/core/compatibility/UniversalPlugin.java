@@ -23,5 +23,6 @@ public interface UniversalPlugin {
     CheckProcessor<?> getCheckProcessor();
     BrandCheckProcessor getBrandCheckProcessor();
     PlayerSettingsCheckProcessor getPlayerSettingsCheckProcessor();
+    boolean isFloodgatePresent();
 
 }

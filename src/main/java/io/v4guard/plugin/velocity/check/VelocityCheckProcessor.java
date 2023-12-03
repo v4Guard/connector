@@ -32,7 +32,7 @@ public class VelocityCheckProcessor extends CheckProcessor<LoginEvent> {
                 , event.getPlayer().getRemoteAddress().getAddress().getHostAddress()
                 , event.getPlayer().getProtocolVersion().getProtocol()
                 , virtualHost.isPresent() ? virtualHost.get().getHostString() : "notFound"
-                , plugin.isFloodGateFound() && FloodgateApi.getInstance().isFloodgatePlayer(event.getPlayer().getUniqueId())
+                , plugin.isFloodgatePresent() && FloodgateApi.getInstance().isFloodgatePlayer(event.getPlayer().getUniqueId())
         );
 
         CoreInstance.get().getCheckDataCache().cache(username, checkData);

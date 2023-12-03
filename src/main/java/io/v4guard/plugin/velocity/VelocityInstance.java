@@ -236,7 +236,9 @@ public class VelocityInstance implements UniversalPlugin {
         return playerSettingsProcessor;
     }
 
-    public boolean isFloodGateFound() {
+    @Override
+    public boolean isFloodgatePresent() {
         return floodGateFound;
     }
+
 }

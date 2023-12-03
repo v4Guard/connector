@@ -26,7 +26,7 @@ public class BungeeCheckProcessor extends CheckProcessor<LoginEvent> {
                 , event.getConnection().getSocketAddress().toString()
                 , event.getConnection().getVersion()
                 , event.getConnection().getVirtualHost().getHostString()
-                , plugin.isFloodGateFound() && FloodgateApi.getInstance().isFloodgatePlayer(event.getConnection().getUniqueId())
+                , plugin.isFloodgatePresent() && FloodgateApi.getInstance().isFloodgatePlayer(event.getConnection().getUniqueId())
         );
 
         plugin.getCheckDataCache().rememberLogin(username, checkData);
