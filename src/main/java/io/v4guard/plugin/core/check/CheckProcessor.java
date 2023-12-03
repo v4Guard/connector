@@ -1,7 +1,5 @@
 package io.v4guard.plugin.core.check;
 
-import io.v4guard.plugin.core.CoreInstance;
-import io.v4guard.plugin.core.UnifiedLogger;
 import io.v4guard.plugin.core.check.nickname.NicknameCallbackTask;
 import io.v4guard.plugin.core.check.vpn.VPNCallbackTask;
 import io.v4guard.plugin.core.constants.SettingsKeys;

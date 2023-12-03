@@ -13,7 +13,6 @@ import org.bson.Document;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class BrandCheckProcessor {

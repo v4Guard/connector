@@ -1,7 +1,6 @@
 package io.v4guard.plugin.core.accounts;
 
 import io.v4guard.plugin.core.CoreInstance;
-import io.v4guard.plugin.core.UnifiedLogger;
 import io.v4guard.plugin.core.accounts.auth.Authentication;
 import io.v4guard.plugin.core.constants.SettingsKeys;
 import io.v4guard.plugin.core.socket.RemoteSettings;
@@ -9,7 +8,6 @@ import org.bson.Document;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-import java.util.logging.Level;
 
 public abstract class MessageReceiver {
 
