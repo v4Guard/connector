@@ -1,7 +1,6 @@
 package io.v4guard.plugin.bungee.listener;
 
 import io.v4guard.plugin.bungee.BungeeInstance;
-import io.v4guard.plugin.bungee.cache.BungeeCheckDataCache;
 import io.v4guard.plugin.core.CoreInstance;
 import io.v4guard.plugin.core.check.PlayerCheckData;
 import net.md_5.bungee.api.connection.PendingConnection;

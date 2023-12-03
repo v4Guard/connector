@@ -19,6 +19,8 @@ public class BrandCallbackTask extends CallbackTask {
 
     @Override
     public void complete() {
+        super.checkData.setPlayerBrandChecked(true);
+
         CoreInstance.get().getBackend().getSocket().emit(
                 "mc:brand"
                 , new Document()

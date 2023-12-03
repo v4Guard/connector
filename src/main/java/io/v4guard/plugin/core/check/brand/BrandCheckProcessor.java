@@ -24,13 +24,8 @@ public class BrandCheckProcessor {
     private final Cache<UUID, BrandCallbackTask> PENDING_CHECKS = Caffeine
             .newBuilder()
             .expireAfterWrite(1, TimeUnit.SECONDS)
-            .removalListener((key, value, cause) -> {
-                BrandCheckProcessor.this.FINALLY_CHECKED.add((UUID) key);
-                ((BrandCallbackTask)value).complete();
-            })
+            .removalListener((key, value, cause) -> ((BrandCallbackTask)value).complete())
             .build();
-
-    private final CopyOnWriteArrayList<UUID> FINALLY_CHECKED = new CopyOnWriteArrayList<>();
 
     public void process(String username, UUID playerUUID, String channel, byte[] bytes) {
         if (!CoreInstance.get().getBackend().isReady()) {
@@ -48,13 +43,13 @@ public class BrandCheckProcessor {
             return;
         }
 
-        if (FINALLY_CHECKED.contains(playerUUID)) {
-            return;
-        }
-
         PlayerCheckData checkData = CoreInstance.get().getCheckDataCache().get(username);
 
         if (checkData == null) {
+            return;
+        }
+
+        if (checkData.isPlayerBrandChecked()) {
             return;
         }
 
@@ -92,7 +87,6 @@ public class BrandCheckProcessor {
 
     public void onPlayerDisconnect(UUID playerUUID) {
         PENDING_CHECKS.invalidate(playerUUID);
-        FINALLY_CHECKED.remove(playerUUID);
     }
 
     public boolean isAllowed(String channel) {

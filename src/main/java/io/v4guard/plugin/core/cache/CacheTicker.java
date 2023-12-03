@@ -8,6 +8,7 @@ public class CacheTicker implements Runnable {
     public void run() {
         CoreInstance.get().getCheckDataCache().handleTick();
         CoreInstance.get().getPlugin().getBrandCheckProcessor().handleTick();
+        CoreInstance.get().getPlugin().getPlayerSettingsCheckProcessor().handleTick();
     }
 
 }

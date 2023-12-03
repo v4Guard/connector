@@ -5,11 +5,12 @@ import io.v4guard.plugin.bungee.adapter.BungeeMessenger;
 import io.v4guard.plugin.bungee.cache.BungeeCheckDataCache;
 import io.v4guard.plugin.bungee.check.BungeeCheckProcessor;
 import io.v4guard.plugin.bungee.listener.PlayerListener;
+import io.v4guard.plugin.bungee.listener.PlayerSettingsListener;
 import io.v4guard.plugin.bungee.listener.PluginMessagingListener;
 import io.v4guard.plugin.core.CoreInstance;
 import io.v4guard.plugin.core.accounts.MessageReceiver;
-import io.v4guard.plugin.core.cache.CheckDataCache;
 import io.v4guard.plugin.core.check.brand.BrandCheckProcessor;
+import io.v4guard.plugin.core.check.settings.PlayerSettingsCheckProcessor;
 import io.v4guard.plugin.core.compatibility.PlayerFetchResult;
 import io.v4guard.plugin.core.compatibility.ServerPlatform;
 import io.v4guard.plugin.core.compatibility.UniversalPlugin;
@@ -19,7 +20,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.bstats.bungeecord.Metrics;
-import org.geysermc.floodgate.api.FloodgateApi;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -32,6 +32,7 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
     private BungeeMessageReceiver messageReceiver;
     private BungeeCheckProcessor checkProcessor;
     private PluginMessagingListener brandCheckProcessor;
+    private PlayerSettingsListener playerSettingsProcessor;
     private CoreInstance coreInstance;
     private boolean floodGateFound;
 
@@ -46,6 +47,7 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
 
         this.checkProcessor = new BungeeCheckProcessor(this);
         this.brandCheckProcessor = new PluginMessagingListener();
+        this.playerSettingsProcessor = new PlayerSettingsListener();
         this.messenger = new BungeeMessenger();
         this.checkDataCache = new BungeeCheckDataCache();
         this.messageReceiver = new BungeeMessageReceiver();
@@ -65,6 +67,7 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
         //this.getProxy().registerChannel(MessageReceiver.CHANNEL);
         this.getProxy().getPluginManager().registerListener(this, this.messageReceiver);
         this.getProxy().getPluginManager().registerListener(this, this.brandCheckProcessor);
+        this.getProxy().getPluginManager().registerListener(this, this.playerSettingsProcessor);
         this.getProxy().getPluginManager().registerListener(this, new PlayerListener(this));
 
         getLogger().info("(Bungee) Enabling... [DONE]");
@@ -150,6 +153,11 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
     @Override
     public BrandCheckProcessor getBrandCheckProcessor() {
         return brandCheckProcessor;
+    }
+
+    @Override
+    public PlayerSettingsCheckProcessor getPlayerSettingsCheckProcessor() {
+        return playerSettingsProcessor;
     }
 
     public boolean isFloodGateFound() {

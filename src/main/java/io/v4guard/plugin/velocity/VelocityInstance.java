@@ -17,6 +17,7 @@ import io.v4guard.plugin.core.CoreInstance;
 import io.v4guard.plugin.core.accounts.MessageReceiver;
 import io.v4guard.plugin.core.cache.CheckDataCache;
 import io.v4guard.plugin.core.check.brand.BrandCheckProcessor;
+import io.v4guard.plugin.core.check.settings.PlayerSettingsCheckProcessor;
 import io.v4guard.plugin.core.compatibility.PlayerFetchResult;
 import io.v4guard.plugin.core.compatibility.ServerPlatform;
 import io.v4guard.plugin.core.compatibility.UniversalPlugin;
@@ -26,6 +27,7 @@ import io.v4guard.plugin.velocity.accounts.VelocityMessageReceiver;
 import io.v4guard.plugin.velocity.adapter.VelocityMessenger;
 import io.v4guard.plugin.velocity.check.VelocityCheckProcessor;
 import io.v4guard.plugin.velocity.listener.PlayerListener;
+import io.v4guard.plugin.velocity.listener.PlayerSettingsListener;
 import io.v4guard.plugin.velocity.listener.PluginMessagingListener;
 import net.kyori.adventure.text.Component;
 import org.bstats.velocity.Metrics;
@@ -60,6 +62,7 @@ public class VelocityInstance implements UniversalPlugin {
     private MessageReceiver messageReceiver;
     private VelocityCheckProcessor checkProcessor;
     private PluginMessagingListener brandCheckProcessor;
+    private PlayerSettingsListener playerSettingsProcessor;
     private boolean floodGateFound;
 
     @Inject
@@ -91,6 +94,7 @@ public class VelocityInstance implements UniversalPlugin {
 
         this.checkProcessor = new VelocityCheckProcessor(this);
         this.brandCheckProcessor = new PluginMessagingListener();
+        this.playerSettingsProcessor = new PlayerSettingsListener();
         this.messenger = new VelocityMessenger();
         this.checkDataCache = new CheckDataCache();
         this.messageReceiver = new VelocityMessageReceiver();
@@ -118,6 +122,7 @@ public class VelocityInstance implements UniversalPlugin {
 
         this.server.getEventManager().register(this, this.messageReceiver);
         this.server.getEventManager().register(this, this.brandCheckProcessor);
+        this.server.getEventManager().register(this, this.playerSettingsProcessor);
         this.server.getEventManager().register(this, new PlayerListener(this));
 
         this.logger.info("(Velocity) Enabling... [DONE]");
@@ -224,6 +229,11 @@ public class VelocityInstance implements UniversalPlugin {
     @Override
     public BrandCheckProcessor getBrandCheckProcessor() {
         return this.brandCheckProcessor;
+    }
+
+    @Override
+    public PlayerSettingsCheckProcessor getPlayerSettingsCheckProcessor() {
+        return playerSettingsProcessor;
     }
 
     public boolean isFloodGateFound() {

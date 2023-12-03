@@ -9,6 +9,7 @@ public class SettingsKeys {
     public static final String ADDONS = "addons";
     public static final String NAME_VALIDATOR = "nameValidator";
     public static final String COLLECT_MC_BRAND = "collectMCBrand";
+    public static final String COLLECT_PLAYER_SETTINGS = "collectPlayerSettings";
     public static final String ANON_VIRTUAL_HOST = "anonVirtualHost";
 
 }

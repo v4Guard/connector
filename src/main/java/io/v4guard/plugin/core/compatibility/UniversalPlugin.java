@@ -4,6 +4,7 @@ import io.v4guard.plugin.core.accounts.MessageReceiver;
 import io.v4guard.plugin.core.cache.CheckDataCache;
 import io.v4guard.plugin.core.check.CheckProcessor;
 import io.v4guard.plugin.core.check.brand.BrandCheckProcessor;
+import io.v4guard.plugin.core.check.settings.PlayerSettingsCheckProcessor;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -21,5 +22,6 @@ public interface UniversalPlugin {
     MessageReceiver getMessageReceiver();
     CheckProcessor<?> getCheckProcessor();
     BrandCheckProcessor getBrandCheckProcessor();
+    PlayerSettingsCheckProcessor getPlayerSettingsCheckProcessor();
 
 }

@@ -18,6 +18,8 @@ public class PlayerCheckData {
     private boolean waitMode;
     private boolean active;
     private boolean bedrock;
+    private boolean playerSettingsChecked;
+    private boolean playerBrandChecked;
 
     private String kickReason;
     private BlockReason blockReason;
@@ -31,6 +33,8 @@ public class PlayerCheckData {
         this.virtualHost = virtualHost;
         this.waitMode = waitMode;
         this.bedrock = bedrock;
+        this.playerSettingsChecked = false;
+        this.playerBrandChecked = false;
         this.kickReason = "Disconnected";
         this.blockReason = BlockReason.NONE;
         this.checkStatus = CheckStatus.WAITING;
@@ -134,6 +138,14 @@ public class PlayerCheckData {
         this.blockReason = blockReason;
     }
 
+    public void setPlayerSettingsChecked(boolean playerSettingsChecked) {
+        this.playerSettingsChecked = playerSettingsChecked;
+    }
+
+    public void setPlayerBrandChecked(boolean playerBrandChecked) {
+        this.playerBrandChecked = playerBrandChecked;
+    }
+
     public String getUsername() {
         return this.username;
     }
@@ -160,6 +172,14 @@ public class PlayerCheckData {
 
     public boolean isBedrock() {
         return this.bedrock;
+    }
+
+    public boolean isPlayerSettingsChecked() {
+        return this.playerSettingsChecked;
+    }
+
+    public boolean isPlayerBrandChecked() {
+        return this.playerBrandChecked;
     }
 
     public long getCreatedAt() {
