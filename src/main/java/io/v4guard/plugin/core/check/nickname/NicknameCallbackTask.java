@@ -23,7 +23,7 @@ public class NicknameCallbackTask extends CallbackTask {
         if (nameValidator.getBoolean("isEnabled")) {
             String regex = nameValidator.getString("regex");
 
-            if (Pattern.compile("^" + regex + "$").matcher(checkData.getUsername()).matches()) {
+            if (!Pattern.compile("^" + regex + "$").matcher(checkData.getUsername()).matches()) {
                 checkData.setCheckStatus(CheckStatus.USER_DENIED);
                 checkData.setKickReason(RemoteSettings.getMessage("invalidUsername"));
             }
