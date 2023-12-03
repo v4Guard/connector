@@ -99,6 +99,21 @@ public class Backend {
 
     private void initializeSecretKey() {
         try {
+            // Migrate old key, kinda ugly but it works
+            if (CoreInstance.get().getPlugin().getDataFolder().getParentFile().toPath().resolve("v4Guard").toFile().exists()) {
+                File oldFolder = CoreInstance.get().getPlugin().getDataFolder().getParentFile().toPath().resolve("v4Guard").toFile();
+                File keyFile = new File(oldFolder, "vpn.key");
+
+                if (keyFile.exists()) {
+                    UnifiedLogger.get().log(Level.INFO, "Migrating old key to new location");
+
+                    writeSecretKey(Files.readString(keyFile.toPath()));
+                    Files.delete(keyFile.toPath());
+                    Files.delete(oldFolder.toPath());
+                }
+            }
+
+
             File keyFile = new File(CoreInstance.get().getPlugin().getDataFolder(), "secret.key");
             String secretKey = null;
 
