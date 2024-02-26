@@ -10,10 +10,10 @@ Today there are many servers that have zero protection against fraud, vpn, proxi
 Reliability is part of the selection process and at v4Guard we take our work very seriously, with more than 6 years of experience in the industry and a team committed to the security and privacy of users.
 
     ✅ Unified and updated information.
-    ✅ Detection of VPN/Proxy and P2P networks.
+    ✅ Detection of VPN/Proxy and Residential P2P networks.
     ✅ Usage, detection and traffic statistics.
-    ✅ 24/7 support in a multitude of languages.
-    ✅ Multitude of configuration options.
+    ✅ 24/7 support in a multiple languages.
+    ✅ Multitude of configuration and customization settings.
     ✅ Support for multiple platforms.
     ✅ A false positive rate reduced to a minimum.
 
@@ -22,8 +22,8 @@ Reliability is part of the selection process and at v4Guard we take our work ver
     📝 Documentation: https://docs.v4guard.io
     📧 Contact: support@v4guard.io
     📞 Support: https://v4guard.io/discord
-    📄 Changelog: https://github.com/v4Guard/v4guard-plugin/commits/
-    📄 Contributors: Ismael Muñoz and Samuel Fernández
+    📄 Changelog: https://github.com/v4Guard/connector/commits/
+    📄 Contributors: Ismael Muñoz, Samuel Fernández and Alejandro G (zHacked)
 
 ## 📌 Compatibility
 v4Guard has been developed to be compatible with most Minecraft servers, however, we cannot guarantee it will work in all cases. If you have any problems with compatibility, please contact our support team.
@@ -43,5 +43,5 @@ The installation of the plugin is very simple, just drag the .jar file to the pl
 v4Guard is open source software under the GNU General Public License v3.0. You can find a copy of the license in the GitHub repository.
 
 <a href="https://v4guard.io/discord">
-         <img alt="v4Guard Discord" src="https://discordapp.com/api/guilds/996842633416683702/widget.png?style=shield">
+<img alt="v4Guard Discord" src="https://discordapp.com/api/guilds/996842633416683702/widget.png?style=shield">
 </a>
