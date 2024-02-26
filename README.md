@@ -1,5 +1,9 @@
 # v4Guard Connector Plugin 
-![v4Guard VPN/Proxy Protection minimalist background](https://cdn.v4guard.io/Header.png)
+
+<p align="center">
+<img src="https://cdn.v4guard.io/logos/logo_transparent.svg" width="128">
+</p>
+
 Today there are many servers that have zero protection against fraud, vpn, proxies and peer-to-peer networks. v4Guard has come to the Minecraft communities to change this and offer a quality solution at an affordable price.
 
 ## 💨 Why v4Guard?
