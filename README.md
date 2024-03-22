@@ -26,7 +26,7 @@ Reliability is part of the selection process, and at v4Guard, we take our work v
     📄 Contributors: Ismael Muñoz, Samuel Fernández and Alejandro G (zHacked)
 
 ## 📌 Compatibility
-Our team designed v4Guard to be compatible with most Minecraft servers; however, we cannot guarantee that it will work in all cases. If you have any problems with compatibility, please get in touch with our support team.
+Our team developed v4Guard to be compatible with most Minecraft servers; however, we cannot guarantee that it will work in all cases. If you have any problems with compatibility, please get in touch with our support team.
 
     ✅ BungeeCord (+forks) 1.8.8 - 1.20.4
     ✅ Velocity 1.7.2 - 1.20.4
