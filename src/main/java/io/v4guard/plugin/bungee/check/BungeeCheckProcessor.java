@@ -13,7 +13,7 @@ import java.util.logging.Level;
 
 public class BungeeCheckProcessor extends CheckProcessor<LoginEvent> {
 
-    private BungeeInstance plugin;
+    private final BungeeInstance plugin;
 
     public BungeeCheckProcessor(BungeeInstance plugin) {
         this.plugin = plugin;

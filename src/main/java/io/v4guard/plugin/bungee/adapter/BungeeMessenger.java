@@ -13,13 +13,13 @@ public class BungeeMessenger implements Messenger {
     @Override
     public void broadcastWithPermission(String message, String permission) {
         boolean sendToAll = permission.equals(ListenersConstants.ALL_PLAYERS_PERMISSION);
+        ComponentBuilder componentBuilder = new ComponentBuilder(message);
+        ProxiedPlayer[] players = ProxyServer.getInstance().getPlayers().toArray(new ProxiedPlayer[0]);
 
-        for(ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-            if(!sendToAll && !player.hasPermission(permission)) {
-                continue;
+        for (ProxiedPlayer player : players) {
+            if (sendToAll || player.hasPermission(permission)) {
+                player.sendMessage(componentBuilder.create());
             }
-
-            player.sendMessage(new ComponentBuilder(message).create());
         }
     }
 
@@ -27,7 +27,7 @@ public class BungeeMessenger implements Messenger {
     public void sendMessageTo(String playerName, String message) {
         PlayerFetchResult<ProxiedPlayer> fetchedPlayer = BungeeInstance.get().fetchPlayer(playerName);
 
-        if(fetchedPlayer.isOnline()) {
+        if (fetchedPlayer.isOnline()) {
             fetchedPlayer.getPlayer().sendMessage(new ComponentBuilder(message).create());
         }
     }

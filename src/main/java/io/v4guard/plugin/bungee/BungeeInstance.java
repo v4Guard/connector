@@ -15,6 +15,7 @@ import io.v4guard.plugin.core.compatibility.PlayerFetchResult;
 import io.v4guard.plugin.core.compatibility.ServerPlatform;
 import io.v4guard.plugin.core.compatibility.UniversalPlugin;
 import io.v4guard.plugin.core.compatibility.UniversalTask;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
@@ -36,12 +37,14 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
     private CoreInstance coreInstance;
     private boolean floodGateFound;
 
+    private final int METRICS = 16219;
+
     @Override
     public void onEnable() {
         getLogger().info("(Bungee) Enabling...");
         getLogger().warning("(Bungee) Remember to allow Metrics on your firewall.");
 
-        new Metrics(this, 16219);
+        ProxyServer.getInstance().getScheduler().runAsync(this, () -> new Metrics(this, METRICS));
 
         instance = this;
 

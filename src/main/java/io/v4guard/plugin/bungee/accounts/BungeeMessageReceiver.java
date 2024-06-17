@@ -15,6 +15,12 @@ import net.md_5.bungee.event.EventPriority;
 
 public class BungeeMessageReceiver extends MessageReceiver implements Listener {
 
+    private final CoreInstance coreInstance;
+
+    public BungeeMessageReceiver() {
+        this.coreInstance = CoreInstance.get();
+    }
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onMessage(PluginMessageEvent event) {
         if (!event.getTag().equals(ShieldChannels.BUNGEE_CHANNEL)) {
@@ -32,7 +38,7 @@ public class BungeeMessageReceiver extends MessageReceiver implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPostLogin(PostLoginEvent e) {
-        if (CoreInstance.get().isAccountShieldFound()) {
+        if (coreInstance.isAccountShieldFound()) {
             return;
         }
 
@@ -46,7 +52,7 @@ public class BungeeMessageReceiver extends MessageReceiver implements Listener {
                     , player.hasPermission("v4guard.accshield")
             );
 
-            CoreInstance.get().getAccountShieldSender().sendSocketMessage(auth);
+            coreInstance.getAccountShieldSender().sendSocketMessage(auth);
         }
     }
 
