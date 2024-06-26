@@ -1,9 +1,9 @@
 package io.v4guard.connector.common.utils;
 
+import com.google.common.net.InternetDomainName;
 import io.v4guard.connector.common.compatibility.DockerDetector;
 
 import java.net.InetAddress;
-import java.net.URL;
 import java.net.UnknownHostException;
 
 public class HostnameUtils {
@@ -19,21 +19,17 @@ public class HostnameUtils {
     }
 
     public static String detectVirtualHost(String virtualHost, boolean anonVirtualHost) {
-        String host = virtualHost;
+        String mainHost;
+
         try {
-            URL hostParsed = new URL(virtualHost);
+            mainHost = InternetDomainName.from(virtualHost).topPrivateDomain().toString();
 
-            if (hostParsed.getHost() != null) {
-                if (anonVirtualHost) {
-                    return "***" + hostParsed.getHost().substring(hostParsed.getHost().lastIndexOf('.') + 1);
-                }
-
-                host = hostParsed.getHost();
+            if (anonVirtualHost && !mainHost.equals(virtualHost)) {
+                virtualHost = "***." + InternetDomainName.from(virtualHost).topPrivateDomain();
             }
+        } catch (Exception ex) { /* failed to get doamin, return the original host */ }
 
-        } catch (Exception ignored) {}
-
-        return host;
+        return virtualHost;
     }
 
 }
