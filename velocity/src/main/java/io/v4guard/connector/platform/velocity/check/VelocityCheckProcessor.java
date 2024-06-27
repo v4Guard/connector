@@ -4,6 +4,7 @@ import com.velocitypowered.api.event.Continuation;
 import com.velocitypowered.api.event.ResultedEvent.ComponentResult;
 import com.velocitypowered.api.event.connection.LoginEvent;;
 import io.v4guard.connector.common.CoreInstance;
+import io.v4guard.connector.common.UnifiedLogger;
 import io.v4guard.connector.common.check.CheckProcessor;
 import io.v4guard.connector.common.check.CheckStatus;
 import io.v4guard.connector.common.check.PlayerCheckData;
@@ -52,7 +53,7 @@ public class VelocityCheckProcessor extends CheckProcessor<LoginEvent> {
                         if (checkData.isWaitMode()) {
                             event.setResult(ComponentResult.denied(Component.text(checkData.getKickReason())));
                         } else {
-                            event.getPlayer().disconnect(Component.text(checkData.getKickReason()));
+                            plugin.getAwaitedKickTaskCache().put(event.getPlayer(), checkData.getKickReason());
                         }
                     }
                 });

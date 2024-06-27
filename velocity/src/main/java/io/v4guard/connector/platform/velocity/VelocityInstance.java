@@ -1,5 +1,7 @@
 package io.v4guard.connector.platform.velocity;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
@@ -12,6 +14,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.messages.LegacyChannelIdentifier;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
+import com.velocitypowered.api.scheduler.ScheduledTask;
 import com.velocitypowered.api.scheduler.Scheduler;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.accounts.MessageReceiver;
@@ -29,6 +32,7 @@ import io.v4guard.connector.platform.velocity.check.VelocityCheckProcessor;
 import io.v4guard.connector.platform.velocity.listener.PlayerListener;
 import io.v4guard.connector.platform.velocity.listener.PlayerSettingsListener;
 import io.v4guard.connector.platform.velocity.listener.PluginMessagingListener;
+import io.v4guard.connector.platform.velocity.task.AwaitedKickTask;
 import net.kyori.adventure.text.Component;
 import org.bstats.velocity.Metrics;
 
@@ -54,7 +58,8 @@ public class VelocityInstance implements UniversalPlugin {
     private CoreInstance coreInstance;
     private final ProxyServer server;
     private final Logger logger;
-    private Metrics.Factory metricsFactory;
+    private final Metrics.Factory metricsFactory;
+    private Cache<Player, String> awaitedKickTaskCache;
     private final Path dataDirectory;
     private final PluginDescription pluginDescription;
     private VelocityMessenger messenger;
@@ -126,6 +131,12 @@ public class VelocityInstance implements UniversalPlugin {
         this.server.getEventManager().register(this, this.playerSettingsProcessor);
         this.server.getEventManager().register(this, new PlayerListener(this));
 
+        this.awaitedKickTaskCache = Caffeine
+                .newBuilder()
+                .build();
+
+        schedule(new AwaitedKickTask(this.awaitedKickTaskCache), 0, 150, TimeUnit.MILLISECONDS);
+
         this.logger.info("(Velocity) Enabling... [DONE]");
     }
 
@@ -133,6 +144,8 @@ public class VelocityInstance implements UniversalPlugin {
     public void onProxyShutdown(ProxyShutdownEvent event) {
         this.logger.info("(Velocity) Disabling...");
         this.logger.info("(Velocity) Disconnecting from the backend...");
+
+        server.getScheduler().tasksByPlugin(this).forEach(ScheduledTask::cancel);
 
         try {
             coreInstance.getRemoteConnection().disconnect();
@@ -193,7 +206,7 @@ public class VelocityInstance implements UniversalPlugin {
         PlayerFetchResult<Player> fetchedPlayer = fetchPlayer(playerName);
 
         if (fetchedPlayer.isOnline()) {
-            fetchedPlayer.getPlayer().disconnect(Component.text(reason));
+            awaitedKickTaskCache.put(fetchedPlayer.getPlayer(), reason);
         }
     }
 
@@ -240,6 +253,10 @@ public class VelocityInstance implements UniversalPlugin {
     @Override
     public boolean isFloodgatePresent() {
         return floodGateFound;
+    }
+
+    public Cache<Player, String> getAwaitedKickTaskCache() {
+        return awaitedKickTaskCache;
     }
 
 }
