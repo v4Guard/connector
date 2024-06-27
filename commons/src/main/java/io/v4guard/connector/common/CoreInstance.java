@@ -52,7 +52,7 @@ public class CoreInstance {
         this.pendingTasks = new PendingTasks();
         this.remoteConnection = new Connection(this);
         this.accountShieldFound = this.plugin.isPluginEnabled("v4guard-account-shield");
-        this.accountShieldSender = new AccountShieldSender();
+        this.accountShieldSender = new AccountShieldSender(this);
 
         this.remoteConnection.prepareAndConnect();
         this.plugin.schedule(new CacheTicker(this), 0, 100, TimeUnit.MILLISECONDS);

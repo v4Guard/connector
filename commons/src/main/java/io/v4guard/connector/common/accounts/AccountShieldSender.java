@@ -1,25 +1,25 @@
 package io.v4guard.connector.common.accounts;
 
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.accounts.auth.Authentication;
 import io.v4guard.connector.common.constants.SettingsKeys;
 
 public class AccountShieldSender {
 
+    private final CoreInstance coreInstance;
+
+    public AccountShieldSender(CoreInstance coreInstance) {
+        this.coreInstance = coreInstance;
+    }
+
     public void sendSocketMessage(Authentication auth) {
-        /*
+        boolean shieldEnabled = coreInstance.getActiveSettings().getActiveAddons().get("accshield");
 
-        //TODO: REFACTOR THIS
-        Document shieldSettings = RemoteSettings.getOrDefault(SettingsKeys.ADDONS, new Document());
-        boolean shieldEnabled = (boolean) shieldSettings.getOrDefault("accshield", false);
+        if (!shieldEnabled) return;
 
-        if (!shieldEnabled) {
-            return;
-        }
-
-        Document finalDocument = auth.serialize();
-        CoreInstance.get().getBackend().getSocket().emit("accshield:login", finalDocument.toJson());
-         */
+        coreInstance.getRemoteConnection().send("accshield:login", coreInstance.getObjectMapper().convertValue(auth, ObjectNode.class));
     }
 
 }

@@ -1,12 +1,14 @@
 package io.v4guard.connector.common.accounts;
 
 import io.v4guard.connector.common.CoreInstance;
+import io.v4guard.connector.common.UnifiedLogger;
 import io.v4guard.connector.common.accounts.auth.Authentication;
 import io.v4guard.connector.common.constants.SettingsKeys;
 import io.v4guard.connector.common.socket.ActiveSettings;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.util.logging.Level;
 
 public abstract class MessageReceiver {
 
@@ -26,14 +28,14 @@ public abstract class MessageReceiver {
         try {
             String data = in.readUTF();
 
-            //Authentication auth = Authentication.deserialize(doc);
-            //CoreInstance.get().getAccountShieldSender().sendSocketMessage(auth);
+            Authentication auth = CoreInstance.get().getObjectMapper().readValue(data, Authentication.class);
+            CoreInstance.get().getAccountShieldSender().sendSocketMessage(auth);
         } catch (Exception exception) {
-            /*UnifiedLogger.get().log(
+            UnifiedLogger.get().log(
                     Level.SEVERE
                     , "An exception has occurred while processing plugin message (data=" + new String(bytes) + ")"
                     , exception
-            );*/
+            );
         }
     }
 
