@@ -11,3 +11,8 @@ dependencies {
     implementation(libs.bstats.bungeecord)
     implementation(project(":commons"))
 }
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}

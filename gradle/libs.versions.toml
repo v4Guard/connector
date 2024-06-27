@@ -9,7 +9,7 @@ floodgate = "2.2.2-SNAPSHOT"
 
 #platform specific
 bungeecord = "1.19-R0.1-SNAPSHOT"
-velocity = "3.2.0-SNAPSHOT"
+velocity = "3.3.0-SNAPSHOT"
 
 [libraries]
 
