@@ -14,6 +14,7 @@ import net.md_5.bungee.event.EventPriority;
 public class PlayerListener implements Listener {
 
     private BungeeInstance plugin;
+    private CoreInstance coreInstance;
 
     public PlayerListener(BungeeInstance plugin) {
         this.plugin = plugin;
@@ -21,17 +22,10 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(LoginEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
 
         PendingConnection connection = event.getConnection();
 
-        if (connection == null) {
-            return;
-        }
-
-        if (!CoreInstance.get().getBackend().isReady()) {
+        if (event.isCancelled() || connection == null || !coreInstance.getBackend().isReady()) {
             return;
         }
 
@@ -50,7 +44,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onProxyDisconnect(PlayerDisconnectEvent event) {
-        CoreInstance.get().getCheckDataCache().cleanup(event.getPlayer().getName());
+        coreInstance.getCheckDataCache().cleanup(event.getPlayer().getName());
     }
 
 }
