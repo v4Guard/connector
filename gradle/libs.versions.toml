@@ -1,0 +1,25 @@
+[versions]
+
+#common
+socketio = "2.1.0"
+caffeine = "3.1.8"
+bstats = "3.0.2"
+jackson-databind = "2.17.1"
+floodgate = "2.2.3-SNAPSHOT"
+
+#platform specific
+bungeecord = "1.21-R0.1-SNAPSHOT"
+velocity = "3.3.0-SNAPSHOT"
+
+[libraries]
+
+socketio = { group = "io.socket", name = "socket.io-client",  version.ref = "socketio" }
+caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "caffeine" }
+jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson-databind" }
+floodgate = { group = "org.geysermc.floodgate", name = "api", version.ref = "floodgate" }
+
+#platform specific
+bstats-bungeecord = { group = "org.bstats", name = "bstats-bungeecord", version.ref = "bstats" }
+bstats-velocity = { group = "org.bstats", name = "bstats-velocity", version.ref = "bstats" }
+bungeecord = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungeecord"}
+velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
