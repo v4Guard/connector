@@ -26,12 +26,11 @@ public class BrandCallbackTask extends CallbackTask {
         ObjectNode node = mapper.createObjectNode();
 
         node.put("username", super.checkData.getUsername())
-                .putArray("brands").add(mapper.valueToTree(BRANDS));
+                .set("brand", mapper.valueToTree(this.BRANDS));
 
         CoreInstance.get().getRemoteConnection().send(
                 "mc:brand"
                 , node
-
         );
     }
 
