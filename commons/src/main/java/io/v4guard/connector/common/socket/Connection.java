@@ -100,22 +100,17 @@ public class Connection {
             File oldFolder = dataFolder.getParentFile().toPath().resolve("v4Guard").toFile();
             File keyFile;
 
-
             if (oldFolder.exists()) {
                 keyFile = new File(oldFolder, "vpn.key");
 
-                if (!keyFile.exists()) {
-                    return;
+                if (keyFile.exists()) {
+                    UnifiedLogger.get().info("Migrating old key to new location");
+
+                    writeSecretKey(Files.readString(keyFile.toPath()));
+                    Files.delete(keyFile.toPath());
+                    Files.delete(oldFolder.toPath());
                 }
-
-                UnifiedLogger.get().info("Migrating old key to new location");
-
-                writeSecretKey(Files.readString(keyFile.toPath()));
-                Files.delete(keyFile.toPath());
-                Files.delete(oldFolder.toPath());
-
             }
-
 
             keyFile = new File(dataFolder, "secret.key");
             String secretKey = null;
