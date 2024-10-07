@@ -16,6 +16,7 @@ public interface UniversalPlugin {
     File getDataFolder();
     PlayerFetchResult<?> fetchPlayer(String playerName);
     void kickPlayer(String playerName, String reason);
+    void kickPlayer(String playerName, String reason, boolean later);
     UniversalTask schedule(Runnable runnable, long delay, long period, TimeUnit timeUnit);
     Messenger getMessenger();
     CheckDataCache getCheckDataCache();
@@ -23,6 +24,5 @@ public interface UniversalPlugin {
     CheckProcessor<?> getCheckProcessor();
     BrandCheckProcessor getBrandCheckProcessor();
     PlayerSettingsCheckProcessor getPlayerSettingsCheckProcessor();
-    boolean isFloodgatePresent();
 
 }

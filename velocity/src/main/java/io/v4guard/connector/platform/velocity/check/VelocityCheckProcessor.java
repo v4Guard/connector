@@ -2,7 +2,8 @@ package io.v4guard.connector.platform.velocity.check;
 
 import com.velocitypowered.api.event.Continuation;
 import com.velocitypowered.api.event.ResultedEvent.ComponentResult;
-import com.velocitypowered.api.event.connection.LoginEvent;;
+import com.velocitypowered.api.event.connection.LoginEvent;
+import com.velocitypowered.api.proxy.Player;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.UnifiedLogger;
 import io.v4guard.connector.common.check.CheckProcessor;
@@ -27,13 +28,16 @@ public class VelocityCheckProcessor extends CheckProcessor<LoginEvent> {
 
     public void onEvent(String username, LoginEvent event, Continuation continuation) {
         Optional<InetSocketAddress> virtualHost = event.getPlayer().getVirtualHost();
+        Player player = event.getPlayer();
+        boolean isFloodgatePlayer = CoreInstance.get().isFloodgateFound()
+                && FloodgateApi.getInstance().isFloodgatePlayer(player.getUniqueId());
 
         PlayerCheckData checkData = prepareCheckData(
                 username
-                , event.getPlayer().getRemoteAddress().getAddress().getHostAddress()
-                , event.getPlayer().getProtocolVersion().getProtocol()
+                , player.getRemoteAddress().getAddress().getHostAddress()
+                , player.getProtocolVersion().getProtocol()
                 , virtualHost.isPresent() ? virtualHost.get().getHostString() : "notFound"
-                , plugin.isFloodgatePresent() && FloodgateApi.getInstance().isFloodgatePlayer(event.getPlayer().getUniqueId())
+                , isFloodgatePlayer
         );
 
         CoreInstance.get().getCheckDataCache().cache(username, checkData);
@@ -44,27 +48,46 @@ public class VelocityCheckProcessor extends CheckProcessor<LoginEvent> {
 
         checkData.whenCompleted((exception) -> {
             if (exception != null) {
-                plugin.getLogger().log(Level.SEVERE, "An exception has occurred while checking player '" + username + "'", exception);
-            } else {
-                PostCheckEvent apiEvent = new PostCheckEvent(username, checkData.getBlockReason());
+                UnifiedLogger.get().log(
+                        Level.SEVERE
+                        , "An exception has occurred while checking player '" + username + "'"
+                        , exception
+                );
 
-                this.plugin.getServer().getEventManager().fire(apiEvent).thenAccept((resultEvent) -> {
-                    if (checkData.getCheckStatus() == CheckStatus.USER_DENIED && resultEvent.getResult().isAllowed()) {
-                        if (checkData.isWaitMode()) {
-                            event.setResult(ComponentResult.denied(Component.text(checkData.getKickReason())));
-                        } else {
-                            plugin.getAwaitedKickTaskCache().put(event.getPlayer(), checkData.getKickReason());
-                        }
-                    }
-                });
+                processFinalStage(event, checkData, continuation, false);
+                return;
             }
 
-            if (checkData.isWaitMode()) {
-                continuation.resume();
-            }
+            PostCheckEvent apiEvent = new PostCheckEvent(username, checkData.getBlockReason());
+
+            this.plugin.getServer().getEventManager().fire(apiEvent).thenAccept((resultEvent) -> {
+                boolean disconnect = checkData.getCheckStatus() == CheckStatus.USER_DENIED
+                        && resultEvent.getResult().isAllowed();
+
+                processFinalStage(event, checkData, continuation, disconnect);
+            });
+
+
         });
 
         checkData.startChecking();
+    }
+
+    private void processFinalStage(
+            LoginEvent event
+            , PlayerCheckData checkData
+            , Continuation continuation
+            , boolean disconnect
+    ) {
+        if (checkData.isWaitMode() && disconnect) {
+            event.setResult(ComponentResult.denied(Component.text(checkData.getKickReason())));
+        } else if (disconnect) {
+            plugin.kickPlayer(event.getPlayer().getUsername(), checkData.getKickReason(), true);
+        }
+
+        if (checkData.isWaitMode()) {
+            continuation.resume();
+        }
     }
 
 }

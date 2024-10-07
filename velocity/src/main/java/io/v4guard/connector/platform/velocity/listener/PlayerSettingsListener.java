@@ -6,24 +6,33 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.player.PlayerSettingsChangedEvent;
 import com.velocitypowered.api.proxy.player.PlayerSettings;
 import com.velocitypowered.api.proxy.player.SkinParts;
+import io.v4guard.connector.common.check.settings.MinecraftSettings;
 import io.v4guard.connector.common.check.settings.PlayerSettingsCheckProcessor;
 
 public class PlayerSettingsListener extends PlayerSettingsCheckProcessor {
 
     @Subscribe(order = PostOrder.EARLY)
-    public void onPlayerPostLogin(PlayerSettingsChangedEvent event) {
-        PlayerSettings mcSettings  = event.getPlayer().getPlayerSettings();
-        SkinParts skinParts = mcSettings.getSkinParts();
+    public void onPlayerSettingsChanged(PlayerSettingsChangedEvent event) {
+        PlayerSettings settings  = event.getPlayer().getPlayerSettings();
+        SkinParts skinParts = settings.getSkinParts();
 
-        super.process(
-                event.getPlayer().getUsername(), event.getPlayer().getUniqueId(),
-                mcSettings.getLocale() != null ? mcSettings.getLocale().toLanguageTag() : "Unknown",
-                String.valueOf(mcSettings.getViewDistance()), String.valueOf(mcSettings.hasChatColors()),
-                mcSettings.getMainHand().name(), mcSettings.getChatMode().name(), String.valueOf(mcSettings.isClientListingAllowed()),
-                String.valueOf(skinParts.hasHat()), String.valueOf(skinParts.hasCape()), String.valueOf(skinParts.hasJacket()),
-                String.valueOf(skinParts.hasLeftSleeve()), String.valueOf(skinParts.hasRightSleeve()),
-                String.valueOf(skinParts.hasLeftPants()), String.valueOf(skinParts.hasLeftPants())
-        );
+        MinecraftSettings allSettings = MinecraftSettings.builder()
+                .locale(settings.getLocale() != null ? settings.getLocale().toLanguageTag() : "Unknown")
+                .viewDistance(String.valueOf(settings.getViewDistance()))
+                .hasColors(String.valueOf(settings.hasChatColors()))
+                .mainHand(settings.getMainHand().name())
+                .chatMode(settings.getChatMode().name())
+                .clientListing(String.valueOf(settings.isClientListingAllowed()))
+                .hasHat(String.valueOf(skinParts.hasHat()))
+                .hasCape(String.valueOf(skinParts.hasCape()))
+                .hasJacket(String.valueOf(skinParts.hasJacket()))
+                .hasLeftSleeve(String.valueOf(skinParts.hasLeftSleeve()))
+                .hasRightSleeve(String.valueOf(skinParts.hasRightSleeve()))
+                .hasLeftPants(String.valueOf(skinParts.hasLeftPants()))
+                .hasRightPants(String.valueOf(skinParts.hasRightPants()))
+                .build();
+
+        super.process(event.getPlayer().getUsername(), event.getPlayer().getUniqueId(), allSettings);
     }
 
     @Subscribe

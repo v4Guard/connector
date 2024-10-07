@@ -29,6 +29,7 @@ public class CoreInstance {
 
     private boolean debugEnabled;
     private boolean accountShieldFound;
+    private boolean floodgateFound;
     private final ServerPlatform platform;
     private final UniversalPlugin plugin;
 
@@ -52,6 +53,7 @@ public class CoreInstance {
         this.pendingTasks = new PendingTasks();
         this.remoteConnection = new Connection(this);
         this.accountShieldFound = this.plugin.isPluginEnabled("v4guard-account-shield");
+        this.floodgateFound = this.plugin.isPluginEnabled("floodgate");
         this.accountShieldSender = new AccountShieldSender(this);
 
         this.remoteConnection.prepareAndConnect();
@@ -67,6 +69,10 @@ public class CoreInstance {
 
     public boolean isAccountShieldFound() {
         return this.accountShieldFound;
+    }
+
+    public boolean isFloodgateFound() {
+        return this.floodgateFound;
     }
 
     public AccountShieldSender getAccountShieldSender() {
@@ -117,7 +123,7 @@ public class CoreInstance {
         try {
             return objectMapper.readTree(json);
         } catch (JsonProcessingException e) {
-            UnifiedLogger.get().log(Level.SEVERE, "Failed to parse JSON", e);
+            UnifiedLogger.get().log(Level.SEVERE, "Could not read json tree", e);
             return null;
         }
     }

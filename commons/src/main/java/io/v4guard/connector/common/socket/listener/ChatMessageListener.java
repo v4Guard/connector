@@ -9,14 +9,12 @@ import io.v4guard.connector.common.UnifiedLogger;
 import io.v4guard.connector.common.compatibility.Messenger;
 import io.v4guard.connector.common.constants.ListenersConstants;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ChatMessageListener implements Emitter.Listener {
 
     private final CoreInstance coreInstance = CoreInstance.get();
 
-    @SuppressWarnings("unchecked")
     @Override
     public void call(Object... args) {
         JsonNode request;
