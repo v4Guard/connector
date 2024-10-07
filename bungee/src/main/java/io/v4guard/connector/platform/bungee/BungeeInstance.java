@@ -35,7 +35,6 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
     private PluginMessagingListener brandCheckProcessor;
     private PlayerSettingsListener playerSettingsProcessor;
     private CoreInstance coreInstance;
-    private boolean floodGateFound;
 
     private final int METRICS = 16219;
 
@@ -61,10 +60,6 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
         } catch (Exception exception) {
             getLogger().log(Level.SEVERE, "(Bungee) Enabling... [ERROR]", exception);
             return;
-        }
-
-        if (isPluginEnabled("floodgate")) {
-            floodGateFound = true;
         }
 
         //this.getProxy().registerChannel(MessageReceiver.CHANNEL);
@@ -120,11 +115,16 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
         );
     }
 
+    @Override
     public void kickPlayer(String playerName, String reason) {
+        kickPlayer(playerName, reason, false);
+    }
+
+    public void kickPlayer(String playerName, String reason, boolean later) {
         PlayerFetchResult<ProxiedPlayer> fetchedPlayer = fetchPlayer(playerName);
 
         if (fetchedPlayer.isOnline()) {
-            fetchedPlayer.getPlayer().disconnect(TextComponent.fromLegacyText(reason));
+            fetchedPlayer.getPlayer().disconnect(TextComponent.fromLegacy(reason));
         }
     }
 
@@ -161,10 +161,5 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
     @Override
     public PlayerSettingsCheckProcessor getPlayerSettingsCheckProcessor() {
         return playerSettingsProcessor;
-    }
-
-    @Override
-    public boolean isFloodgatePresent() {
-        return floodGateFound;
     }
 }

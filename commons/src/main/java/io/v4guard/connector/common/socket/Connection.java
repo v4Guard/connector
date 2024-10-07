@@ -96,13 +96,15 @@ public class Connection {
 
     private void initializeSecretKey() {
         try {
-            // Migrate old key, kinda ugly but it works
-            if (CoreInstance.get().getPlugin().getDataFolder().getParentFile().toPath().resolve("v4Guard").toFile().exists()) {
-                File oldFolder = CoreInstance.get().getPlugin().getDataFolder().getParentFile().toPath().resolve("v4Guard").toFile();
-                File keyFile = new File(oldFolder, "vpn.key");
+            File dataFolder = CoreInstance.get().getPlugin().getDataFolder();
+            File oldFolder = dataFolder.getParentFile().toPath().resolve("v4Guard").toFile();
+            File keyFile;
+
+            if (oldFolder.exists()) {
+                keyFile = new File(oldFolder, "vpn.key");
 
                 if (keyFile.exists()) {
-                    UnifiedLogger.get().log(Level.INFO, "Migrating old key to new location");
+                    UnifiedLogger.get().info("Migrating old key to new location");
 
                     writeSecretKey(Files.readString(keyFile.toPath()));
                     Files.delete(keyFile.toPath());
@@ -110,8 +112,7 @@ public class Connection {
                 }
             }
 
-
-            File keyFile = new File(CoreInstance.get().getPlugin().getDataFolder(), "secret.key");
+            keyFile = new File(dataFolder, "secret.key");
             String secretKey = null;
 
             if (keyFile.exists()){
@@ -134,7 +135,6 @@ public class Connection {
             keyFile.getParentFile().mkdirs();
             keyFile.createNewFile();
         }
-
 
         Files.writeString(keyFile.toPath(), secretKey);
     }

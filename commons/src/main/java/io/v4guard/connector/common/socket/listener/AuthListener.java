@@ -41,20 +41,22 @@ public class AuthListener implements Emitter.Listener {
             case NOT_AUTHENTICATED:
                 authCodeGotTimestamp = System.currentTimeMillis();
                 notificationTask = backend.getPlugin().schedule(() -> {
-                    if (remoteConnection.getSocketStatus() == SocketStatus.NOT_AUTHENTICATED) {
-                        if (TimestampUtils.isExpired(authCodeGotTimestamp, MAX_AUTH_CODE_LIFETIME)) {
-                            remoteConnection.reconnect();
-                            notificationTask.cancel();
-                            return;
-                        }
-
-                        UnifiedLogger.get().log(
-                                Level.WARNING,
-                                "This instance is not connected with your account. Connect it using this link: https://dashboard.v4guard.io/link/"
-                                        + remoteConnection.getAuthCode());
-                    } else {
+                    if (remoteConnection.getSocketStatus() != SocketStatus.NOT_AUTHENTICATED) {
                         notificationTask.cancel();
+                        return;
                     }
+
+                    if (TimestampUtils.isExpired(authCodeGotTimestamp, MAX_AUTH_CODE_LIFETIME)) {
+                        remoteConnection.reconnect();
+                        notificationTask.cancel();
+                        return;
+                    }
+
+                    UnifiedLogger.get().log(
+                            Level.WARNING,
+                            "This instance is not connected with your account. Connect it using this link: https://dashboard.v4guard.io/link/"
+                                    + remoteConnection.getAuthCode());
+
                 }, 1, 60, TimeUnit.SECONDS);
                 break;
             case PRE_AUTHENTICATED:

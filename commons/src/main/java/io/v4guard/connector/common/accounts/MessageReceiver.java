@@ -33,7 +33,9 @@ public abstract class MessageReceiver {
         } catch (Exception exception) {
             UnifiedLogger.get().log(
                     Level.SEVERE
-                    , "An exception has occurred while processing plugin message (data=" + new String(bytes) + ")"
+                    , "An exception has occurred while processing plugin message (data="
+                            + new String(bytes)
+                            + ")"
                     , exception
             );
         }

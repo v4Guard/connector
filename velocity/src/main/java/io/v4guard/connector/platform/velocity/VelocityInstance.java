@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
+import com.velocitypowered.api.network.ProtocolState;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
@@ -21,10 +22,8 @@ import io.v4guard.connector.common.accounts.MessageReceiver;
 import io.v4guard.connector.common.cache.CheckDataCache;
 import io.v4guard.connector.common.check.brand.BrandCheckProcessor;
 import io.v4guard.connector.common.check.settings.PlayerSettingsCheckProcessor;
-import io.v4guard.connector.common.compatibility.PlayerFetchResult;
-import io.v4guard.connector.common.compatibility.ServerPlatform;
-import io.v4guard.connector.common.compatibility.UniversalPlugin;
-import io.v4guard.connector.common.compatibility.UniversalTask;
+import io.v4guard.connector.common.compatibility.*;
+import io.v4guard.connector.common.compatibility.kick.AwaitingKick;
 import io.v4guard.connector.common.constants.ShieldChannels;
 import io.v4guard.connector.platform.velocity.accounts.VelocityMessageReceiver;
 import io.v4guard.connector.platform.velocity.adapter.VelocityMessenger;
@@ -32,7 +31,8 @@ import io.v4guard.connector.platform.velocity.check.VelocityCheckProcessor;
 import io.v4guard.connector.platform.velocity.listener.PlayerListener;
 import io.v4guard.connector.platform.velocity.listener.PlayerSettingsListener;
 import io.v4guard.connector.platform.velocity.listener.PluginMessagingListener;
-import io.v4guard.connector.platform.velocity.task.AwaitedKickTask;
+import io.v4guard.connector.platform.velocity.task.AwaitingKickTask;
+
 import net.kyori.adventure.text.Component;
 import org.bstats.velocity.Metrics;
 
@@ -59,7 +59,7 @@ public class VelocityInstance implements UniversalPlugin {
     private final ProxyServer server;
     private final Logger logger;
     private final Metrics.Factory metricsFactory;
-    private Cache<Player, String> awaitedKickTaskCache;
+    private Cache<String, AwaitingKick<Player>> awaitedKickTaskCache;
     private final Path dataDirectory;
     private final PluginDescription pluginDescription;
     private VelocityMessenger messenger;
@@ -68,7 +68,6 @@ public class VelocityInstance implements UniversalPlugin {
     private VelocityCheckProcessor checkProcessor;
     private PluginMessagingListener brandCheckProcessor;
     private PlayerSettingsListener playerSettingsProcessor;
-    private boolean floodGateFound;
 
     @Inject
     public VelocityInstance(
@@ -112,10 +111,6 @@ public class VelocityInstance implements UniversalPlugin {
             return;
         }
 
-        if (isPluginEnabled("floodgate")) {
-            floodGateFound = true;
-        }
-
         //TODO: Why is legacy channel needs to be registered, it's identical to modern.
         this.server.getChannelRegistrar().register(new LegacyChannelIdentifier(ShieldChannels.VELOCITY_CHANNEL));
         this.server.getChannelRegistrar().register(MinecraftChannelIdentifier.from(ShieldChannels.VELOCITY_CHANNEL));
@@ -131,11 +126,9 @@ public class VelocityInstance implements UniversalPlugin {
         this.server.getEventManager().register(this, this.playerSettingsProcessor);
         this.server.getEventManager().register(this, new PlayerListener(this));
 
-        this.awaitedKickTaskCache = Caffeine
-                .newBuilder()
-                .build();
+        this.awaitedKickTaskCache = Caffeine.newBuilder().build();
 
-        schedule(new AwaitedKickTask(this.awaitedKickTaskCache), 0, 150, TimeUnit.MILLISECONDS);
+        schedule(new AwaitingKickTask(this.awaitedKickTaskCache), 0, 150, TimeUnit.MILLISECONDS);
 
         this.logger.info("(Velocity) Enabling... [DONE]");
     }
@@ -196,18 +189,32 @@ public class VelocityInstance implements UniversalPlugin {
 
         return new PlayerFetchResult<>(
                 player.get()
-                , server.map(serverConnection -> serverConnection.getServerInfo().getName()).orElse(null)
+                , server.map(serverCon -> serverCon.getServerInfo().getName()).orElse(null)
                 , true
         );
     }
 
     @Override
     public void kickPlayer(String playerName, String reason) {
+        kickPlayer(playerName, reason, false);
+    }
+
+    @Override
+    public void kickPlayer(String playerName, String reason, boolean later) {
         PlayerFetchResult<Player> fetchedPlayer = fetchPlayer(playerName);
 
-        if (fetchedPlayer.isOnline()) {
-            awaitedKickTaskCache.put(fetchedPlayer.getPlayer(), reason);
+        if (!fetchedPlayer.isOnline()) {
+            return;
         }
+
+        Player player = fetchedPlayer.getPlayer();
+
+        if (later && player.getProtocolState() != ProtocolState.PLAY) {
+            awaitedKickTaskCache.put(playerName, new AwaitingKick<>(player, reason));
+            return;
+        }
+
+        player.disconnect(Component.text(reason));
     }
 
     @Override
@@ -248,15 +255,6 @@ public class VelocityInstance implements UniversalPlugin {
     @Override
     public PlayerSettingsCheckProcessor getPlayerSettingsCheckProcessor() {
         return playerSettingsProcessor;
-    }
-
-    @Override
-    public boolean isFloodgatePresent() {
-        return floodGateFound;
-    }
-
-    public Cache<Player, String> getAwaitedKickTaskCache() {
-        return awaitedKickTaskCache;
     }
 
 }

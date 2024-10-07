@@ -16,11 +16,11 @@ public class ListenersConstants {
     public static final String EVENT_FIND  = "find";
     public static final String EVENT_RECONNECT  = "reconnect";
 
-    //Auth
+    // Auth
     public static final String AUTH_CODE  = "code";
     public static final String AUTH_STATUS  = "status";
 
-    //Messager
+    // Messenger
     public static final String ALL_PLAYERS_PERMISSION = "*";
     public static final String NO_PERMISSION_NEEDED = "no-permission";
 
