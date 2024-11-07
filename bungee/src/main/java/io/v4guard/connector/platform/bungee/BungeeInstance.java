@@ -52,7 +52,6 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
         this.playerSettingsProcessor = new PlayerSettingsListener();
         this.messenger = new BungeeMessenger();
         this.checkDataCache = new BungeeCheckDataCache();
-        this.messageReceiver = new BungeeMessageReceiver();
 
         try {
             this.coreInstance = new CoreInstance(ServerPlatform.BUNGEE, this);
@@ -61,6 +60,8 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
             getLogger().log(Level.SEVERE, "(Bungee) Enabling... [ERROR]", exception);
             return;
         }
+
+        this.messageReceiver = new BungeeMessageReceiver(coreInstance);
 
         //this.getProxy().registerChannel(MessageReceiver.CHANNEL);
         this.getProxy().getPluginManager().registerListener(this, this.messageReceiver);

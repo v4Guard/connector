@@ -17,8 +17,8 @@ public class BungeeMessageReceiver extends MessageReceiver implements Listener {
 
     private final CoreInstance coreInstance;
 
-    public BungeeMessageReceiver() {
-        this.coreInstance = CoreInstance.get();
+    public BungeeMessageReceiver(CoreInstance coreInstance) {
+        this.coreInstance = coreInstance;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

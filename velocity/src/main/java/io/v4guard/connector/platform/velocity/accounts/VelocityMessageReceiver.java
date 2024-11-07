@@ -14,6 +14,13 @@ import io.v4guard.connector.common.constants.ShieldChannels;
 
 public class VelocityMessageReceiver extends MessageReceiver {
 
+
+    private CoreInstance coreInstance;
+
+    public VelocityMessageReceiver(CoreInstance coreInstance) {
+        this.coreInstance = coreInstance;
+    }
+
     @Subscribe(order = PostOrder.FIRST)
     public void onMessage(PluginMessageEvent event) {
         if (!ShieldChannels.VELOCITY_CHANNEL.equals(event.getIdentifier().getId())) {
@@ -30,7 +37,7 @@ public class VelocityMessageReceiver extends MessageReceiver {
 
     @Subscribe(order = PostOrder.LAST)
     public void onPostLogin(PostLoginEvent event) {
-        if (CoreInstance.get().isAccountShieldFound()) {
+        if (coreInstance.isAccountShieldFound()) {
             return;
         }
 
@@ -44,7 +51,7 @@ public class VelocityMessageReceiver extends MessageReceiver {
                     , player.hasPermission("v4guard.accshield")
             );
 
-            CoreInstance.get().getAccountShieldSender().sendSocketMessage(auth);
+            coreInstance.getAccountShieldSender().sendSocketMessage(auth);
         }
     }
 

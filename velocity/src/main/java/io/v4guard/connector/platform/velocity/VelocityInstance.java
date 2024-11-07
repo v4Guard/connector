@@ -101,7 +101,6 @@ public class VelocityInstance implements UniversalPlugin {
         this.playerSettingsProcessor = new PlayerSettingsListener();
         this.messenger = new VelocityMessenger();
         this.checkDataCache = new CheckDataCache();
-        this.messageReceiver = new VelocityMessageReceiver();
 
         try {
             coreInstance = new CoreInstance(ServerPlatform.VELOCITY, this);
@@ -110,6 +109,9 @@ public class VelocityInstance implements UniversalPlugin {
             this.logger.log(Level.SEVERE, "(Velocity) Enabling... [ERROR]", exception);
             return;
         }
+
+        this.messageReceiver = new VelocityMessageReceiver(coreInstance);
+
 
         //TODO: Why is legacy channel needs to be registered, it's identical to modern.
         this.server.getChannelRegistrar().register(new LegacyChannelIdentifier(ShieldChannels.VELOCITY_CHANNEL));
