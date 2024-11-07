@@ -66,7 +66,7 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
         this.getProxy().getPluginManager().registerListener(this, this.messageReceiver);
         this.getProxy().getPluginManager().registerListener(this, this.brandCheckProcessor);
         this.getProxy().getPluginManager().registerListener(this, this.playerSettingsProcessor);
-        this.getProxy().getPluginManager().registerListener(this, new PlayerListener(this));
+        this.getProxy().getPluginManager().registerListener(this, new PlayerListener(this, coreInstance));
 
         getLogger().info("(Bungee) Enabling... [DONE]");
     }

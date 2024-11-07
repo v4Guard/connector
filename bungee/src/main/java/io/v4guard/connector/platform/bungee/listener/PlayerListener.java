@@ -13,11 +13,12 @@ import net.md_5.bungee.event.EventPriority;
 
 public class PlayerListener implements Listener {
 
-    private BungeeInstance plugin;
-    private CoreInstance coreInstance;
+    private final BungeeInstance plugin;
+    private final CoreInstance coreInstance;
 
-    public PlayerListener(BungeeInstance plugin) {
+    public PlayerListener(BungeeInstance plugin, CoreInstance coreInstance) {
         this.plugin = plugin;
+        this.coreInstance = coreInstance;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
