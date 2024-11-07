@@ -30,14 +30,15 @@ public abstract class MessageReceiver {
 
             Authentication auth = CoreInstance.get().getObjectMapper().readValue(data, Authentication.class);
             CoreInstance.get().getAccountShieldSender().sendSocketMessage(auth);
-        } catch (Exception exception) {
+        } catch (Exception ignored) {
+            /*
             UnifiedLogger.get().log(
                     Level.SEVERE
                     , "An exception has occurred while processing plugin message (data="
                             + new String(bytes)
                             + ")"
                     , exception
-            );
+            ); */
         }
     }
 
