@@ -76,7 +76,10 @@ public class BungeeCheckProcessor extends CheckProcessor<LoginEvent> {
             event.setCancelled(true);
             event.setReason(TextComponent.fromLegacy(checkData.getKickReason()));
         } else if (disconnect) {
-            event.getConnection().disconnect(TextComponent.fromLegacy(checkData.getKickReason()));
+            plugin.kickPlayer(
+                    event.getConnection().getName(),
+                    checkData.getKickReason()
+            );
         }
 
         if (checkData.isWaitMode()) {

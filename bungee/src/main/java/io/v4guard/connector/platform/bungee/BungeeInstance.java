@@ -1,5 +1,7 @@
 package io.v4guard.connector.platform.bungee;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.check.brand.BrandCheckProcessor;
 import io.v4guard.connector.common.check.settings.PlayerSettingsCheckProcessor;
@@ -7,17 +9,21 @@ import io.v4guard.connector.common.compatibility.PlayerFetchResult;
 import io.v4guard.connector.common.compatibility.ServerPlatform;
 import io.v4guard.connector.common.compatibility.UniversalPlugin;
 import io.v4guard.connector.common.compatibility.UniversalTask;
+import io.v4guard.connector.common.compatibility.kick.AwaitingKick;
 import io.v4guard.connector.platform.bungee.adapter.BungeeMessenger;
 import io.v4guard.connector.platform.bungee.cache.BungeeCheckDataCache;
 import io.v4guard.connector.platform.bungee.check.BungeeCheckProcessor;
 import io.v4guard.connector.platform.bungee.listener.PlayerListener;
 import io.v4guard.connector.platform.bungee.listener.PlayerSettingsListener;
 import io.v4guard.connector.platform.bungee.listener.PluginMessagingListener;
+import io.v4guard.connector.platform.bungee.task.AwaitingKickTask;
+import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.protocol.Protocol;
 import org.bstats.bungeecord.Metrics;
 
 import java.util.concurrent.TimeUnit;
@@ -31,6 +37,8 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
     private BungeeCheckProcessor checkProcessor;
     private PluginMessagingListener brandCheckProcessor;
     private PlayerSettingsListener playerSettingsProcessor;
+    private Cache<String, AwaitingKick<String>> awaitedKickTaskCache;
+    private AwaitingKickTask awaitedKickTask;
     private CoreInstance coreInstance;
 
     private final int METRICS = 16219;
@@ -58,6 +66,15 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
             return;
         }
 
+
+        this.awaitedKickTaskCache = Caffeine
+                .newBuilder()
+                .expireAfterWrite(ProxyServer.getInstance().getConfig().getTimeout(), TimeUnit.MILLISECONDS) //prevent memory leaks in case of a player not being processed by the proxy
+                .build();
+
+
+        this.awaitedKickTask = new AwaitingKickTask(this.awaitedKickTaskCache, this.getProxy());
+        this.schedule(this.awaitedKickTask, 0, 150, TimeUnit.MILLISECONDS);
 
         //this.getProxy().registerChannel(MessageReceiver.CHANNEL);
         this.getProxy().getPluginManager().registerListener(this, this.brandCheckProcessor);
@@ -120,6 +137,15 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
         PlayerFetchResult<ProxiedPlayer> fetchedPlayer = fetchPlayer(playerName);
 
         if (fetchedPlayer.isOnline()) {
+            if (!(fetchedPlayer.getPlayer() instanceof UserConnection userConnection)) {
+                return;
+            }
+
+            if (userConnection.getCh().getEncodeProtocol() != Protocol.GAME) {
+                awaitedKickTaskCache.put(playerName, new AwaitingKick<>(playerName, reason));
+                return;
+            }
+
             fetchedPlayer.getPlayer().disconnect(TextComponent.fromLegacy(reason));
         }
     }

@@ -5,17 +5,18 @@ plugins {
 }
 
 dependencies {
-    compileOnly(libs.bungeecord)
+    //compileOnly(libs.bungeecord)
     compileOnly(libs.floodgate)
     compileOnly(libs.caffeine)
 
+    compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(libs.bstats.bungeecord)
     implementation(project(":commons"))
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 bungee {
