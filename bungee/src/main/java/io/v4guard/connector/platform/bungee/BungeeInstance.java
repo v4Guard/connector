@@ -1,14 +1,12 @@
 package io.v4guard.connector.platform.bungee;
 
 import io.v4guard.connector.common.CoreInstance;
-import io.v4guard.connector.common.accounts.MessageReceiver;
 import io.v4guard.connector.common.check.brand.BrandCheckProcessor;
 import io.v4guard.connector.common.check.settings.PlayerSettingsCheckProcessor;
 import io.v4guard.connector.common.compatibility.PlayerFetchResult;
 import io.v4guard.connector.common.compatibility.ServerPlatform;
 import io.v4guard.connector.common.compatibility.UniversalPlugin;
 import io.v4guard.connector.common.compatibility.UniversalTask;
-import io.v4guard.connector.platform.bungee.accounts.BungeeMessageReceiver;
 import io.v4guard.connector.platform.bungee.adapter.BungeeMessenger;
 import io.v4guard.connector.platform.bungee.cache.BungeeCheckDataCache;
 import io.v4guard.connector.platform.bungee.check.BungeeCheckProcessor;
@@ -30,7 +28,6 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
     private static BungeeInstance instance;
     private BungeeMessenger messenger;
     private BungeeCheckDataCache checkDataCache;
-    private BungeeMessageReceiver messageReceiver;
     private BungeeCheckProcessor checkProcessor;
     private PluginMessagingListener brandCheckProcessor;
     private PlayerSettingsListener playerSettingsProcessor;
@@ -61,10 +58,8 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
             return;
         }
 
-        this.messageReceiver = new BungeeMessageReceiver(coreInstance);
 
         //this.getProxy().registerChannel(MessageReceiver.CHANNEL);
-        this.getProxy().getPluginManager().registerListener(this, this.messageReceiver);
         this.getProxy().getPluginManager().registerListener(this, this.brandCheckProcessor);
         this.getProxy().getPluginManager().registerListener(this, this.playerSettingsProcessor);
         this.getProxy().getPluginManager().registerListener(this, new PlayerListener(this, coreInstance));
@@ -142,11 +137,6 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
     @Override
     public BungeeCheckDataCache getCheckDataCache() {
         return checkDataCache;
-    }
-
-    @Override
-    public MessageReceiver getMessageReceiver() {
-        return messageReceiver;
     }
 
     @Override

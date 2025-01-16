@@ -18,14 +18,11 @@ import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import com.velocitypowered.api.scheduler.Scheduler;
 import io.v4guard.connector.common.CoreInstance;
-import io.v4guard.connector.common.accounts.MessageReceiver;
 import io.v4guard.connector.common.cache.CheckDataCache;
 import io.v4guard.connector.common.check.brand.BrandCheckProcessor;
 import io.v4guard.connector.common.check.settings.PlayerSettingsCheckProcessor;
 import io.v4guard.connector.common.compatibility.*;
 import io.v4guard.connector.common.compatibility.kick.AwaitingKick;
-import io.v4guard.connector.common.constants.ShieldChannels;
-import io.v4guard.connector.platform.velocity.accounts.VelocityMessageReceiver;
 import io.v4guard.connector.platform.velocity.adapter.VelocityMessenger;
 import io.v4guard.connector.platform.velocity.check.VelocityCheckProcessor;
 import io.v4guard.connector.platform.velocity.listener.PlayerListener;
@@ -64,7 +61,6 @@ public class VelocityInstance implements UniversalPlugin {
     private final PluginDescription pluginDescription;
     private VelocityMessenger messenger;
     private CheckDataCache checkDataCache;
-    private MessageReceiver messageReceiver;
     private VelocityCheckProcessor checkProcessor;
     private PluginMessagingListener brandCheckProcessor;
     private PlayerSettingsListener playerSettingsProcessor;
@@ -110,20 +106,12 @@ public class VelocityInstance implements UniversalPlugin {
             return;
         }
 
-        this.messageReceiver = new VelocityMessageReceiver(coreInstance);
-
-
-        //TODO: Why is legacy channel needs to be registered, it's identical to modern.
-        this.server.getChannelRegistrar().register(new LegacyChannelIdentifier(ShieldChannels.VELOCITY_CHANNEL));
-        this.server.getChannelRegistrar().register(MinecraftChannelIdentifier.from(ShieldChannels.VELOCITY_CHANNEL));
-
         for (String channel : BrandCheckProcessor.MODERN_LABYMOD_CHANNELS) {
             this.server.getChannelRegistrar().register(MinecraftChannelIdentifier.from(channel));
         }
 
         this.server.getChannelRegistrar().register(new LegacyChannelIdentifier(BrandCheckProcessor.LEGACY_LABYMOD_CHANNEL));
 
-        this.server.getEventManager().register(this, this.messageReceiver);
         this.server.getEventManager().register(this, this.brandCheckProcessor);
         this.server.getEventManager().register(this, this.playerSettingsProcessor);
         this.server.getEventManager().register(this, new PlayerListener(this));
@@ -239,10 +227,6 @@ public class VelocityInstance implements UniversalPlugin {
         return checkDataCache;
     }
 
-    @Override
-    public MessageReceiver getMessageReceiver() {
-        return messageReceiver;
-    }
 
     @Override
     public VelocityCheckProcessor getCheckProcessor() {

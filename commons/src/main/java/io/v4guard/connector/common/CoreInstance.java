@@ -71,6 +71,10 @@ public class CoreInstance {
         return this.accountShieldFound;
     }
 
+    public void setAccountShieldFound(boolean accountShieldFound) {
+        this.accountShieldFound = accountShieldFound;
+    }
+
     public boolean isFloodgateFound() {
         return this.floodgateFound;
     }

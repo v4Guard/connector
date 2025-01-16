@@ -1,6 +1,5 @@
 package io.v4guard.connector.common.compatibility;
 
-import io.v4guard.connector.common.accounts.MessageReceiver;
 import io.v4guard.connector.common.cache.CheckDataCache;
 import io.v4guard.connector.common.check.CheckProcessor;
 import io.v4guard.connector.common.check.brand.BrandCheckProcessor;
@@ -20,7 +19,6 @@ public interface UniversalPlugin {
     UniversalTask schedule(Runnable runnable, long delay, long period, TimeUnit timeUnit);
     Messenger getMessenger();
     CheckDataCache getCheckDataCache();
-    MessageReceiver getMessageReceiver();
     CheckProcessor<?> getCheckProcessor();
     BrandCheckProcessor getBrandCheckProcessor();
     PlayerSettingsCheckProcessor getPlayerSettingsCheckProcessor();
