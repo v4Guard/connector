@@ -31,8 +31,7 @@ public class AwaitingKickTask implements Runnable {
             }
 
             if (!(player instanceof UserConnection userConnection)) {
-                //User has an invalid state for whatever reason
-                awaitedKickTaskCache.invalidate(playerName);
+                //User has not been fully connected yet
                 return;
             }
 
