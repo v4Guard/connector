@@ -21,7 +21,6 @@ public class AccountShieldSender {
 
         if (!shieldEnabled) return;
 
-        UnifiedLogger.get().log(Level.INFO, "Sending auth message to backend: " + auth.getUsername(), auth.toString());
         coreInstance.getRemoteConnection().send("accshield:login", coreInstance.getObjectMapper().convertValue(auth, ObjectNode.class));
     }
 
