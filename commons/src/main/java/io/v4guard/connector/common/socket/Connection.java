@@ -29,18 +29,18 @@ public class Connection {
 
     private boolean reconnected = false;
     private final CoreInstance backend;
+    private final HashMap<String, List<String>> headers;
 
     private String authCode;
 
     private final HashMap<String, Emitter.Listener> registeredListeners = new HashMap<>();
 
     public Connection(CoreInstance coreInstance) {
+        this.headers = new HashMap<>();
         this.backend = coreInstance;
     }
 
     public void prepareAndConnect() {
-        HashMap<String, List<String>> headers = new HashMap<>();
-
         headers.put(ConnectorConstants.VERSION_HEADER, Collections.singletonList(CoreInstance.PLUGIN_VERSION));
         headers.put(ConnectorConstants.HOSTNAME_HEADER, Collections.singletonList(HostnameUtils.detectHostname()));
         headers.put(ConnectorConstants.INSTANCE_NAME_HEADER, Collections.singletonList(new File(System.getProperty("user.dir")).getName()));
@@ -117,6 +117,9 @@ public class Connection {
 
             if (keyFile.exists()){
                 secretKey = Files.readString(keyFile.toPath());
+
+                String companyCode = secretKey.substring(0, 3);
+                headers.put(ConnectorConstants.COMPANY_NAME_HEADER, Collections.singletonList(companyCode));
             }
 
             options.auth = Collections.singletonMap(
