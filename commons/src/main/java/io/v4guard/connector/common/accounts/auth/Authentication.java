@@ -42,7 +42,7 @@ public class Authentication {
         this.authType = authType;
     }
 
-    public boolean hasPermission() {
+    public boolean isHasPermission() {
         return hasPermission;
     }
 
