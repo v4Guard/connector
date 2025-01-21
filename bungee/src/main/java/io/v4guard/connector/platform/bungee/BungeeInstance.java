@@ -37,7 +37,7 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
     private BungeeCheckProcessor checkProcessor;
     private PluginMessagingListener brandCheckProcessor;
     private PlayerSettingsListener playerSettingsProcessor;
-    private Cache<String, AwaitingKick<String>> awaitedKickTaskCache;
+    private Cache<String, AwaitingKick<ProxiedPlayer>> awaitedKickTaskCache;
     private AwaitingKickTask awaitedKickTask;
     private CoreInstance coreInstance;
 
@@ -73,7 +73,7 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
                 .build();
 
 
-        this.awaitedKickTask = new AwaitingKickTask(this.awaitedKickTaskCache, this.getProxy());
+        this.awaitedKickTask = new AwaitingKickTask(this.awaitedKickTaskCache);
         this.schedule(this.awaitedKickTask, 0, 150, TimeUnit.MILLISECONDS);
 
         //this.getProxy().registerChannel(MessageReceiver.CHANNEL);
@@ -137,12 +137,8 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
         PlayerFetchResult<ProxiedPlayer> fetchedPlayer = fetchPlayer(playerName);
 
         if (fetchedPlayer.isOnline()) {
-            if (!(fetchedPlayer.getPlayer() instanceof UserConnection userConnection)) {
-                return;
-            }
-
-            if (userConnection.getCh().getEncodeProtocol() != Protocol.GAME) {
-                awaitedKickTaskCache.put(playerName, new AwaitingKick<>(playerName, reason));
+            if (later) {
+                awaitedKickTaskCache.put(playerName, new AwaitingKick<>(fetchedPlayer.getPlayer(), reason));
                 return;
             }
 

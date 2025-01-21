@@ -78,7 +78,8 @@ public class BungeeCheckProcessor extends CheckProcessor<LoginEvent> {
         } else if (disconnect) {
             plugin.kickPlayer(
                     event.getConnection().getName(),
-                    checkData.getKickReason()
+                    checkData.getKickReason(),
+                    true
             );
         }
 
