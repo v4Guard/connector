@@ -6,7 +6,7 @@ plugins {
 tasks {
     shadowJar {
         destinationDirectory.set(file("$rootDir/out"))
-        archiveFileName.set("v4Guard-${project.name}-${project.version}.jar")
+        archiveFileName.set("v4Guard-connector-${project.name}-${project.version}.jar")
 
         val prefix = "io.v4guard.connector.libs"
 
