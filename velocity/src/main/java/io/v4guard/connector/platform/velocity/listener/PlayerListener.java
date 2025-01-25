@@ -25,7 +25,7 @@ public class PlayerListener {
 
     @Subscribe(order = PostOrder.EARLY)
     public void onAsyncLogin(LoginEvent event, Continuation continuation) {
-        if(!event.getResult().isAllowed()) {
+        if (!event.getResult().isAllowed()) {
             return;
         }
 

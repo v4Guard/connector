@@ -56,7 +56,7 @@ public class VelocityInstance implements UniversalPlugin {
     private final ProxyServer server;
     private final Logger logger;
     private final Metrics.Factory metricsFactory;
-    private Cache<String, AwaitingKick<Player>> awaitedKickTaskCache;
+    private Cache<String, AwaitingKick<String>> awaitedKickTaskCache;
     private final Path dataDirectory;
     private final PluginDescription pluginDescription;
     private VelocityMessenger messenger;
@@ -116,9 +116,14 @@ public class VelocityInstance implements UniversalPlugin {
         this.server.getEventManager().register(this, this.playerSettingsProcessor);
         this.server.getEventManager().register(this, new PlayerListener(this));
 
-        this.awaitedKickTaskCache = Caffeine.newBuilder().build();
+        this.awaitedKickTaskCache = Caffeine.newBuilder()
+                .expireAfterWrite(
+                        this.server.getConfiguration().getConnectTimeout(),
+                        TimeUnit.MILLISECONDS
+                ) // Prevents memory leaks as we don't want to keep the player in the cache after the connection has been timed out
+                .build();
 
-        schedule(new AwaitingKickTask(this.awaitedKickTaskCache), 0, 150, TimeUnit.MILLISECONDS);
+        schedule(new AwaitingKickTask(this.awaitedKickTaskCache, this.server), 0, 150, TimeUnit.MILLISECONDS);
 
         this.logger.info("(Velocity) Enabling... [DONE]");
     }
@@ -191,6 +196,11 @@ public class VelocityInstance implements UniversalPlugin {
 
     @Override
     public void kickPlayer(String playerName, String reason, boolean later) {
+        if (later) {
+            awaitedKickTaskCache.put(playerName, new AwaitingKick<>(playerName, reason));
+            return;
+        }
+
         PlayerFetchResult<Player> fetchedPlayer = fetchPlayer(playerName);
 
         if (!fetchedPlayer.isOnline()) {
@@ -198,11 +208,6 @@ public class VelocityInstance implements UniversalPlugin {
         }
 
         Player player = fetchedPlayer.getPlayer();
-
-        if (later && player.getProtocolState() != ProtocolState.PLAY) {
-            awaitedKickTaskCache.put(playerName, new AwaitingKick<>(player, reason));
-            return;
-        }
 
         player.disconnect(Component.text(reason));
     }

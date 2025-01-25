@@ -133,12 +133,12 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
     }
 
     public void kickPlayer(String playerName, String reason, boolean later) {
-        PlayerFetchResult<ProxiedPlayer> fetchedPlayer = fetchPlayer(playerName);
-
         if (later) {
             awaitedKickTaskCache.put(playerName, new AwaitingKick<>(playerName, reason));
             return;
         }
+
+        PlayerFetchResult<ProxiedPlayer> fetchedPlayer = fetchPlayer(playerName);
 
         if (fetchedPlayer.isOnline()) {
             fetchedPlayer.getPlayer().disconnect(TextComponent.fromLegacy(reason));
