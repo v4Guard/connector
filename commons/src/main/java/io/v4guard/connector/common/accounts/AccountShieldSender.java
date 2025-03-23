@@ -17,6 +17,8 @@ public class AccountShieldSender {
     }
 
     public void sendSocketMessage(Authentication auth) {
+        if (!coreInstance.getRemoteConnection().isReady()) return;
+
         boolean shieldEnabled = coreInstance.getActiveSettings().getActiveAddons().get("accshield");
 
         if (!shieldEnabled) return;
