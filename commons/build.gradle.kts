@@ -1,6 +1,5 @@
 plugins {
     id("connector.common-conventions")
-    id("maven-publish")
 }
 
 dependencies {
