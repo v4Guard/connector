@@ -3,7 +3,7 @@ package io.v4guard.connector.platform.velocity.adapter;
 import com.velocitypowered.api.proxy.Player;
 import io.v4guard.connector.common.compatibility.Messenger;
 import io.v4guard.connector.common.compatibility.PlayerFetchResult;
-import io.v4guard.connector.common.constants.ListenersConstants;
+import io.v4guard.connector.api.constants.ListenersConstants;
 import io.v4guard.connector.platform.velocity.VelocityInstance;
 import net.kyori.adventure.text.Component;
 

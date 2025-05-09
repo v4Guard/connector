@@ -4,16 +4,9 @@ plugins {
 }
 
 dependencies {
+    api(project(":api"))
     compileOnly(libs.bungeecord)
     implementation(libs.socketio)
     implementation(libs.caffeine)
     implementation(libs.jackson.databind)
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-        }
-    }
 }

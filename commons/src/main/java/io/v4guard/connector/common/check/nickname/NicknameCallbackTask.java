@@ -2,16 +2,11 @@ package io.v4guard.connector.common.check.nickname;
 
 
 import io.v4guard.connector.common.CoreInstance;
-import io.v4guard.connector.common.UnifiedLogger;
 import io.v4guard.connector.common.check.CallbackTask;
 import io.v4guard.connector.common.check.CheckStatus;
 import io.v4guard.connector.common.check.PlayerCheckData;
-import io.v4guard.connector.common.constants.SettingsKeys;
 import io.v4guard.connector.common.socket.ActiveSettings;
 import io.v4guard.connector.common.utils.StringUtils;
-import org.json.JSONObject;
-
-import java.util.regex.Pattern;
 
 public class NicknameCallbackTask extends CallbackTask {
 

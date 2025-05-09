@@ -2,12 +2,12 @@ package io.v4guard.connector.common.socket.listener;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.socket.emitter.Emitter;
+import io.v4guard.connector.api.socket.SocketStatus;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.UnifiedLogger;
 import io.v4guard.connector.common.compatibility.UniversalTask;
-import io.v4guard.connector.common.constants.ListenersConstants;
+import io.v4guard.connector.api.constants.ListenersConstants;
 import io.v4guard.connector.common.socket.Connection;
-import io.v4guard.connector.common.socket.SocketStatus;
 import io.v4guard.connector.common.utils.TimestampUtils;
 
 import java.io.IOException;

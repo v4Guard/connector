@@ -2,7 +2,7 @@ package io.v4guard.connector.platform.bungee.adapter;
 
 import io.v4guard.connector.common.compatibility.Messenger;
 import io.v4guard.connector.common.compatibility.PlayerFetchResult;
-import io.v4guard.connector.common.constants.ListenersConstants;
+import io.v4guard.connector.api.constants.ListenersConstants;
 import io.v4guard.connector.platform.bungee.BungeeInstance;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;

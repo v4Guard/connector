@@ -1,6 +1,6 @@
 package io.v4guard.connector.common.check.settings;
 
-import io.v4guard.connector.common.constants.SettingsCheckConstants;
+import io.v4guard.connector.api.constants.SettingsCheckConstants;
 
 import java.util.HashMap;
 import java.util.Map;

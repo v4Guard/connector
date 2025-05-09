@@ -1,4 +1,4 @@
-package io.v4guard.connector.common.constants;
+package io.v4guard.connector.api.constants;
 
 public class SettingsKeys {
 

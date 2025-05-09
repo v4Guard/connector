@@ -7,7 +7,7 @@ import io.socket.emitter.Emitter;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.UnifiedLogger;
 import io.v4guard.connector.common.compatibility.Messenger;
-import io.v4guard.connector.common.constants.ListenersConstants;
+import io.v4guard.connector.api.constants.ListenersConstants;
 
 import java.util.List;
 

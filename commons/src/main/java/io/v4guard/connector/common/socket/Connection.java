@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+import io.v4guard.connector.api.socket.SocketStatus;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.UnifiedLogger;
-import io.v4guard.connector.common.constants.ConnectorConstants;
-import io.v4guard.connector.common.constants.ListenersConstants;
+import io.v4guard.connector.api.constants.ConnectorConstants;
+import io.v4guard.connector.api.constants.ListenersConstants;
 import io.v4guard.connector.common.socket.listener.*;
 import io.v4guard.connector.common.utils.HashCalculator;
 import io.v4guard.connector.common.utils.HostnameUtils;
@@ -19,7 +20,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.Level;
 
-public class Connection {
+public class Connection implements io.v4guard.connector.api.socket.Connection {
 
     private Socket socket;
 
@@ -89,6 +90,7 @@ public class Connection {
                         , args -> UnifiedLogger.get().log(Level.SEVERE, "An error occurred while attempting to contact server: " + Arrays.toString(args))
                 );
             }
+            backend.getConnectorAPI().setConnection(this);
         } catch (URISyntaxException exception) {
             UnifiedLogger.get().log(Level.SEVERE, "An exception has occurred while connecting to the backend.", exception);
         }
@@ -163,6 +165,7 @@ public class Connection {
         registerListener(ListenersConstants.EVENT_FIND, new FindListener(backend));
     }
 
+    @Override
     public boolean isReady() {
         return socket != null
                 && socket.connected()
@@ -170,6 +173,7 @@ public class Connection {
                 && CoreInstance.get().getActiveSettings() != null;
     }
 
+    @Override
     public void send(String channel, ObjectNode payload) {
         try {
             this.socket.emit(channel, payload);
@@ -186,10 +190,12 @@ public class Connection {
         this.authCode = authCode;
     }
 
+    @Override
     public SocketStatus getSocketStatus() {
         return socketStatus;
     }
 
+    @Override
     public void setSocketStatus(SocketStatus socketStatus) {
         this.socketStatus = socketStatus;
     }

@@ -16,6 +16,7 @@ import com.velocitypowered.api.proxy.messages.LegacyChannelIdentifier;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import com.velocitypowered.api.scheduler.Scheduler;
+import io.v4guard.connector.api.v4GuardConnectorProvider;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.cache.CheckDataCache;
 import io.v4guard.connector.common.check.brand.BrandCheckProcessor;
@@ -133,6 +134,8 @@ public class VelocityInstance implements UniversalPlugin {
         this.logger.info("(Velocity) Disconnecting from the backend...");
 
         server.getScheduler().tasksByPlugin(this).forEach(ScheduledTask::cancel);
+
+        v4GuardConnectorProvider.unregister();
 
         try {
             coreInstance.getRemoteConnection().disconnect();

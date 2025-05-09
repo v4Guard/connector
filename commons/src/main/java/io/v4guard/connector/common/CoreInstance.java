@@ -3,7 +3,10 @@ package io.v4guard.connector.common;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.v4guard.connector.api.ConnectorAPI;
+import io.v4guard.connector.api.v4GuardConnectorProvider;
 import io.v4guard.connector.common.accounts.AccountShieldSender;
+import io.v4guard.connector.common.api.DefaultConnectorAPI;
 import io.v4guard.connector.common.cache.CacheTicker;
 import io.v4guard.connector.common.cache.CheckDataCache;
 import io.v4guard.connector.common.check.PendingTasks;
@@ -32,11 +35,16 @@ public class CoreInstance {
     private boolean floodgateFound;
     private final ServerPlatform platform;
     private final UniversalPlugin plugin;
+    private final ConnectorAPI connectorAPI;
 
     public CoreInstance(ServerPlatform platform, UniversalPlugin plugin) {
         instance = this;
         this.platform = platform;
         this.plugin = plugin;
+
+        this.connectorAPI = new DefaultConnectorAPI();
+
+        v4GuardConnectorProvider.register(this.connectorAPI);
     }
 
     public void initialize() {
@@ -121,6 +129,10 @@ public class CoreInstance {
 
     public ObjectMapper getObjectMapper() {
         return objectMapper;
+    }
+
+    public ConnectorAPI getConnectorAPI() {
+        return connectorAPI;
     }
 
     public JsonNode readTree(String json) {

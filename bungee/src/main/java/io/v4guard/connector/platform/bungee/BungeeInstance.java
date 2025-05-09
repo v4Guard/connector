@@ -2,6 +2,7 @@ package io.v4guard.connector.platform.bungee;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import io.v4guard.connector.api.v4GuardConnectorProvider;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.UnifiedLogger;
 import io.v4guard.connector.common.check.brand.BrandCheckProcessor;
@@ -87,6 +88,8 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
     public void onDisable() {
         getLogger().info("(Bungee) Disabling...");
         getLogger().info("(Bungee) Disconnecting from the backend...");
+
+        v4GuardConnectorProvider.unregister();
 
         try {
             this.coreInstance.getRemoteConnection().disconnect();

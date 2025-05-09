@@ -1,16 +1,14 @@
 package io.v4guard.connector.common.check.vpn;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.v4guard.connector.common.CoreInstance;
-import io.v4guard.connector.common.UnifiedLogger;
 import io.v4guard.connector.common.check.BlockReason;
 import io.v4guard.connector.common.check.CallbackTask;
 import io.v4guard.connector.common.check.CheckStatus;
 import io.v4guard.connector.common.check.PlayerCheckData;
-import io.v4guard.connector.common.constants.VPNCheckConstants;
+import io.v4guard.connector.api.constants.VPNCheckConstants;
 import io.v4guard.connector.common.utils.StringUtils;
 
 import java.util.ArrayList;
