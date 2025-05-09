@@ -1,7 +1,22 @@
 plugins {
     id("connector.common-conventions")
+    id("maven-publish")
 }
 
 dependencies {
-    implementation(libs.jackson.databind)
+    compileOnly(libs.jackson.databind)
+}
+
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+        }
+    }
 }
