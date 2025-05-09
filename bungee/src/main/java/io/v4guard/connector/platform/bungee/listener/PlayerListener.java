@@ -1,8 +1,6 @@
 package io.v4guard.connector.platform.bungee.listener;
 
 import io.v4guard.connector.common.CoreInstance;
-import io.v4guard.connector.common.accounts.auth.AuthType;
-import io.v4guard.connector.common.accounts.auth.Authentication;
 import io.v4guard.connector.common.check.PlayerCheckData;
 import io.v4guard.connector.platform.bungee.BungeeInstance;
 import net.md_5.bungee.api.connection.PendingConnection;
@@ -39,7 +37,6 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPostLoginEvent(PostLoginEvent event) {
-        ProxiedPlayer player = event.getPlayer();
         String playerName = event.getPlayer().getName();
         PlayerCheckData checkData = plugin.getCheckDataCache().getTempCheckData(playerName);
 
@@ -47,20 +44,6 @@ public class PlayerListener implements Listener {
             plugin.getCheckDataCache().cache(playerName, checkData);
         }
 
-        if (coreInstance.isAccountShieldFound()) {
-            return;
-        }
-
-        if (player.getPendingConnection().isOnlineMode()) {
-            Authentication auth = new Authentication(
-                    player.getName(),
-                    player.getUniqueId(),
-                    AuthType.MOJANG,
-                    player.hasPermission("v4guard.accshield")
-            );
-
-            coreInstance.getAccountShieldSender().sendSocketMessage(auth);
-        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

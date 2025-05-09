@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.v4guard.connector.api.ConnectorAPI;
 import io.v4guard.connector.api.v4GuardConnectorProvider;
-import io.v4guard.connector.common.accounts.AccountShieldSender;
 import io.v4guard.connector.common.api.DefaultConnectorAPI;
 import io.v4guard.connector.common.cache.CacheTicker;
 import io.v4guard.connector.common.cache.CheckDataCache;
@@ -26,12 +25,10 @@ public class CoreInstance {
     private static CoreInstance instance;
     private PendingTasks pendingTasks;
     private Connection remoteConnection;
-    private AccountShieldSender accountShieldSender;
     private ObjectMapper objectMapper;
     private ActiveSettings activeSettings;
 
     private boolean debugEnabled;
-    private boolean accountShieldFound;
     private boolean floodgateFound;
     private final ServerPlatform platform;
     private final UniversalPlugin plugin;
@@ -60,9 +57,7 @@ public class CoreInstance {
 
         this.pendingTasks = new PendingTasks();
         this.remoteConnection = new Connection(this);
-        this.accountShieldFound = this.plugin.isPluginEnabled("v4guard-account-shield");
         this.floodgateFound = this.plugin.isPluginEnabled("floodgate");
-        this.accountShieldSender = new AccountShieldSender(this);
 
         this.remoteConnection.prepareAndConnect();
         this.plugin.schedule(new CacheTicker(this), 0, 100, TimeUnit.MILLISECONDS);
@@ -75,20 +70,8 @@ public class CoreInstance {
         UnifiedLogger.overrideBy(logger);
     }
 
-    public boolean isAccountShieldFound() {
-        return this.accountShieldFound;
-    }
-
-    public void setAccountShieldFound(boolean accountShieldFound) {
-        this.accountShieldFound = accountShieldFound;
-    }
-
     public boolean isFloodgateFound() {
         return this.floodgateFound;
-    }
-
-    public AccountShieldSender getAccountShieldSender() {
-        return this.accountShieldSender;
     }
 
     public UniversalPlugin getPlugin() {

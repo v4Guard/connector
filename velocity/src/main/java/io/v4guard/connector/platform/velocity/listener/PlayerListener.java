@@ -9,8 +9,6 @@ import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.proxy.Player;
 import io.v4guard.connector.common.CoreInstance;
-import io.v4guard.connector.common.accounts.auth.AuthType;
-import io.v4guard.connector.common.accounts.auth.Authentication;
 import io.v4guard.connector.platform.velocity.VelocityInstance;
 
 public class PlayerListener {
@@ -34,29 +32,6 @@ public class PlayerListener {
         } else {
             continuation.resume();
         }
-    }
-
-    @Subscribe(order = PostOrder.LAST)
-    public void onPostLogin(PostLoginEvent event, Continuation continuation) {
-        if (coreInstance.isAccountShieldFound()) {
-            continuation.resume();
-            return;
-        }
-
-        Player player = event.getPlayer();
-
-        if (player.isOnlineMode()) {
-            Authentication auth = new Authentication(
-                    player.getUsername()
-                    , player.getUniqueId()
-                    , AuthType.MOJANG
-                    , player.hasPermission("v4guard.accshield")
-            );
-
-            coreInstance.getAccountShieldSender().sendSocketMessage(auth);
-        }
-
-        continuation.resume();
     }
 
     @Subscribe(order = PostOrder.EARLY)
