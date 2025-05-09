@@ -9,12 +9,16 @@ import java.net.UnknownHostException;
 public class HostnameUtils {
 
     public static String detectHostname() {
-        if (DockerDetector.isRunningInsideDocker()){
+        if (System.getProperty("io.v4guard.connector.hostname") != null) {
+            return System.getProperty("io.v4guard.connector.hostname");
+        } else if (DockerDetector.isRunningInsideDocker()){
             return "Docker Container";
-        } else try {
-            return InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            return "Unknown";
+        } else {
+            try {
+                return InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException e) {
+                return "Unknown";
+            }
         }
     }
 

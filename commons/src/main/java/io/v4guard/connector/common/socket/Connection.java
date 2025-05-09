@@ -12,6 +12,7 @@ import io.v4guard.connector.api.constants.ListenersConstants;
 import io.v4guard.connector.common.socket.listener.*;
 import io.v4guard.connector.common.utils.HashCalculator;
 import io.v4guard.connector.common.utils.HostnameUtils;
+import io.v4guard.connector.common.utils.NameUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +45,7 @@ public class Connection implements io.v4guard.connector.api.socket.Connection {
     public void prepareAndConnect() {
         headers.put(ConnectorConstants.VERSION_HEADER, Collections.singletonList(CoreInstance.PLUGIN_VERSION));
         headers.put(ConnectorConstants.HOSTNAME_HEADER, Collections.singletonList(HostnameUtils.detectHostname()));
-        headers.put(ConnectorConstants.INSTANCE_NAME_HEADER, Collections.singletonList(new File(System.getProperty("user.dir")).getName()));
+        headers.put(ConnectorConstants.INSTANCE_NAME_HEADER, Collections.singletonList(NameUtils.getName()));
         headers.put(ConnectorConstants.SERVICE_NAME_HEADER, Collections.singletonList("minecraft"));
         headers.put(ConnectorConstants.PLUGIN_MODE_HEADER, Collections.singletonList(backend.getPlatform().name()));
         headers.put(ConnectorConstants.INTEGRITY_HEADER, Collections.singletonList(HashCalculator.calculateHash()));
