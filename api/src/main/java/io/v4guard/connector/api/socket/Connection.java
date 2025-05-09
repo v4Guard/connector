@@ -11,7 +11,7 @@ public interface Connection {
     boolean isReady();
 
     /**
-     * Send a message to the v4guard server.
+     * Send a message to the v4Guard server.
      * @param channel the channel to send the message to
      * @param payload the message to send
      */
