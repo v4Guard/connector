@@ -1,6 +1,7 @@
 package io.v4guard.connector.common.socket;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import io.v4guard.connector.api.socket.ActiveSettings;
 import io.v4guard.connector.common.UnifiedLogger;
 import io.v4guard.connector.common.serializer.ActiveSettingsDeserializer;
 
@@ -9,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 @JsonDeserialize(using = ActiveSettingsDeserializer.class)
-public class ActiveSettings {
+public class DefaultActiveSettings implements ActiveSettings {
 
     private ConcurrentHashMap<String, Boolean> general;
     private NameValidator nameValidator;
@@ -18,11 +19,11 @@ public class ActiveSettings {
     private ConcurrentHashMap<String, Boolean> privacySettings;
 
 
-    public ActiveSettings(ConcurrentHashMap<String, Boolean> general,
-                          ConcurrentHashMap<String, List<String>> messages,
-                          NameValidator nameValidator,
-                          ConcurrentHashMap<String, Boolean> activeAddons,
-                          ConcurrentHashMap<String, Boolean> privacySettings
+    public DefaultActiveSettings(ConcurrentHashMap<String, Boolean> general,
+                                 ConcurrentHashMap<String, List<String>> messages,
+                                 NameValidator nameValidator,
+                                 ConcurrentHashMap<String, Boolean> activeAddons,
+                                 ConcurrentHashMap<String, Boolean> privacySettings
     ) {
         this.general = general;
         this.nameValidator = nameValidator;
@@ -31,13 +32,14 @@ public class ActiveSettings {
         this.privacySettings = privacySettings;
     }
 
-    public ActiveSettings() {
+    public DefaultActiveSettings() {
         this.general = new ConcurrentHashMap<>();
         this.messages = new ConcurrentHashMap<>();
         this.activeAddons = new ConcurrentHashMap<>();
         this.privacySettings = new ConcurrentHashMap<>();
     }
 
+    @Override
     public ConcurrentHashMap<String, Boolean> getGeneral() {
         return general;
     }
@@ -49,11 +51,11 @@ public class ActiveSettings {
     public NameValidator getNameValidator() {
         return nameValidator;
     }
-
+    @Override
     public ConcurrentHashMap<String, Boolean> getActiveAddons() {
         return activeAddons;
     }
-
+    @Override
     public ConcurrentHashMap<String, Boolean> getPrivacySettings() {
         return privacySettings;
     }

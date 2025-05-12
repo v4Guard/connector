@@ -1,18 +1,18 @@
 package io.v4guard.connector.common.socket.listener;
 
 import io.socket.emitter.Emitter;
-import io.v4guard.connector.common.socket.Connection;
+import io.v4guard.connector.common.socket.ActiveConnection;
 
 public class ConnectListener implements Emitter.Listener {
 
-    private final Connection remoteConnection;
+    private final ActiveConnection remoteActiveConnection;
 
-    public ConnectListener(Connection backend) {
-        this.remoteConnection = backend;
+    public ConnectListener(ActiveConnection backend) {
+        this.remoteActiveConnection = backend;
     }
 
     @Override
     public void call(Object... args) {
-        remoteConnection.initializeListeners();
+        remoteActiveConnection.initializeListeners();
     }
 }

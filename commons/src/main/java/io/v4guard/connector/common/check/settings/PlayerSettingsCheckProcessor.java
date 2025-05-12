@@ -5,7 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.check.PlayerCheckData;
 import io.v4guard.connector.api.constants.SettingsKeys;
-import io.v4guard.connector.common.socket.ActiveSettings;
+import io.v4guard.connector.common.socket.DefaultActiveSettings;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -24,9 +24,9 @@ public class PlayerSettingsCheckProcessor {
             return;
         }
 
-        ActiveSettings activeSettings = CoreInstance.get().getActiveSettings();
-        boolean invalidatedCache = activeSettings.getGeneralSetting(SettingsKeys.INVALIDATE_CACHE, false);
-        boolean collectSettings = activeSettings.getPrivacySetting(SettingsKeys.COLLECT_PLAYER_SETTINGS);
+        DefaultActiveSettings defaultActiveSettings = CoreInstance.get().getActiveSettings();
+        boolean invalidatedCache = defaultActiveSettings.getGeneralSetting(SettingsKeys.INVALIDATE_CACHE, false);
+        boolean collectSettings = defaultActiveSettings.getPrivacySetting(SettingsKeys.COLLECT_PLAYER_SETTINGS);
 
         if (invalidatedCache && !collectSettings) {
             return;

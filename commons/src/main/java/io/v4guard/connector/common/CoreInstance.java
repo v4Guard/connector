@@ -11,8 +11,8 @@ import io.v4guard.connector.common.cache.CheckDataCache;
 import io.v4guard.connector.common.check.PendingTasks;
 import io.v4guard.connector.common.compatibility.ServerPlatform;
 import io.v4guard.connector.common.compatibility.UniversalPlugin;
-import io.v4guard.connector.common.socket.ActiveSettings;
-import io.v4guard.connector.common.socket.Connection;
+import io.v4guard.connector.common.socket.DefaultActiveSettings;
+import io.v4guard.connector.common.socket.ActiveConnection;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -24,9 +24,9 @@ public class CoreInstance {
 
     private static CoreInstance instance;
     private PendingTasks pendingTasks;
-    private Connection remoteConnection;
+    private ActiveConnection remoteActiveConnection;
     private ObjectMapper objectMapper;
-    private ActiveSettings activeSettings;
+    private DefaultActiveSettings defaultActiveSettings;
 
     private boolean debugEnabled;
     private boolean floodgateFound;
@@ -56,10 +56,10 @@ public class CoreInstance {
         }
 
         this.pendingTasks = new PendingTasks();
-        this.remoteConnection = new Connection(this);
+        this.remoteActiveConnection = new ActiveConnection(this);
         this.floodgateFound = this.plugin.isPluginEnabled("floodgate");
 
-        this.remoteConnection.prepareAndConnect();
+        this.remoteActiveConnection.prepareAndConnect();
         this.plugin.schedule(new CacheTicker(this), 0, 100, TimeUnit.MILLISECONDS);
     }
 
@@ -90,8 +90,8 @@ public class CoreInstance {
         return debugEnabled;
     }
 
-    public Connection getRemoteConnection() {
-        return remoteConnection;
+    public ActiveConnection getRemoteConnection() {
+        return remoteActiveConnection;
     }
 
     public PendingTasks getPendingTasks() {
@@ -102,12 +102,13 @@ public class CoreInstance {
         return plugin.getCheckDataCache();
     }
 
-    public ActiveSettings getActiveSettings() {
-        return activeSettings;
+    public DefaultActiveSettings getActiveSettings() {
+        return defaultActiveSettings;
     }
 
-    public void setActiveSettings(ActiveSettings activeSettings) {
-        this.activeSettings = activeSettings;
+    public void setActiveSettings(DefaultActiveSettings defaultActiveSettings) {
+        this.defaultActiveSettings = defaultActiveSettings;
+        this.connectorAPI.setActiveSettings(defaultActiveSettings);
     }
 
     public ObjectMapper getObjectMapper() {

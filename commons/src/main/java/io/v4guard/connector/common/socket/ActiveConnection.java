@@ -1,14 +1,16 @@
 package io.v4guard.connector.common.socket;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+import io.v4guard.connector.api.constants.ConnectorConstants;
+import io.v4guard.connector.api.constants.ListenersConstants;
+import io.v4guard.connector.api.socket.Connection;
 import io.v4guard.connector.api.socket.SocketStatus;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.UnifiedLogger;
-import io.v4guard.connector.api.constants.ConnectorConstants;
-import io.v4guard.connector.api.constants.ListenersConstants;
 import io.v4guard.connector.common.socket.listener.*;
 import io.v4guard.connector.common.utils.HashCalculator;
 import io.v4guard.connector.common.utils.HostnameUtils;
@@ -18,10 +20,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 
-public class Connection implements io.v4guard.connector.api.socket.Connection {
+public class ActiveConnection implements Connection {
 
     private Socket socket;
 
@@ -35,9 +40,11 @@ public class Connection implements io.v4guard.connector.api.socket.Connection {
 
     private String authCode;
 
+    private String secretKey;
+
     private final HashMap<String, Emitter.Listener> registeredListeners = new HashMap<>();
 
-    public Connection(CoreInstance coreInstance) {
+    public ActiveConnection(CoreInstance coreInstance) {
         this.headers = new HashMap<>();
         this.backend = coreInstance;
     }
@@ -53,7 +60,7 @@ public class Connection implements io.v4guard.connector.api.socket.Connection {
         this.options = IO.Options.builder()
                 .setForceNew(false)
                 .setMultiplex(true)
-                .setTransports(new String[]{"websocket","polling"})
+                .setTransports(new String[]{"websocket", "polling"})
                 .setUpgrade(true)
                 .setRememberUpgrade(false)
                 .setSecure(true)
@@ -116,9 +123,9 @@ public class Connection implements io.v4guard.connector.api.socket.Connection {
             }
 
             keyFile = new File(dataFolder, "secret.key");
-            String secretKey = null;
 
-            if (keyFile.exists()){
+
+            if (keyFile.exists()) {
                 secretKey = Files.readString(keyFile.toPath());
 
                 String companyCode = secretKey.substring(0, 3);
@@ -145,7 +152,7 @@ public class Connection implements io.v4guard.connector.api.socket.Connection {
         Files.writeString(keyFile.toPath(), secretKey);
     }
 
-    public void registerListener(String event, Emitter.Listener listener){
+    public void registerListener(String event, Emitter.Listener listener) {
         if (this.registeredListeners.containsKey(event)) {
             this.socket.off(event);
         }
@@ -175,6 +182,14 @@ public class Connection implements io.v4guard.connector.api.socket.Connection {
     }
 
     @Override
+    public void send(String channel, String payload) {
+        try {
+            send(channel, backend.getObjectMapper().readValue(payload, ObjectNode.class));
+        } catch (JsonProcessingException exception) {
+            UnifiedLogger.get().log(Level.SEVERE, "An exception has occurred while sending a message to the backend", exception);
+        }
+    }
+
     public void send(String channel, ObjectNode payload) {
         try {
             this.socket.emit(channel, payload);
@@ -189,6 +204,10 @@ public class Connection implements io.v4guard.connector.api.socket.Connection {
 
     public void setAuthCode(String authCode) {
         this.authCode = authCode;
+    }
+
+    public String getSecretKey() {
+        return secretKey;
     }
 
     @Override

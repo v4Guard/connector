@@ -4,7 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.socket.emitter.Emitter;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.UnifiedLogger;
-import io.v4guard.connector.common.socket.ActiveSettings;
+import io.v4guard.connector.common.api.DefaultConnectorAPI;
+import io.v4guard.connector.common.socket.DefaultActiveSettings;
 
 import java.util.logging.Level;
 
@@ -19,8 +20,9 @@ public class SettingsListener implements Emitter.Listener {
     @Override
     public void call(Object... args) {
         try {
-            ActiveSettings activeSettings = coreInstance.getObjectMapper().readValue(args[0].toString(), ActiveSettings.class);
-            coreInstance.setActiveSettings(activeSettings);
+            DefaultActiveSettings defaultActiveSettings = coreInstance.getObjectMapper().readValue(args[0].toString(), DefaultActiveSettings.class);
+            coreInstance.setActiveSettings(defaultActiveSettings);
+
         } catch (JsonProcessingException e) {
             UnifiedLogger.get().log(Level.SEVERE, "An exception has occurred while updating settings", e);
         }

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.socket.emitter.Emitter;
 import io.v4guard.connector.common.CoreInstance;
-import io.v4guard.connector.common.socket.ActiveSettings;
+import io.v4guard.connector.common.socket.DefaultActiveSettings;
 
 import java.util.ArrayList;
 
@@ -21,7 +21,7 @@ public class SettingListener implements Emitter.Listener {
     @Override
     public void call(Object... args) {
         JsonNode json = CoreInstance.get().readTree(args[0].toString());
-        ActiveSettings settings = CoreInstance.get().getActiveSettings();
+        DefaultActiveSettings settings = CoreInstance.get().getActiveSettings();
 
         Type type = Type.valueOf(json.get("type").asText());
 
@@ -40,7 +40,7 @@ public class SettingListener implements Emitter.Listener {
                 break;
             case NAME_VALIDATOR:
                 settings.setNameValidator(
-                        CoreInstance.get().getObjectMapper().convertValue(json.get("value"), ActiveSettings.NameValidator.class)
+                        CoreInstance.get().getObjectMapper().convertValue(json.get("value"), DefaultActiveSettings.NameValidator.class)
                 );
                 break;
             case ADDON:
