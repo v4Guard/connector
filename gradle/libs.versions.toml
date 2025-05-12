@@ -10,6 +10,7 @@ floodgate = "2.2.3-SNAPSHOT"
 #platform specific
 bungeecord = "1.21-R0.1-SNAPSHOT"
 velocity = "3.4.0-SNAPSHOT"
+commandflow = "0.7.0"
 
 [libraries]
 
@@ -23,3 +24,5 @@ bstats-bungeecord = { group = "org.bstats", name = "bstats-bungeecord", version.
 bstats-velocity = { group = "org.bstats", name = "bstats-velocity", version.ref = "bstats" }
 bungeecord = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungeecord"}
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
+commandflow-velocity = { group = "team.unnamed", name = "commandflow-velocity", version.ref = "commandflow" }
+

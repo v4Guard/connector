@@ -18,6 +18,7 @@ import com.velocitypowered.api.scheduler.ScheduledTask;
 import com.velocitypowered.api.scheduler.Scheduler;
 import io.v4guard.connector.api.v4GuardConnectorProvider;
 import io.v4guard.connector.common.CoreInstance;
+import io.v4guard.connector.common.UnifiedLogger;
 import io.v4guard.connector.common.cache.CheckDataCache;
 import io.v4guard.connector.common.check.brand.BrandCheckProcessor;
 import io.v4guard.connector.common.check.settings.PlayerSettingsCheckProcessor;
@@ -25,6 +26,7 @@ import io.v4guard.connector.common.compatibility.*;
 import io.v4guard.connector.common.compatibility.kick.AwaitingKick;
 import io.v4guard.connector.platform.velocity.adapter.VelocityMessenger;
 import io.v4guard.connector.platform.velocity.check.VelocityCheckProcessor;
+import io.v4guard.connector.platform.velocity.command.ConnectorCommand;
 import io.v4guard.connector.platform.velocity.listener.PlayerListener;
 import io.v4guard.connector.platform.velocity.listener.PlayerSettingsListener;
 import io.v4guard.connector.platform.velocity.listener.PluginMessagingListener;
@@ -32,6 +34,13 @@ import io.v4guard.connector.platform.velocity.task.AwaitingKickTask;
 
 import net.kyori.adventure.text.Component;
 import org.bstats.velocity.Metrics;
+import team.unnamed.commandflow.CommandManager;
+import team.unnamed.commandflow.annotated.AnnotatedCommandTreeBuilder;
+import team.unnamed.commandflow.annotated.SubCommandInstanceCreator;
+import team.unnamed.commandflow.annotated.part.PartInjector;
+import team.unnamed.commandflow.annotated.part.defaults.DefaultsModule;
+import team.unnamed.commandflow.velocity.VelocityCommandManager;
+import team.unnamed.commandflow.velocity.factory.VelocityModule;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -124,6 +133,25 @@ public class VelocityInstance implements UniversalPlugin {
                 .build();
 
         schedule(new AwaitingKickTask(this.awaitedKickTaskCache, this.server), 0, 150, TimeUnit.MILLISECONDS);
+
+        PartInjector partInjector = PartInjector.create();
+        partInjector.install(new DefaultsModule());
+        partInjector.install(new VelocityModule(server));
+
+        SubCommandInstanceCreator subCommandInstanceCreator = (aClass, commandClass) -> {
+            try {
+                return aClass.getConstructor().newInstance();
+            } catch (Exception e) {
+                UnifiedLogger.get().log(Level.SEVERE, "An exception has occurred while registering the commands", e);
+            }
+            return null;
+        };
+
+        AnnotatedCommandTreeBuilder builder = AnnotatedCommandTreeBuilder.create(partInjector, subCommandInstanceCreator);
+
+        CommandManager commandManager = new VelocityCommandManager(server, this);
+
+        commandManager.registerCommands(builder.fromClass(new ConnectorCommand()));
 
         this.logger.info("(Velocity) Enabling... [DONE]");
     }
