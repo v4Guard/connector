@@ -15,7 +15,7 @@ public interface Connection {
      * @param channel the channel to send the message to
      * @param payload the message to send
      */
-    void send(String channel, ObjectNode payload);
+    void send(String channel, String payload);
 
     /**
      * Get the socket status.
