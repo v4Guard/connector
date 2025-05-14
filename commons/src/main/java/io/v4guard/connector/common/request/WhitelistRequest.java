@@ -9,22 +9,15 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-public class WhitelistRequest {
+public class WhitelistRequest extends BackendRequest<Boolean> {
 
-    private final OkHttpClient client;
-    private final RequestBody EMPTY_BODY;
-
-    public WhitelistRequest() {
-        this.client = new OkHttpClient.Builder()
-                .addInterceptor(new DefaultHeaderInfoInterceptor(CoreInstance.get().getRemoteConnection()))
+    public CompletableFuture<Boolean> addWhitelist(String player, String executor) {
+        RequestBody body = new FormBody.Builder()
+                .add("executor", executor)
                 .build();
-        this.EMPTY_BODY = RequestBody.create(null, new byte[0]);
-    }
-
-    public CompletableFuture<Boolean> addWhitelist(String player) {
         Request request = new Request.Builder()
                 .url("https://dashboard.v4guard.io/api/v1/whitelist/" + player)
-                .put(EMPTY_BODY)
+                .put(body)
                 .build();
 
         return responseHandle(request);
@@ -39,24 +32,16 @@ public class WhitelistRequest {
         return responseHandle(request);
     }
 
-    public CompletableFuture<Boolean> responseHandle(Request request) {
-        CompletableFuture<Boolean> future = new CompletableFuture<>();
+    @Override
+    public Boolean onResponse(Call call, Response response) throws IOException {
 
-        Call call = client.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                UnifiedLogger.get().log(Level.SEVERE, "An exception has occurred while requesting to add whitelist ", e);
-            }
+        ObjectNode node = CoreInstance.get().getObjectMapper().readValue(response.body().string(), ObjectNode.class);
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                ObjectNode node = CoreInstance.get().getObjectMapper().readValue(response.body().string(), ObjectNode.class);
-                future.complete(node.get("success").asBoolean());
+        return node.get("success").asBoolean();
+    }
 
-            }
-        });
-
-        return future;
+    @Override
+    public void onFailure(Call call, IOException e) {
+        UnifiedLogger.get().log(Level.SEVERE, "An exception has occurred while requesting whitelist ", e);
     }
 }

@@ -1,16 +1,18 @@
 package io.v4guard.connector.platform.velocity.command.sub;
 
 import com.velocitypowered.api.command.CommandSource;
-import io.v4guard.connector.common.UnifiedLogger;
+import com.velocitypowered.api.proxy.Player;
+import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.request.WhitelistRequest;
+import io.v4guard.connector.common.utils.StringUtils;
 import team.unnamed.commandflow.annotated.CommandClass;
 import team.unnamed.commandflow.annotated.annotation.Command;
 import team.unnamed.commandflow.annotated.annotation.Sender;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.logging.Level;
 
-@Command(names = "whitelist")
+@Command(names = "whitelist", permission = "v4guard.command.whitelist")
 public class WhitelistCommand implements CommandClass {
     private final WhitelistRequest whitelistRequest;
 
@@ -27,20 +29,28 @@ public class WhitelistCommand implements CommandClass {
 
     @Command(names = "add")
     public void addWhitelist(@Sender CommandSource source, String player) {
+        CompletableFuture<Boolean> future = whitelistRequest.addWhitelist(player, source instanceof Player ? ((Player) source).getUsername() : null);
 
-        CompletableFuture<Boolean> future = whitelistRequest.addWhitelist(player);
+        future.thenAccept(success -> {
+            String message = StringUtils.buildMultilineString(
+                    CoreInstance.get().getActiveSettings().getMessage(success  ?  "whitelistAdd" : "whitelistAddFailed")
+            );
 
-        future.whenComplete((success, ex) -> {
-            if (ex != null) {
-                UnifiedLogger.get().log(Level.SEVERE, "An exception has occurred on the response to add whitelist ", ex);
-            }
-            if(success) {
-                source.sendPlainMessage(player + " has been added to the whitelist");
-            } else {
-                source.sendPlainMessage(player + " couldn't be added to the whitelist");
-            }
+            source.sendPlainMessage(StringUtils.replacePlaceholders(message, Map.of("username", player)));
 
         });
+//
+//        future.whenComplete((success, ex) -> {
+//            if (ex != null) {
+//                UnifiedLogger.get().log(Level.SEVERE, "An exception has occurred on the response to add whitelist ", ex);
+//            }
+//            if (success) {
+//                source.sendPlainMessage(player + " has been added to the whitelist");
+//            } else {
+//                source.sendPlainMessage(player + " couldn't be added to the whitelist");
+//            }
+//
+//        });
 
 
     }
@@ -50,15 +60,12 @@ public class WhitelistCommand implements CommandClass {
     public void removeWhitelist(@Sender CommandSource source, String player) {
         CompletableFuture<Boolean> future = whitelistRequest.removeWhitelist(player);
 
-        future.whenComplete((success, ex) -> {
-            if (ex != null) {
-                UnifiedLogger.get().log(Level.SEVERE, "An exception has occurred on the response to add whitelist ", ex);
-            }
-            if(success) {
-                source.sendPlainMessage(player + " has been removed of the whitelist");
-            } else {
-                source.sendPlainMessage(player + " couldn't be removed of the whitelist");
-            }
+        future.thenAccept(success -> {
+            String message = StringUtils.buildMultilineString(
+                    CoreInstance.get().getActiveSettings().getMessage(success  ?  "whitelistRemove" : "whitelistRemoveFailed")
+            );
+
+            source.sendPlainMessage(StringUtils.replacePlaceholders(message, Map.of("username", player)));
 
         });
 

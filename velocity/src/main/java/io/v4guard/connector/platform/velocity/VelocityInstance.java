@@ -27,6 +27,9 @@ import io.v4guard.connector.common.compatibility.kick.AwaitingKick;
 import io.v4guard.connector.platform.velocity.adapter.VelocityMessenger;
 import io.v4guard.connector.platform.velocity.check.VelocityCheckProcessor;
 import io.v4guard.connector.platform.velocity.command.ConnectorCommand;
+import io.v4guard.connector.platform.velocity.command.internal.annotations.CommandFlag;
+import io.v4guard.connector.platform.velocity.command.internal.modifier.ValueCommandFlagModifier;
+import io.v4guard.connector.platform.velocity.command.internal.part.FlagPartFactory;
 import io.v4guard.connector.platform.velocity.listener.PlayerListener;
 import io.v4guard.connector.platform.velocity.listener.PlayerSettingsListener;
 import io.v4guard.connector.platform.velocity.listener.PluginMessagingListener;
@@ -37,6 +40,7 @@ import org.bstats.velocity.Metrics;
 import team.unnamed.commandflow.CommandManager;
 import team.unnamed.commandflow.annotated.AnnotatedCommandTreeBuilder;
 import team.unnamed.commandflow.annotated.SubCommandInstanceCreator;
+import team.unnamed.commandflow.annotated.part.Key;
 import team.unnamed.commandflow.annotated.part.PartInjector;
 import team.unnamed.commandflow.annotated.part.defaults.DefaultsModule;
 import team.unnamed.commandflow.velocity.VelocityCommandManager;
@@ -137,6 +141,9 @@ public class VelocityInstance implements UniversalPlugin {
         PartInjector partInjector = PartInjector.create();
         partInjector.install(new DefaultsModule());
         partInjector.install(new VelocityModule(server));
+        partInjector.bindFactory(new Key(Boolean.class, CommandFlag.class), new FlagPartFactory());
+        partInjector.bindModifier(CommandFlag.class, new ValueCommandFlagModifier());
+
 
         SubCommandInstanceCreator subCommandInstanceCreator = (aClass, commandClass) -> {
             try {

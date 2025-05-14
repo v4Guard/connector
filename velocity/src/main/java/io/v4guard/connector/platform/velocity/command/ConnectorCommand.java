@@ -10,16 +10,18 @@ import team.unnamed.commandflow.annotated.annotation.SubCommandClasses;
 
 @SubCommandClasses(
         {
-                WhitelistCommand.class
+                WhitelistCommand.class,
+                BlacklistCommand.class
         }
 )
-@Command(names = "connector", permission = "v4guard.command")
+@Command(names = "v4Guard", permission = "v4guard.command")
 public class ConnectorCommand implements CommandClass {
 
     @Command(names = "")
     public void help(@Sender CommandSource source) {
         source.sendPlainMessage("Commands: ");
         source.sendPlainMessage("/connector whitelist <add/remove> <player>");
+        source.sendPlainMessage("/connector blacklist <add/remove> <player>");
 
     }
 
