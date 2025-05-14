@@ -3,10 +3,6 @@ plugins {
     id("maven-publish")
 }
 
-dependencies {
-    compileOnly(libs.jackson.databind)
-}
-
 
 java {
     withJavadocJar()

@@ -1,7 +1,5 @@
 package io.v4guard.connector.api.socket;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 public interface Connection {
 
     /**
