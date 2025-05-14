@@ -2,6 +2,7 @@ package io.v4guard.connector.api;
 
 import io.v4guard.connector.api.socket.ActiveSettings;
 import io.v4guard.connector.api.socket.Connection;
+import io.v4guard.connector.api.socket.EventRegistry;
 
 public interface ConnectorAPI {
 
@@ -18,6 +19,12 @@ public interface ConnectorAPI {
     ActiveSettings getActiveSettings();
 
     /**
+     * Get the event registery of the connection to v4Guard server.
+     * @return the event registery
+     */
+    EventRegistry getEventRegistery();
+
+    /**
      * Set the socket connection to the v4Guard server.
      * @param connection the socket connection
      */
@@ -28,5 +35,11 @@ public interface ConnectorAPI {
      * @param activeSettings the active settings
      */
     void setActiveSettings(ActiveSettings activeSettings);
+
+    /**
+     * Set the event registery of the connection to v4Guard server.
+     * @param eventRegistry the event registery
+     */
+    void setEventRegistery(EventRegistry eventRegistry);
 
 }

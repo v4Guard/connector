@@ -89,11 +89,11 @@ public class ActiveConnection implements Connection {
             this.socket = IO.socket("wss://connector.v4guard.io/minecraft", options);
             this.socket.connect();
 
-            registerListener(ListenersConstants.EVENT_CONNECT, new ConnectListener(this));
-            registerListener(ListenersConstants.EVENT_RECONNECT, new ReconnectListener(this));
+            registerInternalListener(ListenersConstants.EVENT_CONNECT, new ConnectListener(this));
+            registerInternalListener(ListenersConstants.EVENT_RECONNECT, new ReconnectListener(this));
 
             if (backend.isDebugEnabled()) {
-                registerListener(
+                registerInternalListener(
                         ListenersConstants.EVENT_CONNECT_ERROR
                         , args -> UnifiedLogger.get().log(Level.SEVERE, "An error occurred while attempting to contact server: " + Arrays.toString(args))
                 );
@@ -152,7 +152,7 @@ public class ActiveConnection implements Connection {
         Files.writeString(keyFile.toPath(), secretKey);
     }
 
-    public void registerListener(String event, Emitter.Listener listener) {
+    private void registerInternalListener(String event, Emitter.Listener listener) {
         if (this.registeredListeners.containsKey(event)) {
             this.socket.off(event);
         }
@@ -161,16 +161,23 @@ public class ActiveConnection implements Connection {
         this.socket.on(event, listener);
     }
 
+    public void registerListener(String event, Emitter.Listener listener) {
+        this.socket.on(event, listener);
+    }
+    public void unregisterListener(String event, Emitter.Listener listener) {
+        this.socket.off(event, listener);
+    }
+
     public void initializeListeners() {
-        registerListener(ListenersConstants.EVENT_AUTH, new AuthListener(backend, this));
-        registerListener(ListenersConstants.EVENT_SETTINGS, new SettingsListener(backend));
-        registerListener(ListenersConstants.EVENT_SETTING, new SettingListener());
-        registerListener(ListenersConstants.EVENT_CONSOLE, new ConsoleMessageListener());
-        registerListener(ListenersConstants.EVENT_CHECK, new CheckListener());
-        registerListener(ListenersConstants.EVENT_MESSAGE, new ChatMessageListener());
-        registerListener(ListenersConstants.EVENT_KICK, new KickListener());
-        registerListener(ListenersConstants.EVENT_CLEAN_CACHE, new CleanCacheListener(backend));
-        registerListener(ListenersConstants.EVENT_FIND, new FindListener(backend));
+        registerInternalListener(ListenersConstants.EVENT_AUTH, new AuthListener(backend, this));
+        registerInternalListener(ListenersConstants.EVENT_SETTINGS, new SettingsListener(backend));
+        registerInternalListener(ListenersConstants.EVENT_SETTING, new SettingListener());
+        registerInternalListener(ListenersConstants.EVENT_CONSOLE, new ConsoleMessageListener());
+        registerInternalListener(ListenersConstants.EVENT_CHECK, new CheckListener());
+        registerInternalListener(ListenersConstants.EVENT_MESSAGE, new ChatMessageListener());
+        registerInternalListener(ListenersConstants.EVENT_KICK, new KickListener());
+        registerInternalListener(ListenersConstants.EVENT_CLEAN_CACHE, new CleanCacheListener(backend));
+        registerInternalListener(ListenersConstants.EVENT_FIND, new FindListener(backend));
     }
 
     @Override

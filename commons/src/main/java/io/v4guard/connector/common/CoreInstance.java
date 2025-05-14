@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.v4guard.connector.api.ConnectorAPI;
+import io.v4guard.connector.api.socket.EventRegistry;
 import io.v4guard.connector.api.v4GuardConnectorProvider;
 import io.v4guard.connector.common.api.DefaultConnectorAPI;
 import io.v4guard.connector.common.cache.CacheTicker;
@@ -13,6 +14,7 @@ import io.v4guard.connector.common.compatibility.ServerPlatform;
 import io.v4guard.connector.common.compatibility.UniversalPlugin;
 import io.v4guard.connector.common.socket.DefaultActiveSettings;
 import io.v4guard.connector.common.socket.ActiveConnection;
+import io.v4guard.connector.common.socket.listener.DefaultEventRegistery;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -27,6 +29,7 @@ public class CoreInstance {
     private ActiveConnection remoteActiveConnection;
     private ObjectMapper objectMapper;
     private DefaultActiveSettings defaultActiveSettings;
+    private EventRegistry eventRegistry;
 
     private boolean debugEnabled;
     private boolean floodgateFound;
@@ -60,6 +63,7 @@ public class CoreInstance {
         this.floodgateFound = this.plugin.isPluginEnabled("floodgate");
 
         this.remoteActiveConnection.prepareAndConnect();
+        this.eventRegistry = new DefaultEventRegistery();
         this.plugin.schedule(new CacheTicker(this), 0, 100, TimeUnit.MILLISECONDS);
     }
 
@@ -109,6 +113,10 @@ public class CoreInstance {
     public void setActiveSettings(DefaultActiveSettings defaultActiveSettings) {
         this.defaultActiveSettings = defaultActiveSettings;
         this.connectorAPI.setActiveSettings(defaultActiveSettings);
+    }
+
+    public EventRegistry getEventRegistery() {
+        return eventRegistry;
     }
 
     public ObjectMapper getObjectMapper() {
