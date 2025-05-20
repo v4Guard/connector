@@ -1,11 +1,10 @@
-package io.v4guard.connector.platform.velocity.command.internal.part;
+package io.v4guard.connector.common.command.internal.part;
 
 import team.unnamed.commandflow.CommandContext;
 import team.unnamed.commandflow.annotated.part.PartFactory;
 import team.unnamed.commandflow.exception.ArgumentParseException;
 import team.unnamed.commandflow.part.ArgumentPart;
 import team.unnamed.commandflow.part.CommandPart;
-import team.unnamed.commandflow.part.defaults.PrimitivePart;
 import team.unnamed.commandflow.stack.ArgumentStack;
 
 import java.lang.annotation.Annotation;

@@ -7,6 +7,10 @@ import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.UnifiedLogger;
 import io.v4guard.connector.common.check.brand.BrandCheckProcessor;
 import io.v4guard.connector.common.check.settings.PlayerSettingsCheckProcessor;
+import io.v4guard.connector.common.command.internal.annotations.CommandFlag;
+import io.v4guard.connector.common.command.internal.modifier.ValueCommandFlagModifier;
+import io.v4guard.connector.common.command.internal.part.FlagPartFactory;
+import io.v4guard.connector.common.command.internal.usage.CustomUsageBuilder;
 import io.v4guard.connector.common.compatibility.PlayerFetchResult;
 import io.v4guard.connector.common.compatibility.ServerPlatform;
 import io.v4guard.connector.common.compatibility.UniversalPlugin;
@@ -15,6 +19,7 @@ import io.v4guard.connector.common.compatibility.kick.AwaitingKick;
 import io.v4guard.connector.platform.bungee.adapter.BungeeMessenger;
 import io.v4guard.connector.platform.bungee.cache.BungeeCheckDataCache;
 import io.v4guard.connector.platform.bungee.check.BungeeCheckProcessor;
+import io.v4guard.connector.platform.bungee.command.ConnectorCommand;
 import io.v4guard.connector.platform.bungee.listener.PlayerListener;
 import io.v4guard.connector.platform.bungee.listener.PlayerSettingsListener;
 import io.v4guard.connector.platform.bungee.listener.PluginMessagingListener;
@@ -25,6 +30,14 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.bstats.bungeecord.Metrics;
+import team.unnamed.commandflow.CommandManager;
+import team.unnamed.commandflow.annotated.AnnotatedCommandTreeBuilder;
+import team.unnamed.commandflow.annotated.SubCommandInstanceCreator;
+import team.unnamed.commandflow.annotated.part.Key;
+import team.unnamed.commandflow.annotated.part.PartInjector;
+import team.unnamed.commandflow.annotated.part.defaults.DefaultsModule;
+import team.unnamed.commandflow.bungee.BungeeCommandManager;
+import team.unnamed.commandflow.bungee.factory.BungeeModule;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -80,6 +93,31 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
         this.getProxy().getPluginManager().registerListener(this, this.brandCheckProcessor);
         this.getProxy().getPluginManager().registerListener(this, this.playerSettingsProcessor);
         this.getProxy().getPluginManager().registerListener(this, new PlayerListener(this, coreInstance));
+
+        PartInjector partInjector = PartInjector.create();
+        partInjector.install(new DefaultsModule());
+        partInjector.install(new BungeeModule());
+        partInjector.bindFactory(new Key(Boolean.class, CommandFlag.class), new FlagPartFactory());
+        partInjector.bindModifier(CommandFlag.class, new ValueCommandFlagModifier());
+
+
+        SubCommandInstanceCreator subCommandInstanceCreator = (aClass, commandClass) -> {
+            try {
+                return aClass.getConstructor().newInstance();
+            } catch (Exception e) {
+                UnifiedLogger.get().log(Level.SEVERE, "An exception has occurred while registering the commands", e);
+            }
+            return null;
+        };
+
+        AnnotatedCommandTreeBuilder builder = AnnotatedCommandTreeBuilder.create(partInjector, subCommandInstanceCreator);
+
+        CommandManager commandManager = new BungeeCommandManager(this);
+
+        commandManager.setUsageBuilder(new CustomUsageBuilder());
+
+        commandManager.registerCommands(builder.fromClass(new ConnectorCommand()));
+
 
         getLogger().info("(Bungee) Enabling... [DONE]");
     }

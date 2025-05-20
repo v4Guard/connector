@@ -1,4 +1,4 @@
-package io.v4guard.connector.platform.velocity.command.internal.annotations;
+package io.v4guard.connector.common.command.internal.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

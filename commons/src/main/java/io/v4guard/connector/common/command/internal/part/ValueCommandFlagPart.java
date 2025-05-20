@@ -1,4 +1,4 @@
-package io.v4guard.connector.platform.velocity.command.internal.part;
+package io.v4guard.connector.common.command.internal.part;
 
 import team.unnamed.commandflow.CommandContext;
 import team.unnamed.commandflow.exception.ArgumentParseException;

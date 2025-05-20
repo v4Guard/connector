@@ -1,8 +1,8 @@
-package io.v4guard.connector.platform.velocity.command.internal.modifier;
+package io.v4guard.connector.common.command.internal.modifier;
 
 
-import io.v4guard.connector.platform.velocity.command.internal.annotations.CommandFlag;
-import io.v4guard.connector.platform.velocity.command.internal.part.ValueCommandFlagPart;
+import io.v4guard.connector.common.command.internal.annotations.CommandFlag;
+import io.v4guard.connector.common.command.internal.part.ValueCommandFlagPart;
 import team.unnamed.commandflow.annotated.part.PartModifier;
 import team.unnamed.commandflow.part.CommandPart;
 

@@ -27,9 +27,10 @@ import io.v4guard.connector.common.compatibility.kick.AwaitingKick;
 import io.v4guard.connector.platform.velocity.adapter.VelocityMessenger;
 import io.v4guard.connector.platform.velocity.check.VelocityCheckProcessor;
 import io.v4guard.connector.platform.velocity.command.ConnectorCommand;
-import io.v4guard.connector.platform.velocity.command.internal.annotations.CommandFlag;
-import io.v4guard.connector.platform.velocity.command.internal.modifier.ValueCommandFlagModifier;
-import io.v4guard.connector.platform.velocity.command.internal.part.FlagPartFactory;
+import io.v4guard.connector.common.command.internal.annotations.CommandFlag;
+import io.v4guard.connector.common.command.internal.modifier.ValueCommandFlagModifier;
+import io.v4guard.connector.common.command.internal.part.FlagPartFactory;
+import io.v4guard.connector.common.command.internal.usage.CustomUsageBuilder;
 import io.v4guard.connector.platform.velocity.listener.PlayerListener;
 import io.v4guard.connector.platform.velocity.listener.PlayerSettingsListener;
 import io.v4guard.connector.platform.velocity.listener.PluginMessagingListener;
@@ -157,6 +158,8 @@ public class VelocityInstance implements UniversalPlugin {
         AnnotatedCommandTreeBuilder builder = AnnotatedCommandTreeBuilder.create(partInjector, subCommandInstanceCreator);
 
         CommandManager commandManager = new VelocityCommandManager(server, this);
+
+        commandManager.setUsageBuilder(new CustomUsageBuilder());
 
         commandManager.registerCommands(builder.fromClass(new ConnectorCommand()));
 

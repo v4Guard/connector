@@ -1,11 +1,12 @@
-package io.v4guard.connector.platform.velocity.command.sub;
+package io.v4guard.connector.platform.bungee.command.sub;
 
-import com.velocitypowered.api.command.CommandSource;
-import com.velocitypowered.api.proxy.Player;
 import io.v4guard.connector.common.CoreInstance;
+import io.v4guard.connector.common.command.internal.annotations.CommandFlag;
 import io.v4guard.connector.common.request.BlacklistRequest;
 import io.v4guard.connector.common.utils.StringUtils;
-import io.v4guard.connector.common.command.internal.annotations.CommandFlag;
+import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import team.unnamed.commandflow.annotated.CommandClass;
 import team.unnamed.commandflow.annotated.annotation.*;
 
@@ -21,13 +22,13 @@ public class BlacklistCommand implements CommandClass {
     }
 
     @Command(names = "")
-    public void help(@Sender CommandSource source) {
-        source.sendPlainMessage("§d▲ §lV4GUARD §7Correct usage: /v4guard blacklist add <username> <reason_preset> <reason> [-i] [-p] [-s]");
-        source.sendPlainMessage("§d▲ §lV4GUARD §7Correct usage: /v4guard blacklist remove <id-blacklist>");
+    public void help(@Sender CommandSender source) {
+        source.sendMessage(new ComponentBuilder("§d▲ §lV4GUARD §7Correct usage: /v4guard blacklist add <username> <reason_preset> <reason> [-i] [-p] [-s]").create());
+        source.sendMessage(new ComponentBuilder("§d▲ §lV4GUARD §7Correct usage: /v4guard blacklist remove <id-blacklist>").create());
     }
 
     @Command(names = "add")
-    public void addBlacklist(@Sender CommandSource source,
+    public void addBlacklist(@Sender CommandSender source,
                              @Suggestions(suggestions = {"<username>", "<ipAddress>"}) String value,
                              @Suggestions(suggestions =
                                      {
@@ -47,29 +48,29 @@ public class BlacklistCommand implements CommandClass {
                              @OptArg("") @Text String reason
     ) {
         blacklistRequest.addBlacklist(
-                        value,
-                        preset,
-                        reason,
-                        ipBan,
-                        silent,
-                        propagate,
-                        source instanceof Player ? ((Player) source).getUsername() : null
-                ).thenAccept(success -> {
-                    String message = StringUtils.buildMultilineString(
-                            CoreInstance.get().getActiveSettings().getMessage(success ? "blacklistAdd" : "blacklistAddFailed")
-                    );
-                    source.sendPlainMessage(StringUtils.replacePlaceholders(message, Map.of("username", value)));
-                });
+                value,
+                preset,
+                reason,
+                ipBan,
+                silent,
+                propagate,
+                source instanceof ProxiedPlayer ? source.getName() : null
+        ).thenAccept(success -> {
+            String message = StringUtils.buildMultilineString(
+                    CoreInstance.get().getActiveSettings().getMessage(success ? "blacklistAdd" : "blacklistAddFailed")
+            );
+            source.sendMessage(new ComponentBuilder(StringUtils.replacePlaceholders(message, Map.of("username", value))).create());
+        });
     }
 
     @Command(names = "remove")
-    public void removeBlacklist(@Sender CommandSource source, @Suggestions(suggestions = "<code>") String id) {
+    public void removeBlacklist(@Sender CommandSender source, @Suggestions(suggestions = "<code>") String id) {
         blacklistRequest.removeBlacklist(id)
                 .thenAccept(success -> {
                     String message = StringUtils.buildMultilineString(
                             CoreInstance.get().getActiveSettings().getMessage(success ? "blacklistRemove" : "blacklistRemoveFailed")
                     );
-                    source.sendPlainMessage(StringUtils.replacePlaceholders(message, Map.of("id", id)));
+                    source.sendMessage(new ComponentBuilder(StringUtils.replacePlaceholders(message, Map.of("id", id))).create());
                 });
 
     }

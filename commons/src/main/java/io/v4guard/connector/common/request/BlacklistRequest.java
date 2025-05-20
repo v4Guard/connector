@@ -3,6 +3,7 @@ package io.v4guard.connector.common.request;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.UnifiedLogger;
+import io.v4guard.connector.common.utils.IpAddressUtils;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -13,7 +14,7 @@ import java.util.logging.Level;
 public class BlacklistRequest extends BackendRequest<Boolean> {
 
     public CompletableFuture<Boolean> addBlacklist(
-            Map.Entry<String,String> value,
+            String value,
             String preset,
             String reason,
             boolean ipBan,
@@ -21,8 +22,15 @@ public class BlacklistRequest extends BackendRequest<Boolean> {
             boolean propagate,
             String executor
     ) {
+        Map.Entry<String, String> entry;
+
+        if (IpAddressUtils.isValidIPAddress(value)) {
+            entry = Map.entry("address", value);
+        } else {
+            entry = Map.entry("username", value);
+        }
         RequestBody body = new FormBody.Builder()
-                .add(value.getKey(), value.getValue())
+                .add(entry.getKey(), entry.getValue())
                 .add("reason", reason)
                 .add("reason_preset", preset)
                 .add("ipban", ipBan+"")
