@@ -8,8 +8,11 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.v4guard.connector.api.socket.Addon;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.socket.DefaultActiveSettings;
+import io.v4guard.connector.common.socket.NameValidator;
+import io.v4guard.connector.common.socket.listener.DefaultAddon;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,7 +53,7 @@ public class ActiveSettingsDeserializer extends JsonDeserializer<DefaultActiveSe
                 JsonNode activeAddnos = rootNode.get("addons");
                 for (Iterator<String> it = activeAddnos.fieldNames(); it.hasNext(); ) {
                     String key = it.next();
-                    defaultActiveSettings.getActiveAddons().put(key, activeAddnos.get(key).asBoolean());
+                    defaultActiveSettings.getActiveAddons().put(key, objectMapper.convertValue(activeAddnos.get(key), DefaultAddon.class));
                 }
                 continue;
             }
@@ -66,8 +69,8 @@ public class ActiveSettingsDeserializer extends JsonDeserializer<DefaultActiveSe
 
             JsonNode nameValidatorNode = rootNode.get("nameValidator");
 
-            defaultActiveSettings.setNameValidator(new DefaultActiveSettings.NameValidator(
-                    nameValidatorNode.get("isEnabled").asBoolean(), nameValidatorNode.get("regex").asText()
+            defaultActiveSettings.setNameValidator(new NameValidator(
+                    nameValidatorNode.get("enabled").asBoolean(), nameValidatorNode.get("regex").asText()
             ));
         }
 

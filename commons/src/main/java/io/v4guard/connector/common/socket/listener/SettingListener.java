@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.socket.emitter.Emitter;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.socket.DefaultActiveSettings;
+import io.v4guard.connector.common.socket.NameValidator;
 
 import java.util.ArrayList;
 
@@ -40,11 +41,11 @@ public class SettingListener implements Emitter.Listener {
                 break;
             case NAME_VALIDATOR:
                 settings.setNameValidator(
-                        CoreInstance.get().getObjectMapper().convertValue(json.get("value"), DefaultActiveSettings.NameValidator.class)
+                        CoreInstance.get().getObjectMapper().convertValue(json.get("value"), NameValidator.class)
                 );
                 break;
             case ADDON:
-                settings.updateAddonState(json.get("key").asText(), json.get("value").asBoolean());
+                settings.updateAddonState(json.get("key").asText(), CoreInstance.get().getObjectMapper().convertValue("value", DefaultAddon.class));
                 break;
         }
     }

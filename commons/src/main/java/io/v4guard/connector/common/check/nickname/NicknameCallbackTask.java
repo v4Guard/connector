@@ -6,6 +6,7 @@ import io.v4guard.connector.common.check.CallbackTask;
 import io.v4guard.connector.common.check.CheckStatus;
 import io.v4guard.connector.common.check.PlayerCheckData;
 import io.v4guard.connector.common.socket.DefaultActiveSettings;
+import io.v4guard.connector.common.socket.NameValidator;
 import io.v4guard.connector.common.utils.StringUtils;
 
 public class NicknameCallbackTask extends CallbackTask {
@@ -17,7 +18,7 @@ public class NicknameCallbackTask extends CallbackTask {
     public void start() {
         super.start();
 
-        DefaultActiveSettings.NameValidator nameValidator = CoreInstance.get().getActiveSettings().getNameValidator();
+        NameValidator nameValidator = CoreInstance.get().getActiveSettings().getNameValidator();
 
         if (!nameValidator.isValid(checkData.getUsername())) {
            checkData.setCheckStatus(CheckStatus.USER_DENIED);

@@ -7,7 +7,7 @@ public class ListenersConstants {
     public static final String EVENT_CONNECT_ERROR = "connect_error";
     public static final String EVENT_CHECK = "check";
     public static final String EVENT_AUTH = "auth";
-    public static final String EVENT_SETTINGS = "settings";
+    public static final String EVENT_SETTINGS = "settings2";
     public static final String EVENT_SETTING = "setting";
     public static final String EVENT_CONSOLE = "console";
     public static final String EVENT_MESSAGE  = "message";
