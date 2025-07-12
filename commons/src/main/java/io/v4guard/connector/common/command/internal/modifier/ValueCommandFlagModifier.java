@@ -15,7 +15,7 @@ public class ValueCommandFlagModifier implements PartModifier {
     public CommandPart modify(CommandPart original, List<? extends Annotation> modifiers) {
         CommandFlag flag = getModifier(modifiers, CommandFlag.class);
 
-        String shortName = flag != null ? flag.value() + "" : original.getName();
+        String shortName = flag != null ? flag.value() : original.getName();
 
         return new ValueCommandFlagPart(shortName, flag != null && flag.allowFullName(), original, flag != null && flag.hasDefaultValue());
     }

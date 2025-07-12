@@ -20,8 +20,8 @@ public class FlagPartFactory implements PartFactory {
             @Override
             public List<?> parseValue(CommandContext commandContext, ArgumentStack argumentStack, CommandPart commandPart) throws ArgumentParseException {
                 return Collections.singletonList(!argumentStack.hasNext());
-
             }
+
             @Override
             public String getName() {
                 return s;
