@@ -10,9 +10,14 @@ import java.util.List;
 
 public class KickListener implements Emitter.Listener {
 
+    private final CoreInstance coreInstance;
+
+    public KickListener(CoreInstance coreInstance) {
+        this.coreInstance = coreInstance;
+    }
+
     @Override
     public void call(Object... args) {
-        CoreInstance coreInstance = CoreInstance.get();
         JsonNode request = coreInstance.readTree(args[0].toString());
 
         String username = request.get("username").asText();

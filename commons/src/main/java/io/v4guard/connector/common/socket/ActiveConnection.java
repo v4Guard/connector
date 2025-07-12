@@ -171,11 +171,11 @@ public class ActiveConnection implements Connection {
     public void initializeListeners() {
         registerInternalListener(ListenersConstants.EVENT_AUTH, new AuthListener(backend, this));
         registerInternalListener(ListenersConstants.EVENT_SETTINGS, new SettingsListener(backend));
-        registerInternalListener(ListenersConstants.EVENT_SETTING, new SettingListener());
-        registerInternalListener(ListenersConstants.EVENT_CONSOLE, new ConsoleMessageListener());
-        registerInternalListener(ListenersConstants.EVENT_CHECK, new CheckListener());
-        registerInternalListener(ListenersConstants.EVENT_MESSAGE, new ChatMessageListener());
-        registerInternalListener(ListenersConstants.EVENT_KICK, new KickListener());
+        registerInternalListener(ListenersConstants.EVENT_SETTING, new SettingListener(backend));
+        registerInternalListener(ListenersConstants.EVENT_CONSOLE, new ConsoleMessageListener(backend));
+        registerInternalListener(ListenersConstants.EVENT_CHECK, new CheckListener(backend));
+        registerInternalListener(ListenersConstants.EVENT_MESSAGE, new ChatMessageListener(backend));
+        registerInternalListener(ListenersConstants.EVENT_KICK, new KickListener(backend));
         registerInternalListener(ListenersConstants.EVENT_CLEAN_CACHE, new CleanCacheListener(backend));
         registerInternalListener(ListenersConstants.EVENT_FIND, new FindListener(backend));
     }

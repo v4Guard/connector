@@ -13,14 +13,18 @@ import java.util.List;
 
 public class ChatMessageListener implements Emitter.Listener {
 
-    private final CoreInstance coreInstance = CoreInstance.get();
+    private final CoreInstance coreInstance;
+
+    public ChatMessageListener(CoreInstance coreInstance) {
+        this.coreInstance = coreInstance;
+    }
 
     @Override
     public void call(Object... args) {
         JsonNode request;
 
         try {
-            request = CoreInstance.get().getObjectMapper().readTree(args[0].toString());
+            request = coreInstance.getObjectMapper().readTree(args[0].toString());
         } catch (JsonProcessingException e) {
             UnifiedLogger.get().severe("Error parsing message: " + e.getMessage());
             return;

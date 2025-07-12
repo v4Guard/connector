@@ -4,13 +4,20 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.socket.emitter.Emitter;
 import io.v4guard.connector.common.CoreInstance;
-import io.v4guard.connector.common.socket.DefaultActiveSettings;
+import io.v4guard.connector.common.socket.settings.DefaultActiveSettings;
 import io.v4guard.connector.common.socket.NameValidator;
+import io.v4guard.connector.common.socket.settings.DefaultAddonSetting;
 
 import java.util.ArrayList;
 
 public class SettingListener implements Emitter.Listener {
 
+    private final CoreInstance coreInstance;
+    
+    public SettingListener(CoreInstance coreInstance) {
+        this.coreInstance = coreInstance;
+    }
+    
     private enum Type {
         GENERAL,
         MESSAGE,
@@ -21,8 +28,8 @@ public class SettingListener implements Emitter.Listener {
 
     @Override
     public void call(Object... args) {
-        JsonNode json = CoreInstance.get().readTree(args[0].toString());
-        DefaultActiveSettings settings = CoreInstance.get().getActiveSettings();
+        JsonNode json = coreInstance.readTree(args[0].toString());
+        DefaultActiveSettings settings = coreInstance.getActiveSettings();
 
         Type type = Type.valueOf(json.get("type").asText());
 
@@ -31,7 +38,7 @@ public class SettingListener implements Emitter.Listener {
                 settings.updateGeneralValue(json.get("key").asText(), json.get("value").asBoolean());
                 break;
             case MESSAGE:
-                settings.updateMessage(json.get("key").asText(), CoreInstance.get().getObjectMapper().convertValue(
+                settings.updateMessage(json.get("key").asText(), coreInstance.getObjectMapper().convertValue(
                         json.get("message"),
                         new TypeReference<ArrayList<String>>() {})
                 );
@@ -41,11 +48,11 @@ public class SettingListener implements Emitter.Listener {
                 break;
             case NAME_VALIDATOR:
                 settings.setNameValidator(
-                        CoreInstance.get().getObjectMapper().convertValue(json.get("value"), NameValidator.class)
+                        coreInstance.getObjectMapper().convertValue(json.get("value"), NameValidator.class)
                 );
                 break;
             case ADDON:
-                settings.updateAddonState(json.get("key").asText(), CoreInstance.get().getObjectMapper().convertValue("value", DefaultAddon.class));
+                settings.updateAddonState(json.get("key").asText(), coreInstance.getObjectMapper().convertValue("value", DefaultAddonSetting.class));
                 break;
         }
     }

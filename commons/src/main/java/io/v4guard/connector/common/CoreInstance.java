@@ -12,9 +12,9 @@ import io.v4guard.connector.common.cache.CheckDataCache;
 import io.v4guard.connector.common.check.PendingTasks;
 import io.v4guard.connector.common.compatibility.ServerPlatform;
 import io.v4guard.connector.common.compatibility.UniversalPlugin;
-import io.v4guard.connector.common.socket.DefaultActiveSettings;
+import io.v4guard.connector.common.socket.settings.DefaultActiveSettings;
 import io.v4guard.connector.common.socket.ActiveConnection;
-import io.v4guard.connector.common.socket.listener.DefaultEventRegistery;
+import io.v4guard.connector.common.socket.registry.DefaultEventRegistry;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -63,7 +63,7 @@ public class CoreInstance {
         this.floodgateFound = this.plugin.isPluginEnabled("floodgate");
 
         this.remoteActiveConnection.prepareAndConnect();
-        this.eventRegistry = new DefaultEventRegistery();
+        this.eventRegistry = new DefaultEventRegistry();
         this.plugin.schedule(new CacheTicker(this), 0, 100, TimeUnit.MILLISECONDS);
     }
 
@@ -115,7 +115,7 @@ public class CoreInstance {
         this.connectorAPI.setActiveSettings(defaultActiveSettings);
     }
 
-    public EventRegistry getEventRegistery() {
+    public EventRegistry getEventRegistry() {
         return eventRegistry;
     }
 
