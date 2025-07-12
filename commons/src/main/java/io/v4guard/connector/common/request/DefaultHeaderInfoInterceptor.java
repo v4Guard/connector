@@ -22,6 +22,7 @@ public class DefaultHeaderInfoInterceptor implements Interceptor {
         Request requestWithHeaders = original
                 .newBuilder()
                 .header("Content-Type", "application/json")
+                .header("User-Agent", "v4Guard API")
                 .header("X-V4G-KEY", activeConnection.getSecretKey())
                 .build();
         return chain.proceed(requestWithHeaders);
