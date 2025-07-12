@@ -24,7 +24,7 @@ public class DefaultConnectorAPI implements ConnectorAPI {
     }
 
     @Override
-    public EventRegistry getEventRegistery() {
+    public EventRegistry getEventRegistry() {
         return eventRegistry;
     }
 

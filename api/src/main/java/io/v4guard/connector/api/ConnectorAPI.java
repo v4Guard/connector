@@ -22,7 +22,7 @@ public interface ConnectorAPI {
      * Get the event registery of the connection to v4Guard server.
      * @return the event registery
      */
-    EventRegistry getEventRegistery();
+    EventRegistry getEventRegistry();
 
     /**
      * Set the socket connection to the v4Guard server.
