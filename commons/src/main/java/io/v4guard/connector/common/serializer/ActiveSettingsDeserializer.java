@@ -36,34 +36,35 @@ public class ActiveSettingsDeserializer extends JsonDeserializer<DefaultActiveSe
                 continue;
             }
 
-            if (rootKey.equals("messages")) {
-                JsonNode messageNode = rootNode.get("messages");
-                for (Iterator<String> it = messageNode.fieldNames(); it.hasNext(); ) {
-                    String key = it.next();
-                    defaultActiveSettings.getMessages().put(key, objectMapper.convertValue(
-                            messageNode.get(key),
-                            new TypeReference<ArrayList<String>>() {})
-                    );
+            switch (rootKey) {
+                case "messages" -> {
+                    JsonNode messageNode = rootNode.get("messages");
+                    for (Iterator<String> it = messageNode.fieldNames(); it.hasNext(); ) {
+                        String key = it.next();
+                        defaultActiveSettings.getMessages().put(key, objectMapper.convertValue(
+                                messageNode.get(key),
+                                new TypeReference<ArrayList<String>>() {
+                                })
+                        );
+                    }
+                    continue;
                 }
-                continue;
-            }
-
-            if (rootKey.equals("addons")) {
-                JsonNode activeAddnos = rootNode.get("addons");
-                for (Iterator<String> it = activeAddnos.fieldNames(); it.hasNext(); ) {
-                    String key = it.next();
-                    defaultActiveSettings.getActiveAddons().put(key, objectMapper.convertValue(activeAddnos.get(key), DefaultAddon.class));
+                case "addons" -> {
+                    JsonNode activeAddons = rootNode.get("addons");
+                    for (Iterator<String> it = activeAddons.fieldNames(); it.hasNext(); ) {
+                        String key = it.next();
+                        defaultActiveSettings.getActiveAddons().put(key, objectMapper.convertValue(activeAddons.get(key), DefaultAddonSetting.class));
+                    }
+                    continue;
                 }
-                continue;
-            }
-
-            if (rootKey.equals("privacy")) {
-                JsonNode privacyNode = rootNode.get("privacy");
-                for (Iterator<String> it = privacyNode.fieldNames(); it.hasNext(); ) {
-                    String key = it.next();
-                    defaultActiveSettings.getPrivacySettings().put(key, privacyNode.get(key).asBoolean());
+                case "privacy" -> {
+                    JsonNode privacyNode = rootNode.get("privacy");
+                    for (Iterator<String> it = privacyNode.fieldNames(); it.hasNext(); ) {
+                        String key = it.next();
+                        defaultActiveSettings.getPrivacySettings().put(key, privacyNode.get(key).asBoolean());
+                    }
+                    continue;
                 }
-                continue;
             }
 
             JsonNode nameValidatorNode = rootNode.get("nameValidator");
