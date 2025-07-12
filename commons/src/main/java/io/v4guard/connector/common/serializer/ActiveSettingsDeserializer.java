@@ -8,11 +8,10 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.v4guard.connector.api.socket.Addon;
 import io.v4guard.connector.common.CoreInstance;
-import io.v4guard.connector.common.socket.DefaultActiveSettings;
+import io.v4guard.connector.common.socket.settings.DefaultActiveSettings;
 import io.v4guard.connector.common.socket.NameValidator;
-import io.v4guard.connector.common.socket.listener.DefaultAddon;
+import io.v4guard.connector.common.socket.settings.DefaultAddonSetting;
 
 import java.io.IOException;
 import java.util.ArrayList;

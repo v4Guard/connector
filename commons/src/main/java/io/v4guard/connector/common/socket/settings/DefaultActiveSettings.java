@@ -1,9 +1,10 @@
-package io.v4guard.connector.common.socket;
+package io.v4guard.connector.common.socket.settings;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.v4guard.connector.api.socket.ActiveSettings;
 import io.v4guard.connector.api.socket.Addon;
 import io.v4guard.connector.common.serializer.ActiveSettingsDeserializer;
+import io.v4guard.connector.common.socket.NameValidator;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;

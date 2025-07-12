@@ -4,7 +4,7 @@ import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.check.nickname.NicknameCallbackTask;
 import io.v4guard.connector.common.check.vpn.VPNCallbackTask;
 import io.v4guard.connector.api.constants.SettingsKeys;
-import io.v4guard.connector.common.socket.DefaultActiveSettings;
+import io.v4guard.connector.common.socket.settings.DefaultActiveSettings;
 import io.v4guard.connector.common.utils.HostnameUtils;
 
 public abstract class CheckProcessor<E> {

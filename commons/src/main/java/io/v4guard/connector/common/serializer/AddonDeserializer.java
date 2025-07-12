@@ -9,22 +9,22 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.v4guard.connector.common.CoreInstance;
-import io.v4guard.connector.common.socket.listener.DefaultAddon;
+import io.v4guard.connector.common.socket.settings.DefaultAddonSetting;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class AddonDeserializer extends JsonDeserializer<DefaultAddon> {
+public class AddonDeserializer extends JsonDeserializer<DefaultAddonSetting> {
 
     private final ObjectMapper objectMapper = CoreInstance.get().getObjectMapper();
 
     @Override
-    public DefaultAddon deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException, JacksonException {
+    public DefaultAddonSetting deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException, JacksonException {
         ObjectCodec codec = jsonParser.getCodec();
         JsonNode rootNode = codec.readTree(jsonParser);
 
-        DefaultAddon defaultAddon = new DefaultAddon();
+        DefaultAddonSetting defaultAddonSetting = new DefaultAddonSetting();
 
         Iterator<String> rootKeys = rootNode.fieldNames();
         while (rootKeys.hasNext()) {
@@ -35,20 +35,20 @@ public class AddonDeserializer extends JsonDeserializer<DefaultAddon> {
                     JsonNode settingsNode = rootNode.get("settings");
                     for (Iterator<String> it = settingsNode.fieldNames(); it.hasNext(); ) {
                         String key = it.next();
-                        defaultAddon.getSettings().put(key, settingsNode.get(key).asText());
+                        defaultAddonSetting.getSettings().put(key, settingsNode.get(key).asText());
                     }
                     break;
                 case "messages":
                     JsonNode messagesNode = rootNode.get("messages");
                     for (Iterator<String> it = messagesNode.fieldNames(); it.hasNext(); ) {
                         String key = it.next();
-                        defaultAddon.getMessages().put(key, objectMapper.convertValue(
+                        defaultAddonSetting.getMessages().put(key, objectMapper.convertValue(
                                 messagesNode.get(key),
                                 new TypeReference<ArrayList<String>>() {}));
                     }
                     break;
                 case "enabled":
-                    defaultAddon.setEnabled(rootNode.get("enabled").asBoolean());
+                    defaultAddonSetting.setEnabled(rootNode.get("enabled").asBoolean());
                     break;
             }
 
@@ -57,6 +57,6 @@ public class AddonDeserializer extends JsonDeserializer<DefaultAddon> {
 
 
 
-        return defaultAddon;
+        return defaultAddonSetting;
     }
 }

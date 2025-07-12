@@ -5,7 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.check.PlayerCheckData;
 import io.v4guard.connector.api.constants.SettingsKeys;
-import io.v4guard.connector.common.socket.DefaultActiveSettings;
+import io.v4guard.connector.common.socket.settings.DefaultActiveSettings;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;

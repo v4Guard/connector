@@ -4,8 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.socket.emitter.Emitter;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.UnifiedLogger;
-import io.v4guard.connector.common.api.DefaultConnectorAPI;
-import io.v4guard.connector.common.socket.DefaultActiveSettings;
+import io.v4guard.connector.common.socket.settings.DefaultActiveSettings;
 
 import java.util.logging.Level;
 

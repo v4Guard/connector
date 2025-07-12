@@ -1,4 +1,4 @@
-package io.v4guard.connector.common.socket.listener;
+package io.v4guard.connector.common.socket.settings;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.v4guard.connector.api.socket.Addon;
@@ -8,19 +8,19 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @JsonDeserialize(using = AddonDeserializer.class)
-public class DefaultAddon implements Addon {
+public class DefaultAddonSetting implements Addon {
     private boolean enabled;
 
     private ConcurrentHashMap<String, String> settings = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, List<String>> messages = new ConcurrentHashMap<>();
 
-    public DefaultAddon(boolean isEnabled, ConcurrentHashMap<String, String> settings, ConcurrentHashMap<String, List<String>> messages) {
+    public DefaultAddonSetting(boolean isEnabled, ConcurrentHashMap<String, String> settings, ConcurrentHashMap<String, List<String>> messages) {
         this.enabled = isEnabled;
         this.settings = settings;
         this.messages = messages;
     }
 
-    public DefaultAddon() { }
+    public DefaultAddonSetting() { }
 
     @Override
     public boolean isEnabled() {
