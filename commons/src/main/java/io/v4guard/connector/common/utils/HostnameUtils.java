@@ -31,7 +31,7 @@ public class HostnameUtils {
             if (anonVirtualHost && !mainHost.equals(virtualHost)) {
                 virtualHost = "***." + InternetDomainName.from(virtualHost).topPrivateDomain();
             }
-        } catch (Exception ex) { /* failed to get doamin, return the original host */ }
+        } catch (Exception ex) { /* failed to get domain, return the original host */ }
 
         return virtualHost;
     }

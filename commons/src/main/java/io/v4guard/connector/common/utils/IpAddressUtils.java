@@ -9,7 +9,7 @@ public class IpAddressUtils {
             + "d{2}|2[0-4]\\d|25[0-5])";
 
 
-    private static Pattern pattern
+    private static final Pattern pattern
             = Pattern.compile(ZERO_TO_255 + "\\."
             + ZERO_TO_255 + "\\."
             + ZERO_TO_255 + "\\."
