@@ -29,7 +29,7 @@ public class BlacklistCommand implements CommandClass {
 
     @Command(names = "add")
     public void addBlacklist(@Sender CommandSender source,
-                             @Suggestions(suggestions = {"<username>", "<ipAddress>"}) String value,
+                             @Suggestions(suggestions = {"<username>", "<ip>"}) String value,
                              @Suggestions(suggestions =
                                      {
                                              "cheating_or_illegal_modifications",
@@ -54,7 +54,7 @@ public class BlacklistCommand implements CommandClass {
                 ipBan,
                 silent,
                 propagate,
-                source instanceof ProxiedPlayer ? source.getName() : null
+                source instanceof ProxiedPlayer ? source.getName() : "Console"
         ).thenAccept(success -> {
             String message = StringUtils.buildMultilineString(
                     CoreInstance.get().getActiveSettings().getMessage(success ? "blacklistAdd" : "blacklistAddFailed")

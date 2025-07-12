@@ -28,7 +28,7 @@ public class BlacklistCommand implements CommandClass {
 
     @Command(names = "add")
     public void addBlacklist(@Sender CommandSource source,
-                             @Suggestions(suggestions = {"<username>", "<ipAddress>"}) String value,
+                             @Suggestions(suggestions = {"<username>", "<ip>"}) String value,
                              @Suggestions(suggestions =
                                      {
                                              "cheating_or_illegal_modifications",

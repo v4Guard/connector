@@ -10,12 +10,10 @@ import team.unnamed.commandflow.annotated.annotation.Command;
 import team.unnamed.commandflow.annotated.annotation.Sender;
 import team.unnamed.commandflow.annotated.annotation.SubCommandClasses;
 
-@SubCommandClasses(
-        {
-                WhitelistCommand.class,
-                BlacklistCommand.class
-        }
-)
+@SubCommandClasses({
+    WhitelistCommand.class,
+    BlacklistCommand.class
+})
 @Command(names = "v4Guard", permission = "v4guard.command")
 public class ConnectorCommand implements CommandClass {
 
