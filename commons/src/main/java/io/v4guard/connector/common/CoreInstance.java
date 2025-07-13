@@ -3,14 +3,18 @@ package io.v4guard.connector.common;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.v4guard.connector.common.accounts.AccountShieldSender;
+import io.v4guard.connector.api.ConnectorAPI;
+import io.v4guard.connector.api.socket.EventRegistry;
+import io.v4guard.connector.api.v4GuardConnectorProvider;
+import io.v4guard.connector.common.api.DefaultConnectorAPI;
 import io.v4guard.connector.common.cache.CacheTicker;
 import io.v4guard.connector.common.cache.CheckDataCache;
 import io.v4guard.connector.common.check.PendingTasks;
 import io.v4guard.connector.common.compatibility.ServerPlatform;
 import io.v4guard.connector.common.compatibility.UniversalPlugin;
-import io.v4guard.connector.common.socket.ActiveSettings;
-import io.v4guard.connector.common.socket.Connection;
+import io.v4guard.connector.common.socket.settings.DefaultActiveSettings;
+import io.v4guard.connector.common.socket.ActiveConnection;
+import io.v4guard.connector.common.socket.registry.DefaultEventRegistry;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -18,25 +22,29 @@ import java.util.logging.Logger;
 
 public class CoreInstance {
 
-    public static final String PLUGIN_VERSION = "2.5.0";
+    public static final String PLUGIN_VERSION = "3.0.0";
 
     private static CoreInstance instance;
     private PendingTasks pendingTasks;
-    private Connection remoteConnection;
-    private AccountShieldSender accountShieldSender;
+    private ActiveConnection remoteActiveConnection;
     private ObjectMapper objectMapper;
-    private ActiveSettings activeSettings;
+    private DefaultActiveSettings defaultActiveSettings;
+    private EventRegistry eventRegistry;
 
     private boolean debugEnabled;
-    private boolean accountShieldFound;
     private boolean floodgateFound;
     private final ServerPlatform platform;
     private final UniversalPlugin plugin;
+    private final ConnectorAPI connectorAPI;
 
     public CoreInstance(ServerPlatform platform, UniversalPlugin plugin) {
         instance = this;
         this.platform = platform;
         this.plugin = plugin;
+
+        this.connectorAPI = new DefaultConnectorAPI();
+
+        v4GuardConnectorProvider.register(this.connectorAPI);
     }
 
     public void initialize() {
@@ -51,12 +59,11 @@ public class CoreInstance {
         }
 
         this.pendingTasks = new PendingTasks();
-        this.remoteConnection = new Connection(this);
-        this.accountShieldFound = this.plugin.isPluginEnabled("v4guard-account-shield");
+        this.remoteActiveConnection = new ActiveConnection(this);
         this.floodgateFound = this.plugin.isPluginEnabled("floodgate");
-        this.accountShieldSender = new AccountShieldSender(this);
 
-        this.remoteConnection.prepareAndConnect();
+        this.remoteActiveConnection.prepareAndConnect();
+        this.eventRegistry = new DefaultEventRegistry();
         this.plugin.schedule(new CacheTicker(this), 0, 100, TimeUnit.MILLISECONDS);
     }
 
@@ -67,20 +74,8 @@ public class CoreInstance {
         UnifiedLogger.overrideBy(logger);
     }
 
-    public boolean isAccountShieldFound() {
-        return this.accountShieldFound;
-    }
-
-    public void setAccountShieldFound(boolean accountShieldFound) {
-        this.accountShieldFound = accountShieldFound;
-    }
-
     public boolean isFloodgateFound() {
         return this.floodgateFound;
-    }
-
-    public AccountShieldSender getAccountShieldSender() {
-        return this.accountShieldSender;
     }
 
     public UniversalPlugin getPlugin() {
@@ -99,8 +94,8 @@ public class CoreInstance {
         return debugEnabled;
     }
 
-    public Connection getRemoteConnection() {
-        return remoteConnection;
+    public ActiveConnection getRemoteConnection() {
+        return remoteActiveConnection;
     }
 
     public PendingTasks getPendingTasks() {
@@ -111,16 +106,25 @@ public class CoreInstance {
         return plugin.getCheckDataCache();
     }
 
-    public ActiveSettings getActiveSettings() {
-        return activeSettings;
+    public DefaultActiveSettings getActiveSettings() {
+        return defaultActiveSettings;
     }
 
-    public void setActiveSettings(ActiveSettings activeSettings) {
-        this.activeSettings = activeSettings;
+    public void setActiveSettings(DefaultActiveSettings defaultActiveSettings) {
+        this.defaultActiveSettings = defaultActiveSettings;
+        this.connectorAPI.setActiveSettings(defaultActiveSettings);
+    }
+
+    public EventRegistry getEventRegistry() {
+        return eventRegistry;
     }
 
     public ObjectMapper getObjectMapper() {
         return objectMapper;
+    }
+
+    public ConnectorAPI getConnectorAPI() {
+        return connectorAPI;
     }
 
     public JsonNode readTree(String json) {

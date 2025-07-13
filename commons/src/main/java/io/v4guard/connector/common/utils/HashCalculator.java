@@ -36,6 +36,6 @@ public class HashCalculator {
             } catch (Exception ignored) {  }
         } catch (Exception ignored) {  }
 
-        return "7634670e00000000000000000000000000000001";
+        return "A40A8DE8192311FD425C4B53BB3C6FC4D595CF500D893AF0D93BFA5ACF2C235E";
     }
 }

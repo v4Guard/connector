@@ -1,25 +1,32 @@
 package io.v4guard.connector.common.socket;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+import io.v4guard.connector.api.constants.ConnectorConstants;
+import io.v4guard.connector.api.constants.ListenersConstants;
+import io.v4guard.connector.api.socket.Connection;
+import io.v4guard.connector.api.socket.SocketStatus;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.UnifiedLogger;
-import io.v4guard.connector.common.constants.ConnectorConstants;
-import io.v4guard.connector.common.constants.ListenersConstants;
 import io.v4guard.connector.common.socket.listener.*;
 import io.v4guard.connector.common.utils.HashCalculator;
 import io.v4guard.connector.common.utils.HostnameUtils;
+import io.v4guard.connector.common.utils.NameUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 
-public class Connection {
+public class ActiveConnection implements Connection {
 
     private Socket socket;
 
@@ -33,9 +40,11 @@ public class Connection {
 
     private String authCode;
 
+    private String secretKey;
+
     private final HashMap<String, Emitter.Listener> registeredListeners = new HashMap<>();
 
-    public Connection(CoreInstance coreInstance) {
+    public ActiveConnection(CoreInstance coreInstance) {
         this.headers = new HashMap<>();
         this.backend = coreInstance;
     }
@@ -43,7 +52,7 @@ public class Connection {
     public void prepareAndConnect() {
         headers.put(ConnectorConstants.VERSION_HEADER, Collections.singletonList(CoreInstance.PLUGIN_VERSION));
         headers.put(ConnectorConstants.HOSTNAME_HEADER, Collections.singletonList(HostnameUtils.detectHostname()));
-        headers.put(ConnectorConstants.INSTANCE_NAME_HEADER, Collections.singletonList(new File(System.getProperty("user.dir")).getName()));
+        headers.put(ConnectorConstants.INSTANCE_NAME_HEADER, Collections.singletonList(NameUtils.getName()));
         headers.put(ConnectorConstants.SERVICE_NAME_HEADER, Collections.singletonList("minecraft"));
         headers.put(ConnectorConstants.PLUGIN_MODE_HEADER, Collections.singletonList(backend.getPlatform().name()));
         headers.put(ConnectorConstants.INTEGRITY_HEADER, Collections.singletonList(HashCalculator.calculateHash()));
@@ -51,7 +60,7 @@ public class Connection {
         this.options = IO.Options.builder()
                 .setForceNew(false)
                 .setMultiplex(true)
-                .setTransports(new String[]{"websocket","polling"})
+                .setTransports(new String[]{"websocket", "polling"})
                 .setUpgrade(true)
                 .setRememberUpgrade(false)
                 .setSecure(true)
@@ -80,15 +89,16 @@ public class Connection {
             this.socket = IO.socket("wss://connector.v4guard.io/minecraft", options);
             this.socket.connect();
 
-            registerListener(ListenersConstants.EVENT_CONNECT, new ConnectListener(this));
-            registerListener(ListenersConstants.EVENT_RECONNECT, new ReconnectListener(this));
+            registerInternalListener(ListenersConstants.EVENT_CONNECT, new ConnectListener(this));
+            registerInternalListener(ListenersConstants.EVENT_RECONNECT, new ReconnectListener(this));
 
             if (backend.isDebugEnabled()) {
-                registerListener(
+                registerInternalListener(
                         ListenersConstants.EVENT_CONNECT_ERROR
                         , args -> UnifiedLogger.get().log(Level.SEVERE, "An error occurred while attempting to contact server: " + Arrays.toString(args))
                 );
             }
+            backend.getConnectorAPI().setConnection(this);
         } catch (URISyntaxException exception) {
             UnifiedLogger.get().log(Level.SEVERE, "An exception has occurred while connecting to the backend.", exception);
         }
@@ -113,9 +123,9 @@ public class Connection {
             }
 
             keyFile = new File(dataFolder, "secret.key");
-            String secretKey = null;
 
-            if (keyFile.exists()){
+
+            if (keyFile.exists()) {
                 secretKey = Files.readString(keyFile.toPath());
 
                 String companyCode = secretKey.substring(0, 3);
@@ -142,7 +152,7 @@ public class Connection {
         Files.writeString(keyFile.toPath(), secretKey);
     }
 
-    public void registerListener(String event, Emitter.Listener listener){
+    private void registerInternalListener(String event, Emitter.Listener listener) {
         if (this.registeredListeners.containsKey(event)) {
             this.socket.off(event);
         }
@@ -151,23 +161,40 @@ public class Connection {
         this.socket.on(event, listener);
     }
 
-    public void initializeListeners() {
-        registerListener(ListenersConstants.EVENT_AUTH, new AuthListener(backend, this));
-        registerListener(ListenersConstants.EVENT_SETTINGS, new SettingsListener(backend));
-        registerListener(ListenersConstants.EVENT_SETTING, new SettingListener());
-        registerListener(ListenersConstants.EVENT_CONSOLE, new ConsoleMessageListener());
-        registerListener(ListenersConstants.EVENT_CHECK, new CheckListener());
-        registerListener(ListenersConstants.EVENT_MESSAGE, new ChatMessageListener());
-        registerListener(ListenersConstants.EVENT_KICK, new KickListener());
-        registerListener(ListenersConstants.EVENT_CLEAN_CACHE, new CleanCacheListener(backend));
-        registerListener(ListenersConstants.EVENT_FIND, new FindListener(backend));
+    public void registerListener(String event, Emitter.Listener listener) {
+        this.socket.on(event, listener);
+    }
+    public void unregisterListener(String event, Emitter.Listener listener) {
+        this.socket.off(event, listener);
     }
 
+    public void initializeListeners() {
+        registerInternalListener(ListenersConstants.EVENT_AUTH, new AuthListener(backend, this));
+        registerInternalListener(ListenersConstants.EVENT_SETTINGS, new SettingsListener(backend));
+        registerInternalListener(ListenersConstants.EVENT_SETTING, new SettingListener(backend));
+        registerInternalListener(ListenersConstants.EVENT_CONSOLE, new ConsoleMessageListener(backend));
+        registerInternalListener(ListenersConstants.EVENT_CHECK, new CheckListener(backend));
+        registerInternalListener(ListenersConstants.EVENT_MESSAGE, new ChatMessageListener(backend));
+        registerInternalListener(ListenersConstants.EVENT_KICK, new KickListener(backend));
+        registerInternalListener(ListenersConstants.EVENT_CLEAN_CACHE, new CleanCacheListener(backend));
+        registerInternalListener(ListenersConstants.EVENT_FIND, new FindListener(backend));
+    }
+
+    @Override
     public boolean isReady() {
         return socket != null
                 && socket.connected()
                 && socketStatus == SocketStatus.AUTHENTICATED
                 && CoreInstance.get().getActiveSettings() != null;
+    }
+
+    @Override
+    public void send(String channel, String payload) {
+        try {
+            send(channel, backend.getObjectMapper().readValue(payload, ObjectNode.class));
+        } catch (JsonProcessingException exception) {
+            UnifiedLogger.get().log(Level.SEVERE, "An exception has occurred while sending a message to the backend", exception);
+        }
     }
 
     public void send(String channel, ObjectNode payload) {
@@ -186,10 +213,16 @@ public class Connection {
         this.authCode = authCode;
     }
 
+    public String getSecretKey() {
+        return secretKey;
+    }
+
+    @Override
     public SocketStatus getSocketStatus() {
         return socketStatus;
     }
 
+    @Override
     public void setSocketStatus(SocketStatus socketStatus) {
         this.socketStatus = socketStatus;
     }

@@ -7,8 +7,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.check.PlayerCheckData;
-import io.v4guard.connector.common.constants.SettingsKeys;
-import io.v4guard.connector.common.socket.ActiveSettings;
+import io.v4guard.connector.api.constants.SettingsKeys;
+import io.v4guard.connector.common.socket.settings.DefaultActiveSettings;
 import io.v4guard.connector.common.utils.ProtocolUtils;
 
 import java.util.List;
@@ -31,10 +31,10 @@ public class BrandCheckProcessor {
             return;
         }
 
-        ActiveSettings activeSettings = CoreInstance.get().getActiveSettings();
-        boolean invalidatedCache = activeSettings.getGeneralSetting(SettingsKeys.INVALIDATE_CACHE, false);
+        DefaultActiveSettings defaultActiveSettings = CoreInstance.get().getActiveSettings();
+        boolean invalidatedCache = defaultActiveSettings.getGeneralSetting(SettingsKeys.INVALIDATE_CACHE, false);
 
-        if (invalidatedCache && !activeSettings.getPrivacySetting(SettingsKeys.COLLECT_MC_BRAND)) {
+        if (invalidatedCache && !defaultActiveSettings.getPrivacySetting(SettingsKeys.COLLECT_MC_BRAND)) {
             return;
         }
 

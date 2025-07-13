@@ -10,12 +10,18 @@ import java.util.logging.Level;
 
 public class ConsoleMessageListener implements Emitter.Listener {
 
+    private final CoreInstance coreInstance;
+
+    public ConsoleMessageListener(CoreInstance coreInstance) {
+        this.coreInstance = coreInstance;
+    }
+
     @Override
     public void call(Object... args) {
         JsonNode request;
 
         try {
-            request = CoreInstance.get().getObjectMapper().readTree(args[0].toString());
+            request = coreInstance.getObjectMapper().readTree(args[0].toString());
         } catch (JsonProcessingException e) {
             UnifiedLogger.get().log(Level.SEVERE, "Failed to parse console message", e);
             return;

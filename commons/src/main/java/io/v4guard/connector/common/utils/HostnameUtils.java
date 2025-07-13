@@ -9,12 +9,16 @@ import java.net.UnknownHostException;
 public class HostnameUtils {
 
     public static String detectHostname() {
-        if (DockerDetector.isRunningInsideDocker()){
+        if (System.getProperty("io.v4guard.connector.hostname") != null) {
+            return System.getProperty("io.v4guard.connector.hostname");
+        } else if (DockerDetector.isRunningInsideDocker()){
             return "Docker Container";
-        } else try {
-            return InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            return "Unknown";
+        } else {
+            try {
+                return InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException e) {
+                return "Unknown";
+            }
         }
     }
 
@@ -27,7 +31,7 @@ public class HostnameUtils {
             if (anonVirtualHost && !mainHost.equals(virtualHost)) {
                 virtualHost = "***." + InternetDomainName.from(virtualHost).topPrivateDomain();
             }
-        } catch (Exception ex) { /* failed to get doamin, return the original host */ }
+        } catch (Exception ex) { /* failed to get domain, return the original host */ }
 
         return virtualHost;
     }

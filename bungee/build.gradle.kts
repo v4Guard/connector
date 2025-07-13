@@ -9,6 +9,7 @@ dependencies {
     compileOnly(libs.floodgate)
     compileOnly(libs.caffeine)
 
+    implementation(libs.commandflow.bungeecord)
     compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(libs.bstats.bungeecord)
     implementation(project(":commons"))

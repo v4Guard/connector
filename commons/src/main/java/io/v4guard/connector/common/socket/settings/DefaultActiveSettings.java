@@ -1,28 +1,29 @@
-package io.v4guard.connector.common.socket;
+package io.v4guard.connector.common.socket.settings;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.v4guard.connector.common.UnifiedLogger;
+import io.v4guard.connector.api.socket.ActiveSettings;
+import io.v4guard.connector.api.socket.Addon;
 import io.v4guard.connector.common.serializer.ActiveSettingsDeserializer;
+import io.v4guard.connector.common.socket.NameValidator;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
 
 @JsonDeserialize(using = ActiveSettingsDeserializer.class)
-public class ActiveSettings {
+public class DefaultActiveSettings implements ActiveSettings {
 
     private ConcurrentHashMap<String, Boolean> general;
     private NameValidator nameValidator;
     private ConcurrentHashMap<String, List<String>> messages;
-    private ConcurrentHashMap<String, Boolean> activeAddons;
+    private ConcurrentHashMap<String, Addon> activeAddons;
     private ConcurrentHashMap<String, Boolean> privacySettings;
 
 
-    public ActiveSettings(ConcurrentHashMap<String, Boolean> general,
-                          ConcurrentHashMap<String, List<String>> messages,
-                          NameValidator nameValidator,
-                          ConcurrentHashMap<String, Boolean> activeAddons,
-                          ConcurrentHashMap<String, Boolean> privacySettings
+    public DefaultActiveSettings(ConcurrentHashMap<String, Boolean> general,
+                                 ConcurrentHashMap<String, List<String>> messages,
+                                 NameValidator nameValidator,
+                                 ConcurrentHashMap<String, Addon> activeAddons,
+                                 ConcurrentHashMap<String, Boolean> privacySettings
     ) {
         this.general = general;
         this.nameValidator = nameValidator;
@@ -31,13 +32,14 @@ public class ActiveSettings {
         this.privacySettings = privacySettings;
     }
 
-    public ActiveSettings() {
+    public DefaultActiveSettings() {
         this.general = new ConcurrentHashMap<>();
         this.messages = new ConcurrentHashMap<>();
         this.activeAddons = new ConcurrentHashMap<>();
         this.privacySettings = new ConcurrentHashMap<>();
     }
 
+    @Override
     public ConcurrentHashMap<String, Boolean> getGeneral() {
         return general;
     }
@@ -49,11 +51,11 @@ public class ActiveSettings {
     public NameValidator getNameValidator() {
         return nameValidator;
     }
-
-    public ConcurrentHashMap<String, Boolean> getActiveAddons() {
+    @Override
+    public ConcurrentHashMap<String, Addon> getActiveAddons() {
         return activeAddons;
     }
-
+    @Override
     public ConcurrentHashMap<String, Boolean> getPrivacySettings() {
         return privacySettings;
     }
@@ -70,7 +72,7 @@ public class ActiveSettings {
         this.messages = messages;
     }
 
-    public void setActiveAddons(ConcurrentHashMap<String, Boolean> activeAddons) {
+    public void setActiveAddons(ConcurrentHashMap<String, Addon> activeAddons) {
         this.activeAddons = activeAddons;
     }
 
@@ -82,7 +84,7 @@ public class ActiveSettings {
         general.put(key, value);
     }
 
-    public void updateAddonState(String key, Boolean value) {
+    public void updateAddonState(String key, Addon value) {
         activeAddons.put(key, value);
     }
 
@@ -98,7 +100,7 @@ public class ActiveSettings {
         return general.getOrDefault(key, defaultValue);
     }
 
-    public Boolean getAddonState(String key, Boolean defaultValue) {
+    public Addon getAddonState(String key, Addon defaultValue) {
         return activeAddons.getOrDefault(key, defaultValue);
     }
 
@@ -108,38 +110,5 @@ public class ActiveSettings {
 
     public boolean getPrivacySetting(String key) {
         return privacySettings.getOrDefault(key, true );
-    }
-
-    public static class NameValidator {
-
-        private final boolean isEnabled;
-        private final String regex;
-        private Pattern pattern = null;
-
-        public NameValidator(boolean isEnabled, String regex) {
-            this.isEnabled = isEnabled;
-            this.regex = regex;
-
-            if (isEnabled) {
-                try {
-                    pattern =  Pattern.compile(regex);
-                } catch (Exception e) {
-                    UnifiedLogger.get().severe("Invalid regex pattern: " + regex);
-                }
-            }
-        }
-
-        public boolean isEnabled() {
-            return isEnabled;
-        }
-
-        public String getRegex() {
-            return regex;
-        }
-
-        public boolean isValid(String name) {
-            return !isEnabled || pattern.matcher(name).matches();
-        }
-
     }
 }

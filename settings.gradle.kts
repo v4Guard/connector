@@ -5,7 +5,7 @@ plugins {
 }
 
 listOf(
-    "commons", "velocity", "bungee"
+    "api", "commons", "velocity", "bungee"
 ).forEach { project ->
     include(project)
 }

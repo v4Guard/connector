@@ -16,6 +16,10 @@ repositories {
         name = "sonatype"
         url = uri("https://oss.sonatype.org/content/repositories/snapshots")
     }
+    maven {
+        name = "unnamed"
+        url = uri("https://repo.unnamed.team/repository/unnamed-public/")
+    }
 }
 
 configure<JavaPluginExtension> {

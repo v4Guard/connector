@@ -1,13 +1,13 @@
 package io.v4guard.connector.common.socket.listener;
 
 import io.socket.emitter.Emitter;
-import io.v4guard.connector.common.socket.Connection;
+import io.v4guard.connector.common.socket.ActiveConnection;
 
 public class ReconnectListener implements Emitter.Listener {
 
-    private final Connection backend;
+    private final ActiveConnection backend;
 
-    public ReconnectListener(Connection backend) {
+    public ReconnectListener(ActiveConnection backend) {
         this.backend = backend;
     }
 

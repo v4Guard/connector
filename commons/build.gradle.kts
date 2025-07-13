@@ -1,19 +1,12 @@
 plugins {
     id("connector.common-conventions")
-    id("maven-publish")
 }
 
 dependencies {
+    api(project(":api"))
     compileOnly(libs.bungeecord)
+    compileOnly(libs.commandflow.common)
     implementation(libs.socketio)
     implementation(libs.caffeine)
     implementation(libs.jackson.databind)
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-        }
-    }
 }

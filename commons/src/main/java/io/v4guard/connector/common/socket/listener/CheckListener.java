@@ -10,16 +10,22 @@ import io.v4guard.connector.common.check.vpn.VPNCallbackTask;
 
 public class CheckListener implements Emitter.Listener {
 
+    private final CoreInstance coreInstance;
+    
+    public CheckListener(CoreInstance coreInstance) {
+        this.coreInstance = coreInstance;
+    }
+    
     @Override
     public void call(Object... args) {
         ObjectNode doc;
         try {
-            doc = CoreInstance.get().getObjectMapper().readValue(args[0].toString(), ObjectNode.class);
+            doc = coreInstance.getObjectMapper().readValue(args[0].toString(), ObjectNode.class);
         } catch (JsonProcessingException e) {
             UnifiedLogger.get().severe("Failed to parse check response: " + e.getMessage());
             return;
         }
-        VPNCallbackTask task = (VPNCallbackTask) CoreInstance.get().getPendingTasks().get(doc.get("taskID").asText());
+        VPNCallbackTask task = (VPNCallbackTask) coreInstance.getPendingTasks().get(doc.get("taskID").asText());
 
         if (task != null) {
             task.setData(doc);
