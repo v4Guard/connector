@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 
 public class CoreInstance {
 
-    public static final String PLUGIN_VERSION = "2.5.0";
+    public static final String PLUGIN_VERSION = "3.0.0";
 
     private static CoreInstance instance;
     private PendingTasks pendingTasks;
