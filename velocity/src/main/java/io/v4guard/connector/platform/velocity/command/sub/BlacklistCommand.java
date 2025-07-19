@@ -6,24 +6,34 @@ import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.request.BlacklistRequest;
 import io.v4guard.connector.common.utils.StringUtils;
 import io.v4guard.connector.common.command.internal.annotations.CommandFlag;
+import io.v4guard.connector.platform.velocity.VelocityInstance;
 import team.unnamed.commandflow.annotated.CommandClass;
 import team.unnamed.commandflow.annotated.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @Command(names = "blacklist", permission = "v4guard.command.blacklist")
 public class BlacklistCommand implements CommandClass {
 
     private final BlacklistRequest blacklistRequest;
+    private final VelocityInstance plugin;
 
-    public BlacklistCommand() {
+    private final List<String> defaultHelpMessage = List.of(
+            "§d▲ §lV4GUARD §7Correct usage: /v4guard blacklist add <username> <reason_preset> <reason> [-i] [-p] [-s]",
+            "§d▲ §lV4GUARD §7Correct usage: /v4guard blacklist remove <id-blacklist>"
+    );
+
+    public BlacklistCommand(VelocityInstance plugin) {
+        this.plugin = plugin;
         this.blacklistRequest = new BlacklistRequest();
     }
 
     @Command(names = "")
     public void help(@Sender CommandSource source) {
-        source.sendPlainMessage("§d▲ §lV4GUARD §7Correct usage: /v4guard blacklist add <username> <reason_preset> <reason> [-i] [-p] [-s]");
-        source.sendPlainMessage("§d▲ §lV4GUARD §7Correct usage: /v4guard blacklist remove <id-blacklist>");
+        List<String> help = CoreInstance.get().getActiveSettings().getMessage("blacklistHelp", defaultHelpMessage);
+
+        help.forEach(line -> source.sendMessage(plugin.getLegacyComponentSerializer().deserialize(line)));
     }
 
     @Command(names = "add")
@@ -58,18 +68,25 @@ public class BlacklistCommand implements CommandClass {
                     String message = StringUtils.buildMultilineString(
                             CoreInstance.get().getActiveSettings().getMessage(success ? "blacklistAdd" : "blacklistAddFailed")
                     );
-                    source.sendPlainMessage(StringUtils.replacePlaceholders(message, Map.of("username", value)));
+
+                    source.sendMessage(
+                            plugin.getLegacyComponentSerializer().deserialize(StringUtils.replacePlaceholders(message, Map.of("username", value)))
+                    );
                 });
     }
 
     @Command(names = "remove")
     public void removeBlacklist(@Sender CommandSource source, @Suggestions(suggestions = "<code>") String id) {
-        blacklistRequest.removeBlacklist(id)
+        blacklistRequest
+                .removeBlacklist(id)
                 .thenAccept(success -> {
                     String message = StringUtils.buildMultilineString(
                             CoreInstance.get().getActiveSettings().getMessage(success ? "blacklistRemove" : "blacklistRemoveFailed")
                     );
-                    source.sendPlainMessage(StringUtils.replacePlaceholders(message, Map.of("id", id)));
+
+                    source.sendMessage(
+                            plugin.getLegacyComponentSerializer().deserialize(StringUtils.replacePlaceholders(message, Map.of("id", id)))
+                    );
                 });
 
     }

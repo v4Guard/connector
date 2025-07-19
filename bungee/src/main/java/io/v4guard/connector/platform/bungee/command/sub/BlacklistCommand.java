@@ -10,12 +10,21 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import team.unnamed.commandflow.annotated.CommandClass;
 import team.unnamed.commandflow.annotated.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @Command(names = "blacklist", permission = "v4guard.command.blacklist")
 public class BlacklistCommand implements CommandClass {
 
+
+    private final CoreInstance coreInstance = CoreInstance.get();
     private final BlacklistRequest blacklistRequest;
+
+
+    private final List<String> defaultHelpMessage = List.of(
+            "§d▲ §lV4GUARD §7Correct usage: /v4guard blacklist add <username> <reason_preset> <reason> [-i] [-p] [-s]",
+            "§d▲ §lV4GUARD §7Correct usage: /v4guard blacklist remove <id-blacklist>"
+    );
 
     public BlacklistCommand() {
         this.blacklistRequest = new BlacklistRequest();
@@ -23,8 +32,9 @@ public class BlacklistCommand implements CommandClass {
 
     @Command(names = "")
     public void help(@Sender CommandSender source) {
-        source.sendMessage(new ComponentBuilder("§d▲ §lV4GUARD §7Correct usage: /v4guard blacklist add <username> <reason_preset> <reason> [-i] [-p] [-s]").create());
-        source.sendMessage(new ComponentBuilder("§d▲ §lV4GUARD §7Correct usage: /v4guard blacklist remove <id-blacklist>").create());
+        List<String> help = coreInstance.getActiveSettings().getMessage("blacklistHelp", defaultHelpMessage);
+
+        help.forEach(line -> source.sendMessage(new ComponentBuilder(line).create()));
     }
 
     @Command(names = "add")
@@ -59,6 +69,7 @@ public class BlacklistCommand implements CommandClass {
             String message = StringUtils.buildMultilineString(
                     CoreInstance.get().getActiveSettings().getMessage(success ? "blacklistAdd" : "blacklistAddFailed")
             );
+
             source.sendMessage(new ComponentBuilder(StringUtils.replacePlaceholders(message, Map.of("username", value))).create());
         });
     }

@@ -108,6 +108,10 @@ public class DefaultActiveSettings implements ActiveSettings {
         return messages.getOrDefault(key, List.of("Protocol error"));
     }
 
+    public List<String> getMessage(String key, List<String> defaultValue) {
+        return messages.getOrDefault(key, defaultValue);
+    }
+
     public boolean getPrivacySetting(String key) {
         return privacySettings.getOrDefault(key, true );
     }

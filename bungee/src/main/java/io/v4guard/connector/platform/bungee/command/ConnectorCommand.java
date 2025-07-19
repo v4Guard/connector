@@ -1,6 +1,7 @@
 package io.v4guard.connector.platform.bungee.command;
 
 
+import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.platform.bungee.command.sub.BlacklistCommand;
 import io.v4guard.connector.platform.bungee.command.sub.WhitelistCommand;
 import net.md_5.bungee.api.CommandSender;
@@ -10,6 +11,8 @@ import team.unnamed.commandflow.annotated.annotation.Command;
 import team.unnamed.commandflow.annotated.annotation.Sender;
 import team.unnamed.commandflow.annotated.annotation.SubCommandClasses;
 
+import java.util.List;
+
 @SubCommandClasses({
     WhitelistCommand.class,
     BlacklistCommand.class
@@ -17,11 +20,13 @@ import team.unnamed.commandflow.annotated.annotation.SubCommandClasses;
 @Command(names = "v4Guard", permission = "v4guard.command")
 public class ConnectorCommand implements CommandClass {
 
+    private final List<String> defaultMessage = List.of("§d▲ §lV4GUARD §7Correct usage: /v4guard <blacklist>/<whitelist>");
+
     @Command(names = "")
     public void help(@Sender CommandSender source) {
-        source.sendMessage(new ComponentBuilder("§d▲ §lV4GUARD §7Correct usage: /v4guard <blacklist>/<whitelist>").create());
-
-
+        CoreInstance.get().getActiveSettings()
+                .getMessage("commandHelp", defaultMessage)
+                .forEach(line -> source.sendMessage(new ComponentBuilder(line).create()));
     }
 
 }

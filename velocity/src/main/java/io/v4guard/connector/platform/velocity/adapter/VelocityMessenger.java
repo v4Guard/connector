@@ -9,12 +9,17 @@ import net.kyori.adventure.text.Component;
 
 public class VelocityMessenger implements Messenger {
 
+    private final VelocityInstance velocityInstance;
+
+    public VelocityMessenger(VelocityInstance velocityInstance) {
+        this.velocityInstance = velocityInstance;
+    }
 
     @Override
     public void broadcastWithPermission(String message, String permission) {
         boolean sendToAll = permission.equals(ListenersConstants.ALL_PLAYERS_PERMISSION);
 
-        Component component = Component.text(message);
+        Component component = velocityInstance.getLegacyComponentSerializer().deserialize(message);
 
         for(Player player : VelocityInstance.get().getServer().getAllPlayers()) {
             if(!sendToAll && !player.hasPermission(permission)) {
@@ -30,7 +35,7 @@ public class VelocityMessenger implements Messenger {
         PlayerFetchResult<Player> fetchedPlayer = VelocityInstance.get().fetchPlayer(playerName);
 
         if (fetchedPlayer.isOnline()) {
-            fetchedPlayer.getPlayer().sendMessage(Component.text(message));
+            fetchedPlayer.getPlayer().sendMessage(velocityInstance.getLegacyComponentSerializer().deserialize(message));
         }
     }
 }

@@ -12,22 +12,27 @@ import team.unnamed.commandflow.annotated.annotation.Command;
 import team.unnamed.commandflow.annotated.annotation.Sender;
 import team.unnamed.commandflow.annotated.annotation.Suggestions;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Command(names = "whitelist", permission = "v4guard.command.whitelist")
 public class WhitelistCommand implements CommandClass {
+
     private final WhitelistRequest whitelistRequest;
+    private final List<String> defaultHelpMessage = List.of(
+            "§d▲ §lV4GUARD §7Correct usage: /v4guard whitelist add <username>",
+            "§d▲ §lV4GUARD §7Correct usage: /v4guard whitelist remove <username>"
+    );
 
     public WhitelistCommand() {
         this.whitelistRequest = new WhitelistRequest();
     }
 
-
     @Command(names = "")
     public void help(@Sender CommandSender source) {
-        source.sendMessage(TextComponent.fromLegacy("§d▲ §lV4GUARD §7Correct usage: /v4guard whitelist add <username>"));
-        source.sendMessage(TextComponent.fromLegacy("§d▲ §lV4GUARD §7Correct usage: /v4guard whitelist remove <username>"));
+        List<String> help = CoreInstance.get().getActiveSettings().getMessage("whitelistHelp", defaultHelpMessage);
+        help.forEach(line -> source.sendMessage(new ComponentBuilder(line).create()));
     }
 
     @Command(names = "add")
@@ -40,7 +45,6 @@ public class WhitelistCommand implements CommandClass {
             );
 
             source.sendMessage(new ComponentBuilder(StringUtils.replacePlaceholders(message, Map.of("username", player))).create());
-
         });
 
     }

@@ -37,7 +37,9 @@ import io.v4guard.connector.platform.velocity.listener.PluginMessagingListener;
 import io.v4guard.connector.platform.velocity.task.AwaitingKickTask;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bstats.velocity.Metrics;
+import org.jetbrains.annotations.NotNull;
 import team.unnamed.commandflow.CommandManager;
 import team.unnamed.commandflow.annotated.AnnotatedCommandTreeBuilder;
 import team.unnamed.commandflow.annotated.SubCommandInstanceCreator;
@@ -78,6 +80,13 @@ public class VelocityInstance implements UniversalPlugin {
     private VelocityCheckProcessor checkProcessor;
     private PluginMessagingListener brandCheckProcessor;
     private PlayerSettingsListener playerSettingsProcessor;
+    private final LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer
+            .builder()
+            .character('§')
+            .hexColors()
+            .hexCharacter('#')
+            .build();
+
 
     @Inject
     public VelocityInstance(
@@ -109,7 +118,7 @@ public class VelocityInstance implements UniversalPlugin {
         this.checkProcessor = new VelocityCheckProcessor(this);
         this.brandCheckProcessor = new PluginMessagingListener();
         this.playerSettingsProcessor = new PlayerSettingsListener();
-        this.messenger = new VelocityMessenger();
+        this.messenger = new VelocityMessenger(this);
         this.checkDataCache = new CheckDataCache();
 
         try {
@@ -145,25 +154,28 @@ public class VelocityInstance implements UniversalPlugin {
         partInjector.bindFactory(new Key(Boolean.class, CommandFlag.class), new FlagPartFactory());
         partInjector.bindModifier(CommandFlag.class, new ValueCommandFlagModifier());
 
+        AnnotatedCommandTreeBuilder builder = getAnnotatedCommandTreeBuilder(partInjector);
 
+        CommandManager commandManager = new VelocityCommandManager(server, this);
+
+        commandManager.setUsageBuilder(new CustomUsageBuilder());
+
+        commandManager.registerCommands(builder.fromClass(new ConnectorCommand(this)));
+
+        this.logger.info("(Velocity) Enabling... [DONE]");
+    }
+
+    private @NotNull AnnotatedCommandTreeBuilder getAnnotatedCommandTreeBuilder(PartInjector partInjector) {
         SubCommandInstanceCreator subCommandInstanceCreator = (aClass, commandClass) -> {
             try {
-                return aClass.getConstructor().newInstance();
+                return aClass.getConstructor(VelocityInstance.class).newInstance(this);
             } catch (Exception e) {
                 UnifiedLogger.get().log(Level.SEVERE, "An exception has occurred while registering the commands", e);
             }
             return null;
         };
 
-        AnnotatedCommandTreeBuilder builder = AnnotatedCommandTreeBuilder.create(partInjector, subCommandInstanceCreator);
-
-        CommandManager commandManager = new VelocityCommandManager(server, this);
-
-        commandManager.setUsageBuilder(new CustomUsageBuilder());
-
-        commandManager.registerCommands(builder.fromClass(new ConnectorCommand()));
-
-        this.logger.info("(Velocity) Enabling... [DONE]");
+        return AnnotatedCommandTreeBuilder.create(partInjector, subCommandInstanceCreator);
     }
 
     @Subscribe
@@ -288,4 +300,7 @@ public class VelocityInstance implements UniversalPlugin {
         return playerSettingsProcessor;
     }
 
+    public LegacyComponentSerializer getLegacyComponentSerializer() {
+        return legacyComponentSerializer;
+    }
 }
