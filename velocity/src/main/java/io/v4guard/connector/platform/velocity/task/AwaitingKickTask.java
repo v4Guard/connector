@@ -25,15 +25,11 @@ public class AwaitingKickTask implements Runnable {
                 return;
             }
 
-            if (!player.isActive()) {
-                awaitedKickTaskCache.invalidate(playerName);
+            if (!player.isActive() || player.getProtocolState() != ProtocolState.PLAY) {
+                //awaitedKickTaskCache.invalidate(playerName);
                 return;
             }
-
-            if (player.getProtocolState() != ProtocolState.PLAY) {
-                return;
-            }
-
+            
             player.disconnect(Component.text(kick.getReason()));
             awaitedKickTaskCache.invalidate(playerName);
         });
