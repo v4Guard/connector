@@ -24,6 +24,7 @@ public class PlayerListener {
     @Subscribe(order = PostOrder.EARLY)
     public void onAsyncLogin(LoginEvent event, Continuation continuation) {
         if (!event.getResult().isAllowed()) {
+            continuation.resume();
             return;
         }
 
@@ -35,10 +36,12 @@ public class PlayerListener {
     }
 
     @Subscribe(order = PostOrder.EARLY)
-    public void onProxyDisconnect(DisconnectEvent event) {
+    public void onProxyDisconnect(DisconnectEvent event, Continuation continuation) {
         if (event.getLoginStatus() == LoginStatus.SUCCESSFUL_LOGIN) {
             coreInstance.getCheckDataCache().cleanup(event.getPlayer().getUsername());
         }
+
+        continuation.resume();
     }
 
 }

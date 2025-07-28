@@ -22,6 +22,9 @@ public class BrandCallbackTask extends CallbackTask {
     public void complete() {
         super.checkData.setPlayerBrandChecked(true);
 
+        CoreInstance backend = CoreInstance.get();
+        backend.getPendingTasks().remove(this.taskID);
+
         ObjectMapper mapper = CoreInstance.get().getObjectMapper();
         ObjectNode node = mapper.createObjectNode();
 

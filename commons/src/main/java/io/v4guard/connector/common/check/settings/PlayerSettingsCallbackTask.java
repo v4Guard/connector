@@ -23,6 +23,9 @@ public class PlayerSettingsCallbackTask extends CallbackTask {
 
     @Override
     public void complete() {
+        CoreInstance backend = CoreInstance.get();
+        backend.getPendingTasks().remove(this.taskID);
+
         super.checkData.setPlayerSettingsChecked(true);
 
         ObjectMapper mapper = new ObjectMapper();
