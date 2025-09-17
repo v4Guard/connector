@@ -28,11 +28,12 @@ public class ConsoleMessageListener implements Emitter.Listener {
         }
 
         String message = request.get("message").asText(null);
-        Level lvl = Level.parse(request.get("level").asText("INFO"));
 
-        if (message == null) {
-           return;
-        }
+        Level lvl = Level.INFO;
+
+        try {
+            lvl = Level.parse(request.get("level").asText("INFO").toUpperCase());
+        } catch (IllegalArgumentException ignored) {}
 
         UnifiedLogger.get().log(lvl, message);
     }
