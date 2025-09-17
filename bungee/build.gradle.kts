@@ -4,6 +4,8 @@ plugins {
     id("net.minecrell.plugin-yml.bungee") version "0.6.0"
 }
 
+extra["bungeecord"] = true
+
 dependencies {
     //compileOnly(libs.bungeecord)
     compileOnly(libs.floodgate)
