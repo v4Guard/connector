@@ -139,11 +139,15 @@ public class VelocityInstance implements UniversalPlugin {
         this.server.getEventManager().register(this, this.playerSettingsProcessor);
         this.server.getEventManager().register(this, new PlayerListener(this));
 
+        int connectionTimeout = this.server.getConfiguration().getConnectTimeout();
+        if (connectionTimeout < 3000) {
+            this.logger.warning("(Velocity) Connect timeout is lower than 3000ms, forcing our own timeout of 5000ms. You should raise the timeout in your velocity config.");
+            connectionTimeout = 5000;
+        }
+
+        // Prevents memory leaks as we don't want to keep the player in the cache after the connection has been timed out
         this.awaitedKickTaskCache = Caffeine.newBuilder()
-                .expireAfterWrite(
-                        this.server.getConfiguration().getConnectTimeout(),
-                        TimeUnit.MILLISECONDS
-                ) // Prevents memory leaks as we don't want to keep the player in the cache after the connection has been timed out
+                .expireAfterWrite(connectionTimeout, TimeUnit.MILLISECONDS)
                 .build();
 
         schedule(new AwaitingKickTask(this.awaitedKickTaskCache, this.server), 0, 150, TimeUnit.MILLISECONDS);

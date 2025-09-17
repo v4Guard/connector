@@ -23,16 +23,12 @@ public class PlayerListener {
 
     @Subscribe(order = PostOrder.EARLY)
     public void onAsyncLogin(LoginEvent event, Continuation continuation) {
-        if (!event.getResult().isAllowed()) {
+        if (!event.getResult().isAllowed() || !coreInstance.getRemoteConnection().isReady())  {
             continuation.resume();
             return;
         }
 
-        if (coreInstance.getRemoteConnection().isReady()) {
-            plugin.getCheckProcessor().onEvent(event.getPlayer().getUsername(), event, continuation);
-        } else {
-            continuation.resume();
-        }
+        plugin.getCheckProcessor().onEvent(event.getPlayer().getUsername(), event, continuation);
     }
 
     @Subscribe(order = PostOrder.EARLY)

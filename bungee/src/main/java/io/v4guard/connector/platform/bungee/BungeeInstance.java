@@ -80,9 +80,17 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
         }
 
 
+        int connectionTimeout = ProxyServer.getInstance().getConfig().getTimeout();
+
+        if (connectionTimeout < 3000) {
+            getLogger().warning("(Bungee) Connect timeout is lower than 3000ms, forcing our own timeout of 5000ms. You should raise the timeout in your bungee config.");
+            connectionTimeout = 5000;
+        }
+
+
         this.awaitedKickTaskCache = Caffeine
                 .newBuilder()
-                .expireAfterWrite(ProxyServer.getInstance().getConfig().getTimeout(), TimeUnit.MILLISECONDS) //prevent memory leaks in case of a player not being processed by the proxy
+                .expireAfterWrite(connectionTimeout, TimeUnit.MILLISECONDS) //prevent memory leaks in case of a player not being processed by the proxy
                 .build();
 
 

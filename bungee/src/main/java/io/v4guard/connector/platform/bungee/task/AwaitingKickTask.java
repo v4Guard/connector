@@ -24,8 +24,8 @@ public class AwaitingKickTask implements Runnable {
             ProxiedPlayer player = proxyServer.getPlayer(playerName);
             if (player == null) return;
 
-            if (!(player instanceof UserConnection userConnection)) return;
-            if (userConnection.getCh().getEncodeProtocol() != Protocol.GAME) return;
+            if (!(player instanceof UserConnection userConnection)
+                    || userConnection.getCh().getEncodeProtocol() != Protocol.GAME) return;
 
             player.disconnect(TextComponent.fromLegacy(kick.getReason()));
             awaitedKickTaskCache.invalidate(playerName);
