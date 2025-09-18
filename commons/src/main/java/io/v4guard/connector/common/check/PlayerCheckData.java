@@ -1,7 +1,5 @@
 package io.v4guard.connector.common.check;
 
-import io.v4guard.connector.common.CoreInstance;
-
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 
@@ -88,16 +86,18 @@ public class PlayerCheckData {
         return this.currentTask;
     }
 
-    public void triggerCompletedIfExpired() {
+    public boolean checkAndTriggerIfExpired() {
         if (!this.active) {
-            return;
+            return false;
         }
 
         if (this.currentTask.isExpired()) {
             this.checkStatus = CheckStatus.EXPIRED;
-            CoreInstance.get().getPendingTasks().remove(this.currentTask.getTaskID()); // remove task from pending tasks to avoid memory leak
             triggerTaskCompleted();
+            return true;
         }
+
+        return false;
     }
 
     private void handleWhenCompleted(Exception exception) {

@@ -12,7 +12,7 @@ public class CacheTicker implements Runnable {
 
     @Override
     public void run() {
-        coreInstance.getCheckDataCache().handleTick();
+        coreInstance.getCheckDataCache().handleTick(coreInstance.getPendingTasks());
         coreInstance.getPlugin().getBrandCheckProcessor().handleTick();
         coreInstance.getPlugin().getPlayerSettingsCheckProcessor().handleTick();
     }

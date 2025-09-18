@@ -2,7 +2,10 @@ package io.v4guard.connector.common.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import io.v4guard.connector.common.UnifiedLogger;
+import io.v4guard.connector.common.check.CallbackTask;
 import io.v4guard.connector.common.check.CheckStatus;
+import io.v4guard.connector.common.check.PendingTasks;
 import io.v4guard.connector.common.check.PlayerCheckData;
 
 import java.util.Map;
@@ -23,9 +26,13 @@ public class CheckDataCache {
         }
     }
 
-    public void handleTick() {
+    public void handleTick(PendingTasks pendingTasks) {
         for (PlayerCheckData checkData : USERNAME_TO_DATA_CACHE.asMap().values()) {
-            checkData.triggerCompletedIfExpired();
+            CallbackTask task = checkData.getCurrentTask();
+
+            if (checkData.checkAndTriggerIfExpired()) {
+                pendingTasks.remove(task.getTaskID());
+            }
         }
     }
 
