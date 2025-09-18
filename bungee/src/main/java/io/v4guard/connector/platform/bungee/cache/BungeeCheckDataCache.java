@@ -4,6 +4,8 @@ package io.v4guard.connector.platform.bungee.cache;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.v4guard.connector.common.cache.CheckDataCache;
+import io.v4guard.connector.common.check.CallbackTask;
+import io.v4guard.connector.common.check.PendingTasks;
 import io.v4guard.connector.common.check.PlayerCheckData;
 import net.md_5.bungee.api.ProxyServer;
 
@@ -22,6 +24,7 @@ public class BungeeCheckDataCache extends CheckDataCache {
                     , TimeUnit.MILLISECONDS
             ).build();
 
+
     public void rememberLogin(String username, PlayerCheckData checkData) {
         TEMPORAL_CACHE.put(username, checkData);
     }
@@ -31,13 +34,13 @@ public class BungeeCheckDataCache extends CheckDataCache {
     }
 
     @Override
-    public void handleTick() {
+    public void handleTick(PendingTasks pendingTasks) {
         TEMPORAL_CACHE.cleanUp();
 
         for (PlayerCheckData checkData : TEMPORAL_CACHE.asMap().values()) {
-            checkData.triggerCompletedIfExpired();
+            checkData.checkAndTriggerIfExpired();
         }
 
-        super.handleTick();
+        super.handleTick(pendingTasks);
     }
 }

@@ -4,8 +4,11 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.velocitypowered.api.network.ProtocolState;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import io.v4guard.connector.common.UnifiedLogger;
 import io.v4guard.connector.common.compatibility.kick.AwaitingKick;
 import net.kyori.adventure.text.Component;
+
+import java.util.logging.Level;
 
 public class AwaitingKickTask implements Runnable {
 
@@ -25,8 +28,17 @@ public class AwaitingKickTask implements Runnable {
                 return;
             }
 
+            if (!player.getUsername().equals(playerName)) {
+                UnifiedLogger.get().log(Level.WARNING,
+                        "Player " + playerName + " is not equal to the player's name "
+                                + player.getUsername() + " removing await kick task. And notify us, " +
+                                "this is UEB from the backend!"
+                );
+                awaitedKickTaskCache.invalidate(playerName);
+                return;
+            }
+
             if (!player.isActive() || player.getProtocolState() != ProtocolState.PLAY) {
-                //awaitedKickTaskCache.invalidate(playerName);
                 return;
             }
             

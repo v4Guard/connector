@@ -231,15 +231,25 @@ public class VelocityInstance implements UniversalPlugin {
     @Override
     public PlayerFetchResult<Player> fetchPlayer(String playerName) {
         Optional<Player> player = this.server.getPlayer(playerName);
-
         if (player.isEmpty()) {
             return new PlayerFetchResult<>(null, null, false);
         }
 
-        Optional<ServerConnection> server = player.get().getCurrentServer();
+        Player foundedPlayer = player.get();
+
+        if (!foundedPlayer.getUsername().equals(playerName)) {
+            UnifiedLogger.get().log(Level.WARNING,
+                    "[FND] Player " + playerName + " is not equal to the player's name "
+                            + foundedPlayer.getUsername()
+                            + ". This should not be happening, this is UEB from the backend!"
+            );
+            return new PlayerFetchResult<>(null, null, false);
+        }
+
+        Optional<ServerConnection> server = foundedPlayer.getCurrentServer();
 
         return new PlayerFetchResult<>(
-                player.get()
+                foundedPlayer
                 , server.map(serverCon -> serverCon.getServerInfo().getName()).orElse(null)
                 , true
         );
@@ -264,6 +274,15 @@ public class VelocityInstance implements UniversalPlugin {
         }
 
         Player player = fetchedPlayer.getPlayer();
+
+        if (!player.getUsername().equals(playerName)) {
+            UnifiedLogger.get().log(Level.WARNING,
+                    "[SYNC] Player " + playerName + " is not equal to the player's name "
+                            + player.getUsername() + " removing await kick task. And notify us, " +
+                            "this is UEB from the backend!"
+            );
+            return;
+        }
 
         player.disconnect(Component.text(reason));
     }

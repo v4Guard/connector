@@ -79,7 +79,6 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
             return;
         }
 
-
         int connectionTimeout = ProxyServer.getInstance().getConfig().getTimeout();
 
         if (connectionTimeout < 3000) {
@@ -87,12 +86,10 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
             connectionTimeout = 5000;
         }
 
-
         this.awaitedKickTaskCache = Caffeine
                 .newBuilder()
                 .expireAfterWrite(connectionTimeout, TimeUnit.MILLISECONDS) //prevent memory leaks in case of a player not being processed by the proxy
                 .build();
-
 
         this.awaitedKickTask = new AwaitingKickTask(this.awaitedKickTaskCache, this.getProxy());
         this.schedule(this.awaitedKickTask, 0, 150, TimeUnit.MILLISECONDS);
@@ -167,6 +164,15 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
             return new PlayerFetchResult<>(null, null, false);
         }
 
+        if (!player.getName().equals(playerName)) {
+            UnifiedLogger.get().log(Level.WARNING,
+                    "[FND] Player " + playerName + " is not equal to the player's name "
+                            + player.getName()
+                            + ". This should not be happening, this is UEB from the backend!"
+            );
+            return new PlayerFetchResult<>(null, null, false);
+        }
+
         Server server = player.getServer();
 
         return new PlayerFetchResult<>(
@@ -189,9 +195,20 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
 
         PlayerFetchResult<ProxiedPlayer> fetchedPlayer = fetchPlayer(playerName);
 
-        if (fetchedPlayer.isOnline()) {
-            fetchedPlayer.getPlayer().disconnect(TextComponent.fromLegacy(reason));
+        if (!fetchedPlayer.isOnline()) {
+            return;
         }
+
+        if (!fetchedPlayer.getPlayer().getName().equals(playerName)) {
+            UnifiedLogger.get().log(Level.WARNING,
+                    "[SYNC] Player " + playerName + " is not equal to the player's name "
+                            + fetchedPlayer.getPlayer().getName() + " removing await kick task. And notify us, " +
+                            "this is UEB from the backend!"
+            );
+            return;
+        }
+
+        fetchedPlayer.getPlayer().disconnect(TextComponent.fromLegacy(reason));
     }
 
     @Override
