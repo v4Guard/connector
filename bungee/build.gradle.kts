@@ -26,5 +26,6 @@ bungee {
     name = "v4guard-plugin"
     main = "io.v4guard.connector.platform.bungee.BungeeInstance"
     version = project.version.toString()
+    author = "v4Guard"
     description = "v4Guard connector for BungeeCord platform"
 }
