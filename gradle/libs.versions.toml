@@ -8,7 +8,7 @@ jackson-databind = "2.17.1"
 floodgate = "2.2.3-SNAPSHOT"
 
 #platform specific
-bungeecord = "1.21-R0.1-SNAPSHOT"
+bungeecord = "1.21-R0.5-SNAPSHOT"
 velocity = "3.4.0-SNAPSHOT"
 commandflow = "0.7.0"
 

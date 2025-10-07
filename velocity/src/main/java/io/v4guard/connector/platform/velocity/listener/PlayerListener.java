@@ -33,10 +33,12 @@ public class PlayerListener {
 
     @Subscribe(order = PostOrder.EARLY)
     public void onProxyDisconnect(DisconnectEvent event, Continuation continuation) {
-        if (event.getLoginStatus() == LoginStatus.SUCCESSFUL_LOGIN) {
-            coreInstance.getCheckDataCache().cleanup(event.getPlayer().getUsername());
+        if (event.getLoginStatus() == LoginStatus.CONFLICTING_LOGIN) {
+            continuation.resume();
+            return;
         }
 
+        coreInstance.getCheckDataCache().cleanup(event.getPlayer().getUsername());
         continuation.resume();
     }
 
