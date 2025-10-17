@@ -104,7 +104,6 @@ public class VelocityInstance implements UniversalPlugin {
         this.metricsFactory = metricsFactory;
     }
 
-
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         this.logger.info("(Velocity) Enabling...");

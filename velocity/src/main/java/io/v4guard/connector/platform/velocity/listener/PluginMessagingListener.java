@@ -22,6 +22,7 @@ public class PluginMessagingListener extends BrandCheckProcessor {
 
         if (!CoreInstance.get().getRemoteConnection().isReady()) {
             continuation.resume();
+            return;
         }
 
         super.process(
