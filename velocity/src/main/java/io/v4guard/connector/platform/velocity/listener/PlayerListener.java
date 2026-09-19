@@ -8,8 +8,13 @@ import com.velocitypowered.api.event.connection.DisconnectEvent.LoginStatus;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import io.v4guard.connector.common.CoreInstance;
+import io.v4guard.connector.common.UnifiedLogger;
+import io.v4guard.connector.common.compatibility.FakeChannelDetector;
 import io.v4guard.connector.platform.velocity.VelocityInstance;
+
+import java.util.logging.Level;
 
 public class PlayerListener {
 
@@ -28,7 +33,19 @@ public class PlayerListener {
             return;
         }
 
-        plugin.getCheckProcessor().onEvent(event.getPlayer().getUsername(), event, continuation);
+        Player player = event.getPlayer();
+
+        try {
+            ConnectedPlayer connectedPlayer = (ConnectedPlayer) player;
+            if (FakeChannelDetector.isFakeChannel(connectedPlayer)) {
+                // If the player is a fake player, we don't want to process the event. As we cannot kick the user
+                return;
+            }
+        } catch (ClassCastException e) {
+            UnifiedLogger.get().log(Level.WARNING, "We were unable to check if the user is a fake player, are you using a forked version of Velocity?", e);
+        }
+
+        plugin.getCheckProcessor().onEvent(player.getUsername(), event, continuation);
     }
 
     @Subscribe(order = PostOrder.EARLY)

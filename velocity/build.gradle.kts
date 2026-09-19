@@ -5,19 +5,18 @@ plugins {
 
 dependencies {
     annotationProcessor(libs.velocity)
-    compileOnly(libs.velocity)
     compileOnly(libs.floodgate)
 
-    implementation(libs.bstats.velocity)
-    implementation(libs.cloud.velocity)
-    implementation(libs.cloud.annotations)
+    // To have access to a few internal velocity classes, we have to include the whole velocity jar...
+    compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    compileOnly(libs.velocity)
 
-//    implementation(libs.commandflow.velocity) {
-//        exclude(group = "net.kyori", module = "adventure-api")
-//        exclude(group = "net.kyori", module = "adventure-text-serializer-gson")
-//        exclude(group = "net.kyori", module = "adventure-text-serializer-legacy")
-//        exclude(group = "net.kyori", module = "adventure-text-serializer-plain")
-//    }
-
-    implementation(project(":commons"))
+    listOf(
+        libs.bstats.velocity,
+        libs.cloud.velocity,
+        libs.cloud.annotations,
+        project(":commons")
+    ).forEach {
+        implementation(it)
+    }
 }
