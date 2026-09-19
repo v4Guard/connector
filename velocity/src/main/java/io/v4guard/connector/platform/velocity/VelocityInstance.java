@@ -132,9 +132,15 @@ public class VelocityInstance implements UniversalPlugin {
         this.server.getEventManager().register(this, this.playerSettingsProcessor);
         this.server.getEventManager().register(this, new PlayerListener(this));
 
-        int connectionTimeout = System.getProperty("io.v4guard.connector.connectionTimeout") != null
-                ? Integer.parseInt(System.getProperty("io.v4guard.connector.connectionTimeout", "5000"))
-                : this.server.getConfiguration().getConnectTimeout();
+        String propertyConnTimeout = System.getProperty("io.v4guard.connector.connectionTimeout");
+        int connectionTimeout = this.server.getConfiguration().getConnectTimeout();
+        if (propertyConnTimeout != null && !propertyConnTimeout.trim().isEmpty()) {
+            try {
+                connectionTimeout = Integer.parseInt(propertyConnTimeout.trim());
+            } catch (NumberFormatException e) {
+                this.logger.warning("Ignoring invalid io.v4guard.connector.connectionTimeout: " + propertyConnTimeout);
+            }
+        }
 
         if (connectionTimeout < 3000) {
             this.logger.warning("(Velocity) Connect timeout is lower than 3000ms, forcing our own timeout of 5000ms. You should raise the timeout in your velocity config.");

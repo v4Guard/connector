@@ -76,9 +76,15 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
             return;
         }
 
-        int connectionTimeout = System.getProperty("io.v4guard.connector.connectionTimeout") != null
-                ? Integer.parseInt(System.getProperty("io.v4guard.connector.connectionTimeout", "5000"))
-                : ProxyServer.getInstance().getConfig().getTimeout();
+        String propertyConnTimeout = System.getProperty("io.v4guard.connector.connectionTimeout");
+        int connectionTimeout = ProxyServer.getInstance().getConfig().getTimeout();
+        if (propertyConnTimeout != null && !propertyConnTimeout.trim().isEmpty()) {
+            try {
+                connectionTimeout = Integer.parseInt(propertyConnTimeout.trim());
+            } catch (NumberFormatException e) {
+                this.getLogger().warning("Ignoring invalid io.v4guard.connector.connectionTimeout: " + propertyConnTimeout);
+            }
+        }
 
         if (connectionTimeout < 3000) {
             getLogger().warning("(Bungee) Connect timeout is lower than 3000ms, forcing our own timeout of 5000ms. You should raise the timeout in your bungee config.");
