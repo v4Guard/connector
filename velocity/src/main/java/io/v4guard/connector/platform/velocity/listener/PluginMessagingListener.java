@@ -20,16 +20,11 @@ public class PluginMessagingListener extends BrandCheckProcessor {
     public void onPlayerClientBrand(PlayerClientBrandEvent event, Continuation continuation) {
         Player player = event.getPlayer();
 
-        if (!CoreInstance.get().getRemoteConnection().isReady()) {
-            continuation.resume();
-            return;
-        }
-
         super.process(
-                player.getUsername()
-                , player.getUniqueId()
-                , MINECRAFT_BRAND_CHANNEL.getId()
-                , event.getBrand().getBytes(StandardCharsets.UTF_8)
+                player.getUsername(),
+                player.getUniqueId(),
+                MINECRAFT_BRAND_CHANNEL.getId(),
+                event.getBrand().getBytes(StandardCharsets.UTF_8)
         );
 
         continuation.resume();
@@ -37,17 +32,10 @@ public class PluginMessagingListener extends BrandCheckProcessor {
 
     @Subscribe
     public void onPluginMessage(PluginMessageEvent event, Continuation continuation) {
-        if (!(event.getSource() instanceof Player)) {
+        if (!(event.getSource() instanceof Player player)) {
             continuation.resume();
             return;
         }
-
-        if (!CoreInstance.get().getRemoteConnection().isReady()) {
-            continuation.resume();
-            return;
-        }
-
-        Player player = (Player) event.getSource();
 
         super.process(
                 player.getUsername()
