@@ -4,9 +4,13 @@ plugins {
 
 dependencies {
     api(project(":api"))
+
     compileOnly(libs.bungeecord)
-    compileOnly(libs.commandflow.common)
-    implementation(libs.socketio)
-    implementation(libs.caffeine)
-    implementation(libs.jackson.databind)
+    compileOnly(libs.bundles.adventure)
+
+    listOf(
+        libs.socketio, libs.caffeine, libs.jackson.databind
+    ).forEach {
+        implementation(it)
+    }
 }

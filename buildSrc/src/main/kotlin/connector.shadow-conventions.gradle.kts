@@ -1,5 +1,5 @@
 plugins {
-    id("io.github.goooler.shadow")
+    id("com.gradleup.shadow")
     id("connector.common-conventions")
 }
 
@@ -15,12 +15,13 @@ tasks {
             "okio", "okhttp3", "io.socket", "org.json",
             "org.checkerframework", "org.bstats", "com.fasterxml.jackson",
             "com.google.errorprone.annotations", "com.github.benmanes.caffeine.cache",
-            "team.unnamed.commandflow", "org.jetbrains.annotations", "org.intellij.lang.annotations"
+            "org.incendo.cloud", "org.jetbrains.annotations", "org.intellij.lang.annotations",
+            "io.leangen.geantyref"
         )
 
         if (project.hasProperty("bungeecord")) {
             // bungeecord related dependencies
-            relocations.addAll(listOf("net.kyori.adventure", "net.kyori.examination", "com.google.gson"))
+            relocations.addAll(listOf("net.kyori.adventure", "net.kyori.examination", "net.kyori.option", "com.google.gson"))
         }
 
         relocations.forEach { relocate(it, "${prefix}.$it") }

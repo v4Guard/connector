@@ -5,27 +5,44 @@ socketio = "2.1.1"
 caffeine = "3.1.8"
 bstats = "3.0.2"
 jackson-databind = "2.17.1"
-floodgate = "2.2.3-SNAPSHOT"
+floodgate = "2.2.5-SNAPSHOT"
 
 #platform specific
 bungeecord = "1.21-R0.5-SNAPSHOT"
-velocity = "3.4.0-SNAPSHOT"
-commandflow = "0.7.0"
+velocity = "4.1.2-SNAPSHOT"
+cloud = "2.0.0"
+
+gson = "2.14.0"
+
+adventure = "5.2.0"
+adventure-bungeecord = "4.4.2-SNAPSHOT"
 
 [libraries]
 
 socketio = { group = "io.socket", name = "socket.io-client",  version.ref = "socketio" }
 caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "caffeine" }
+
 jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson-databind" }
+
 floodgate = { group = "org.geysermc.floodgate", name = "api", version.ref = "floodgate" }
-commandflow-common = { group = "team.unnamed", name = "commandflow-api", version.ref = "commandflow" }
+
+cloud-annotations = { group = "org.incendo", name = "cloud-annotations", version.ref = "cloud" }
+
+adventure-text-minimessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
+adventure-text-legacy = { group = "net.kyori", name = "adventure-text-serializer-legacy", version.ref = "adventure" }
+adventure-text-gson = { group = "net.kyori", name = "adventure-text-serializer-gson", version.ref = "adventure" }
+adventure-text-serializer-bungeecord = { group = "net.kyori", name = "adventure-text-serializer-bungeecord", version.ref = "adventure-bungeecord" }
 
 #platform specific
-bstats-bungeecord = { group = "org.bstats", name = "bstats-bungeecord", version.ref = "bstats" }
-bstats-velocity = { group = "org.bstats", name = "bstats-velocity", version.ref = "bstats" }
 bungeecord = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungeecord"}
+bstats-bungeecord = { group = "org.bstats", name = "bstats-bungeecord", version.ref = "bstats" }
+cloud-bungeecord = { group = "org.incendo", name = "cloud-bungee", version.ref = "cloud" }
+gson-json = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
-commandflow-velocity = { group = "team.unnamed", name = "commandflow-velocity", version.ref = "commandflow" }
-commandflow-bungeecord = { group = "team.unnamed", name = "commandflow-bungee", version.ref = "commandflow" }
+bstats-velocity = { group = "org.bstats", name = "bstats-velocity", version.ref = "bstats" }
+cloud-velocity = { group = "org.incendo", name = "cloud-velocity", version.ref = "cloud" }
 
-
+[bundles]
+adventure = ["adventure-text-minimessage", "adventure-text-legacy"]
+adventure-bungeecord = ["adventure-text-minimessage", "adventure-text-legacy", "adventure-text-serializer-bungeecord", "adventure-text-gson", "gson-json"]
