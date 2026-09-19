@@ -31,6 +31,10 @@ public class PlayerListener implements Listener {
             return;
         }
 
+        // Compared to velocity, there is no way to check if the channel is a fake channel as the underlying channel is not accessible.
+        // without using reflection.
+        // So, I would prefer to not check for a fake channel for the implications of using reflection. We can absorb the increased checks.
+
         plugin.getCheckProcessor().onEvent(event.getConnection().getName(), event);
     }
 

@@ -38,10 +38,10 @@ public class PluginMessagingListener extends BrandCheckProcessor {
         }
 
         super.process(
-                player.getUsername()
-                , player.getUniqueId()
-                , event.getIdentifier().getId()
-                , event.getData()
+                player.getUsername(),
+                player.getUniqueId(),
+                event.getIdentifier().getId(),
+                event.getData()
         );
 
         continuation.resume();
