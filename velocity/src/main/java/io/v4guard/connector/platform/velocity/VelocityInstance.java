@@ -37,6 +37,7 @@ import io.v4guard.connector.platform.velocity.listener.PluginMessagingListener;
 import io.v4guard.connector.platform.velocity.task.AwaitingKickTask;
 
 import net.kyori.adventure.text.Component;
+import org.apache.logging.log4j.core.lookup.SystemPropertiesLookup;
 import org.bstats.velocity.Metrics;
 import org.incendo.cloud.SenderMapper;
 import org.incendo.cloud.annotations.AnnotationParser;
@@ -131,7 +132,10 @@ public class VelocityInstance implements UniversalPlugin {
         this.server.getEventManager().register(this, this.playerSettingsProcessor);
         this.server.getEventManager().register(this, new PlayerListener(this));
 
-        int connectionTimeout = this.server.getConfiguration().getConnectTimeout();
+        int connectionTimeout = System.getProperty("io.v4guard.connector.connectionTimeout") != null
+                ? Integer.parseInt(System.getProperty("io.v4guard.connector.connectionTimeout", "5000"))
+                : this.server.getConfiguration().getConnectTimeout();
+
         if (connectionTimeout < 3000) {
             this.logger.warning("(Velocity) Connect timeout is lower than 3000ms, forcing our own timeout of 5000ms. You should raise the timeout in your velocity config.");
             connectionTimeout = 5000;
