@@ -15,6 +15,7 @@ import org.incendo.cloud.annotations.suggestion.Suggestions;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Permission("v4guard.command.whitelist")
@@ -51,7 +52,8 @@ public class WhitelistCommand implements AnnotatedCommand {
 
         future.thenAccept(success -> {
             BaseComponent[] message = plugin.getComponentAdapter().adapt(
-                    CoreInstance.get().getActiveSettings().getMessage(success  ?  "whitelistAdd" : "whitelistAddFailed")
+                    CoreInstance.get().getActiveSettings().getMessage(success  ?  "whitelistAdd" : "whitelistAddFailed"),
+                    Map.of("username", player)
             );
 
             if (message == null) return;
@@ -65,7 +67,8 @@ public class WhitelistCommand implements AnnotatedCommand {
 
         future.thenAccept(success -> {
             BaseComponent[] message = plugin.getComponentAdapter().adapt(
-                    CoreInstance.get().getActiveSettings().getMessage(success  ?  "whitelistRemove" : "whitelistRemoveFailed")
+                    CoreInstance.get().getActiveSettings().getMessage(success  ?  "whitelistRemove" : "whitelistRemoveFailed"),
+                    Map.of("username", player)
             );
 
             if (message == null) return;

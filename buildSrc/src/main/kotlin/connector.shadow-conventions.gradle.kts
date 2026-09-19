@@ -16,7 +16,7 @@ tasks {
             "org.checkerframework", "org.bstats", "com.fasterxml.jackson",
             "com.google.errorprone.annotations", "com.github.benmanes.caffeine.cache",
             "org.incendo.cloud", "org.jetbrains.annotations", "org.intellij.lang.annotations",
-            "io.leangen.geantyref"
+            "io.leangen.geantyref", "org.jspecify.annotations",
         )
 
         if (project.hasProperty("bungeecord")) {
