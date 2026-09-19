@@ -22,8 +22,6 @@ public class KickListener implements Emitter.Listener {
 
         String username = request.get("username").asText();
         List<String> rawReason = coreInstance.getObjectMapper().convertValue(request.get("message"), new TypeReference<>() {});
-        String reason = StringUtils.buildMultilineString(rawReason);
-
-        coreInstance.getPlugin().kickPlayer(username, reason);
+        coreInstance.getPlugin().kickPlayer(username, rawReason);
     }
 }

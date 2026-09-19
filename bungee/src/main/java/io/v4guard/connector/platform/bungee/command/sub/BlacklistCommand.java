@@ -1,61 +1,58 @@
 package io.v4guard.connector.platform.bungee.command.sub;
 
 import io.v4guard.connector.common.CoreInstance;
-import io.v4guard.connector.common.command.internal.annotations.CommandFlag;
+import io.v4guard.connector.common.commands.AnnotatedCommand;
 import io.v4guard.connector.common.request.BlacklistRequest;
-import io.v4guard.connector.common.utils.StringUtils;
+import io.v4guard.connector.platform.bungee.BungeeInstance;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import team.unnamed.commandflow.annotated.CommandClass;
-import team.unnamed.commandflow.annotated.annotation.*;
+import org.incendo.cloud.annotation.specifier.FlagYielding;
+import org.incendo.cloud.annotation.specifier.Greedy;
+import org.incendo.cloud.annotations.*;
+import org.incendo.cloud.annotations.suggestion.Suggestions;
+import org.incendo.cloud.context.CommandContext;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-@Command(names = "blacklist", permission = "v4guard.command.blacklist")
-public class BlacklistCommand implements CommandClass {
+@Permission("v4guard.command.blacklist")
+@Command("v4guard blacklist")
+public class BlacklistCommand implements AnnotatedCommand {
 
-
-    private final CoreInstance coreInstance = CoreInstance.get();
     private final BlacklistRequest blacklistRequest;
-
+    private final BungeeInstance plugin;
 
     private final List<String> defaultHelpMessage = List.of(
-            "§d▲ §lV4GUARD §7Correct usage: /v4guard blacklist add <username> <reason_preset> <reason> [-i] [-p] [-s]",
-            "§d▲ §lV4GUARD §7Correct usage: /v4guard blacklist remove <id-blacklist>"
+            "<bold><color:#cb0c9f>▲ V4GUARD</color></bold> <gray>Correct usage:</gray> <yellow>/v4guard blacklist add <username> <reason_preset> [reason] [-i] [-p] [-s]</yellow>",
+            "<bold><color:#cb0c9f>▲ V4GUARD</color></bold> <gray>Correct usage:</gray> <yellow>/v4guard blacklist remove <id-blacklist></yellow>"
     );
 
-    public BlacklistCommand() {
+    public BlacklistCommand(BungeeInstance plugin) {
+        this.plugin = plugin;
         this.blacklistRequest = new BlacklistRequest();
     }
 
-    @Command(names = "")
-    public void help(@Sender CommandSender source) {
-        List<String> help = coreInstance.getActiveSettings().getMessage("blacklistHelp", defaultHelpMessage);
+    @Command("")
+    public void help(CommandSender source) {
+        BaseComponent[] help = plugin
+                .getComponentAdapter()
+                .adapt(CoreInstance.get().getActiveSettings().getMessage("blacklistHelp", defaultHelpMessage));
 
-        help.forEach(line -> source.sendMessage(new ComponentBuilder(line).create()));
+        if (help == null) return;
+        source.sendMessage(help);
     }
 
-    @Command(names = "add")
-    public void addBlacklist(@Sender CommandSender source,
-                             @Suggestions(suggestions = {"<username>", "<ip>"}) String value,
-                             @Suggestions(suggestions =
-                                     {
-                                             "cheating_or_illegal_modifications",
-                                             "server_griefing",
-                                             "botting",
-                                             "account_stealing",
-                                             "server_crashing",
-                                             "server_exploting",
-                                             "ban_evading",
-                                             "duping",
-                                             "other"
-                                     }) String preset,
-                             @CommandFlag(value = "i", allowFullName = true, hasDefaultValue = true) Boolean ipBan,
-                             @CommandFlag(value = "s", allowFullName = true, hasDefaultValue = true) Boolean silent,
-                             @CommandFlag(value = "p", allowFullName = true, hasDefaultValue = true) Boolean propagate,
-                             @OptArg("") @Text String reason
+    @Command("add <target> <reason_preset> <reason>")
+    public void addBlacklist(CommandSender source,
+                             @Argument(value = "target", suggestions = "target") String value,
+                             @Argument(value = "reason_preset", suggestions = "reason_preset") String preset,
+                             @Flag("i") boolean ipBan,
+                             @Flag("s") boolean silent,
+                             @Flag("p") boolean propagate,
+                             @Argument(value = "reason", suggestions = "reason") @FlagYielding String reason
     ) {
         blacklistRequest.addBlacklist(
                 value,
@@ -66,24 +63,61 @@ public class BlacklistCommand implements CommandClass {
                 propagate,
                 source instanceof ProxiedPlayer ? source.getName() : "Console"
         ).thenAccept(success -> {
-            String message = StringUtils.buildMultilineString(
-                    CoreInstance.get().getActiveSettings().getMessage(success ? "blacklistAdd" : "blacklistAddFailed")
+            BaseComponent[] message = plugin.getComponentAdapter().adapt(
+                    CoreInstance.get().getActiveSettings().getMessage(success ? "blacklistAdd" : "blacklistAddFailed"),
+                    Map.of("username", value)
             );
 
-            source.sendMessage(new ComponentBuilder(StringUtils.replacePlaceholders(message, Map.of("username", value))).create());
+            if (message == null) return;
+
+            source.sendMessage(message);
         });
     }
 
-    @Command(names = "remove")
-    public void removeBlacklist(@Sender CommandSender source, @Suggestions(suggestions = "<code>") String id) {
-        blacklistRequest.removeBlacklist(id)
+    @Command("remove <code>")
+    public void removeBlacklist(CommandSender source, @Argument(value = "code", suggestions = "code") String id) {
+        blacklistRequest
+                .removeBlacklist(id)
                 .thenAccept(success -> {
-                    String message = StringUtils.buildMultilineString(
-                            CoreInstance.get().getActiveSettings().getMessage(success ? "blacklistRemove" : "blacklistRemoveFailed")
+                    BaseComponent[] message = plugin.getComponentAdapter().adapt(
+                            CoreInstance.get().getActiveSettings().getMessage(success ? "blacklistRemove" : "blacklistRemoveFailed"),
+                            Map.of("id", id)
                     );
-                    source.sendMessage(new ComponentBuilder(StringUtils.replacePlaceholders(message, Map.of("id", id))).create());
+
+                    if (message == null) return;
+                    source.sendMessage(message);
                 });
 
     }
 
+    @Suggestions("target")
+    public List<String> target(CommandContext<CommandSender> source, String input) {
+        return Collections.singletonList("<username/ip>");
+    }
+
+    @Suggestions("reason")
+    public List<String> reason(CommandContext<CommandSender> source, String input) {
+        return Collections.singletonList("<reason>");
+    }
+
+    @Suggestions("code")
+    public List<String> code(CommandContext<CommandSender> source, String input) {
+        return Collections.singletonList("<code>");
+    }
+
+
+    @Suggestions("reason_preset")
+    public List<String> reasonPreset(CommandContext<CommandSender> source, String input) {
+        return List.of(
+                "cheating_or_illegal_modifications",
+                "server_griefing",
+                "botting",
+                "account_stealing",
+                "server_crashing",
+                "server_exploiting",
+                "ban_evading",
+                "duping",
+                "other"
+        );
+    }
 }

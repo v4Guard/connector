@@ -9,9 +9,7 @@ import io.v4guard.connector.common.utils.HostnameUtils;
 
 public abstract class CheckProcessor<E> {
 
-    public void onEvent(String username, E event) {
-
-    }
+    public void onEvent(String username, E event) {}
 
     public PlayerCheckData prepareCheckData(String username, String address, int version, String virtualHostTemp, boolean bedrock) {
         DefaultActiveSettings defaultActiveSettings = CoreInstance.get().getActiveSettings();

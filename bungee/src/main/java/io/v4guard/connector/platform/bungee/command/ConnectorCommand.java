@@ -2,31 +2,38 @@ package io.v4guard.connector.platform.bungee.command;
 
 
 import io.v4guard.connector.common.CoreInstance;
-import io.v4guard.connector.platform.bungee.command.sub.BlacklistCommand;
-import io.v4guard.connector.platform.bungee.command.sub.WhitelistCommand;
+import io.v4guard.connector.common.commands.AnnotatedCommand;
+import io.v4guard.connector.platform.bungee.BungeeInstance;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import team.unnamed.commandflow.annotated.CommandClass;
-import team.unnamed.commandflow.annotated.annotation.Command;
-import team.unnamed.commandflow.annotated.annotation.Sender;
-import team.unnamed.commandflow.annotated.annotation.SubCommandClasses;
+import net.md_5.bungee.api.chat.BaseComponent;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.Permission;
 
 import java.util.List;
 
-@SubCommandClasses({
-    WhitelistCommand.class,
-    BlacklistCommand.class
-})
-@Command(names = "v4Guard", permission = "v4guard.command")
-public class ConnectorCommand implements CommandClass {
+@Permission("v4guard.command")
+@Command("v4guard|v4g")
+public class ConnectorCommand implements AnnotatedCommand {
 
-    private final List<String> defaultMessage = List.of("§d▲ §lV4GUARD §7Correct usage: /v4guard <blacklist>/<whitelist>");
+    private final BungeeInstance plugin;
+    private final List<String> defaultMessage = List.of(
+            "<bold><color:#cb0c9f>▲ V4GUARD</color></bold> <gray>Correct usage:</gray> <yellow>/v4guard <blacklist>/<whitelist></yellow>"
+    );
 
-    @Command(names = "")
-    public void help(@Sender CommandSender source) {
-        CoreInstance.get().getActiveSettings()
-                .getMessage("commandHelp", defaultMessage)
-                .forEach(line -> source.sendMessage(new ComponentBuilder(line).create()));
+    public ConnectorCommand(BungeeInstance plugin) {
+        this.plugin = plugin;
+    }
+
+    @Command("")
+    public void help(CommandSender source) {
+        BaseComponent[] help = plugin.getComponentAdapter().adapt(
+                CoreInstance.get()
+                        .getActiveSettings()
+                        .getMessage("help", defaultMessage)
+        );
+
+        if (help == null) return;
+        source.sendMessage(help);
     }
 
 }

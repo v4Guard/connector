@@ -21,7 +21,7 @@ public class NicknameCallbackTask extends CallbackTask {
 
         if (!nameValidator.isValid(checkData.getUsername())) {
            checkData.setCheckStatus(CheckStatus.USER_DENIED);
-           checkData.setKickReason(StringUtils.buildMultilineString(CoreInstance.get().getActiveSettings().getMessage("invalidUsername")));
+           checkData.setKickReason(CoreInstance.get().getActiveSettings().getMessage("invalidUsername"));
         }
 
         complete();

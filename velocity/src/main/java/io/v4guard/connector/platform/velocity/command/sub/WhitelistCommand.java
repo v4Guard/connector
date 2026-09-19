@@ -1,29 +1,32 @@
 package io.v4guard.connector.platform.velocity.command.sub;
 
+import com.mojang.brigadier.context.CommandContext;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import io.v4guard.connector.common.CoreInstance;
+import io.v4guard.connector.common.commands.AnnotatedCommand;
 import io.v4guard.connector.common.request.WhitelistRequest;
-import io.v4guard.connector.common.utils.StringUtils;
 import io.v4guard.connector.platform.velocity.VelocityInstance;
-import team.unnamed.commandflow.annotated.CommandClass;
-import team.unnamed.commandflow.annotated.annotation.Command;
-import team.unnamed.commandflow.annotated.annotation.Sender;
-import team.unnamed.commandflow.annotated.annotation.Suggestions;
+import net.kyori.adventure.text.Component;
+import org.incendo.cloud.annotations.Argument;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.Permission;
+import org.incendo.cloud.annotations.suggestion.Suggestions;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-@Command(names = "whitelist", permission = "v4guard.command.whitelist")
-public class WhitelistCommand implements CommandClass {
+@Permission("v4guard.command.whitelist")
+@Command("v4guard|v4g whitelist")
+public class WhitelistCommand implements AnnotatedCommand {
 
     private final VelocityInstance plugin;
     private final WhitelistRequest whitelistRequest;
 
     private final List<String> defaultHelpMessage = List.of(
-            "§d▲ §lV4GUARD §7Correct usage: /v4guard whitelist add <username>",
-            "§d▲ §lV4GUARD §7Correct usage: /v4guard whitelist remove <username>"
+            "<bold><color:#cb0c9f>▲ V4GUARD</color></bold> <gray>Correct usage:</gray> <yellow>/v4guard whitelist add <username></yellow>",
+            "<bold><color:#cb0c9f>▲ V4GUARD</color></bold> <gray>Correct usage:</gray> <yellow>/v4guard whitelist remove <username></yellow>"
     );
 
     public WhitelistCommand(VelocityInstance plugin) {
@@ -32,45 +35,50 @@ public class WhitelistCommand implements CommandClass {
     }
 
 
-    @Command(names = "")
-    public void help(@Sender CommandSource source) {
-        List<String> help = CoreInstance.get().getActiveSettings().getMessage("whitelistHelp", defaultHelpMessage);
+    @Command("")
+    public void help(CommandSource source) {
+        Component help = plugin.getComponentAdapter().adapt(
+                CoreInstance.get().getActiveSettings().getMessage("whitelistHelp", defaultHelpMessage)
+        );
 
-        help.forEach(line -> source.sendMessage(plugin.getLegacyComponentSerializer().deserialize(line)));
+        if (help == null) return;
+        source.sendMessage(help);
     }
 
-    @Command(names = "add")
-    public void addWhitelist(@Sender CommandSource source, @Suggestions(suggestions = "<username>") String player) {
-        CompletableFuture<Boolean> future = whitelistRequest.addWhitelist(player, source instanceof Player ? ((Player) source).getUsername() : null);
+    @Command("add <username>")
+    public void addWhitelist(CommandSource source,  @Argument(value = "username", suggestions = "username") String player) {
+        CompletableFuture<Boolean> future = whitelistRequest.addWhitelist(player, source instanceof Player ? ((Player) source).getUsername() : "Console");
 
         future.thenAccept(success -> {
-            String message = StringUtils.buildMultilineString(
+            Component message = plugin.getComponentAdapter().adapt(
                     CoreInstance.get().getActiveSettings().getMessage(success  ?  "whitelistAdd" : "whitelistAddFailed")
             );
 
-            source.sendMessage(
-                    plugin.getLegacyComponentSerializer().deserialize(StringUtils.replacePlaceholders(message, Map.of("username", player)))
-            );
+            if (message == null) return;
+            source.sendMessage(message);
         });
 
     }
 
 
-    @Command(names = "remove")
-    public void removeWhitelist(@Sender CommandSource source, @Suggestions(suggestions = "<username>") String player) {
+    @Command("remove <username>")
+    public void removeWhitelist(CommandSource source, @Argument(value = "username", suggestions = "username") String player) {
         CompletableFuture<Boolean> future = whitelistRequest.removeWhitelist(player);
 
         future.thenAccept(success -> {
-            String message = StringUtils.buildMultilineString(
+            Component message = plugin.getComponentAdapter().adapt(
                     CoreInstance.get().getActiveSettings().getMessage(success  ?  "whitelistRemove" : "whitelistRemoveFailed")
             );
 
-            source.sendMessage(
-                    plugin.getLegacyComponentSerializer().deserialize(StringUtils.replacePlaceholders(message, Map.of("username", player)))
-            );
+            if (message == null) return;
+            source.sendMessage(message);
         });
+    }
 
 
+    @Suggestions("username")
+    public List<String> player(CommandContext<CommandSource> source, String input) {
+        return Collections.singletonList("<username>");
     }
 
 }

@@ -6,6 +6,7 @@ import io.v4guard.connector.common.check.brand.BrandCheckProcessor;
 import io.v4guard.connector.common.check.settings.PlayerSettingsCheckProcessor;
 
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public interface UniversalPlugin {
@@ -14,9 +15,14 @@ public interface UniversalPlugin {
     boolean isPluginEnabled(String pluginName);
     File getDataFolder();
     PlayerFetchResult<?> fetchPlayer(String playerName);
-    void kickPlayer(String playerName, String reason);
-    void kickPlayer(String playerName, String reason, boolean later);
+
+    void kickPlayer(String playerName, List<String> reason);
+    void kickPlayer(String playerName, List<String> reason, boolean later);
+
     UniversalTask schedule(Runnable runnable, long delay, long period, TimeUnit timeUnit);
+
+    ComponentAdapter<?> getComponentAdapter();
+
     Messenger getMessenger();
     CheckDataCache getCheckDataCache();
     CheckProcessor<?> getCheckProcessor();

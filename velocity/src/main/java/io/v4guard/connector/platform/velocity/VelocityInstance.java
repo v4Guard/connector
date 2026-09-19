@@ -3,6 +3,7 @@ package io.v4guard.connector.platform.velocity;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.inject.Inject;
+import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
@@ -24,33 +25,27 @@ import io.v4guard.connector.common.check.brand.BrandCheckProcessor;
 import io.v4guard.connector.common.check.settings.PlayerSettingsCheckProcessor;
 import io.v4guard.connector.common.compatibility.*;
 import io.v4guard.connector.common.compatibility.kick.AwaitingKick;
+import io.v4guard.connector.platform.velocity.adapter.VelocityComponentAdapter;
 import io.v4guard.connector.platform.velocity.adapter.VelocityMessenger;
 import io.v4guard.connector.platform.velocity.check.VelocityCheckProcessor;
 import io.v4guard.connector.platform.velocity.command.ConnectorCommand;
-import io.v4guard.connector.common.command.internal.annotations.CommandFlag;
-import io.v4guard.connector.common.command.internal.modifier.ValueCommandFlagModifier;
-import io.v4guard.connector.common.command.internal.part.FlagPartFactory;
-import io.v4guard.connector.common.command.internal.usage.CustomUsageBuilder;
+import io.v4guard.connector.platform.velocity.command.sub.BlacklistCommand;
+import io.v4guard.connector.platform.velocity.command.sub.WhitelistCommand;
 import io.v4guard.connector.platform.velocity.listener.PlayerListener;
 import io.v4guard.connector.platform.velocity.listener.PlayerSettingsListener;
 import io.v4guard.connector.platform.velocity.listener.PluginMessagingListener;
 import io.v4guard.connector.platform.velocity.task.AwaitingKickTask;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bstats.velocity.Metrics;
-import org.jetbrains.annotations.NotNull;
-import team.unnamed.commandflow.CommandManager;
-import team.unnamed.commandflow.annotated.AnnotatedCommandTreeBuilder;
-import team.unnamed.commandflow.annotated.SubCommandInstanceCreator;
-import team.unnamed.commandflow.annotated.part.Key;
-import team.unnamed.commandflow.annotated.part.PartInjector;
-import team.unnamed.commandflow.annotated.part.defaults.DefaultsModule;
-import team.unnamed.commandflow.velocity.VelocityCommandManager;
-import team.unnamed.commandflow.velocity.factory.VelocityModule;
+import org.incendo.cloud.SenderMapper;
+import org.incendo.cloud.annotations.AnnotationParser;
+import org.incendo.cloud.execution.ExecutionCoordinator;
+import org.incendo.cloud.velocity.VelocityCommandManager;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -80,12 +75,8 @@ public class VelocityInstance implements UniversalPlugin {
     private VelocityCheckProcessor checkProcessor;
     private PluginMessagingListener brandCheckProcessor;
     private PlayerSettingsListener playerSettingsProcessor;
-    private final LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer
-            .builder()
-            .character('§')
-            .hexColors()
-            .hexCharacter('#')
-            .build();
+
+    private ComponentAdapter<Component> componentAdapter;
 
 
     @Inject
@@ -114,10 +105,12 @@ public class VelocityInstance implements UniversalPlugin {
             this.logger.warning("(Velocity) Failed to connect with bStats [WARN]");
         }
 
+        this.componentAdapter = new VelocityComponentAdapter();
+
         this.checkProcessor = new VelocityCheckProcessor(this);
         this.brandCheckProcessor = new PluginMessagingListener();
         this.playerSettingsProcessor = new PlayerSettingsListener();
-        this.messenger = new VelocityMessenger(this);
+        this.messenger = new VelocityMessenger(this.server, this.componentAdapter);
         this.checkDataCache = new CheckDataCache();
 
         try {
@@ -149,36 +142,22 @@ public class VelocityInstance implements UniversalPlugin {
                 .expireAfterWrite(connectionTimeout, TimeUnit.MILLISECONDS)
                 .build();
 
-        schedule(new AwaitingKickTask(this.awaitedKickTaskCache, this.server), 0, 150, TimeUnit.MILLISECONDS);
+        schedule(new AwaitingKickTask(this.awaitedKickTaskCache, this.server, this.componentAdapter), 0, 150, TimeUnit.MILLISECONDS);
 
-        PartInjector partInjector = PartInjector.create();
-        partInjector.install(new DefaultsModule());
-        partInjector.install(new VelocityModule(server));
-        partInjector.bindFactory(new Key(Boolean.class, CommandFlag.class), new FlagPartFactory());
-        partInjector.bindModifier(CommandFlag.class, new ValueCommandFlagModifier());
+        VelocityCommandManager<CommandSource> commandManager = new VelocityCommandManager<>(
+                this.server.getPluginManager().getPlugin("v4guard-plugin").orElseThrow(),
+                this.server, ExecutionCoordinator.asyncCoordinator(),
+                SenderMapper.identity()
+        );
 
-        AnnotatedCommandTreeBuilder builder = getAnnotatedCommandTreeBuilder(partInjector);
-
-        CommandManager commandManager = new VelocityCommandManager(server, this);
-
-        commandManager.setUsageBuilder(new CustomUsageBuilder());
-
-        commandManager.registerCommands(builder.fromClass(new ConnectorCommand(this)));
+        AnnotationParser<CommandSource> commandParser = new AnnotationParser<>(commandManager, CommandSource.class);
+        commandParser.parse(List.of(
+                new ConnectorCommand(this),
+                new WhitelistCommand(this),
+                new BlacklistCommand(this)
+        ));
 
         this.logger.info("(Velocity) Enabling... [DONE]");
-    }
-
-    private @NotNull AnnotatedCommandTreeBuilder getAnnotatedCommandTreeBuilder(PartInjector partInjector) {
-        SubCommandInstanceCreator subCommandInstanceCreator = (aClass, commandClass) -> {
-            try {
-                return aClass.getConstructor(VelocityInstance.class).newInstance(this);
-            } catch (Exception e) {
-                UnifiedLogger.get().log(Level.SEVERE, "An exception has occurred while registering the commands", e);
-            }
-            return null;
-        };
-
-        return AnnotatedCommandTreeBuilder.create(partInjector, subCommandInstanceCreator);
     }
 
     @Subscribe
@@ -255,12 +234,12 @@ public class VelocityInstance implements UniversalPlugin {
     }
 
     @Override
-    public void kickPlayer(String playerName, String reason) {
+    public void kickPlayer(String playerName, List<String> reason) {
         kickPlayer(playerName, reason, false);
     }
 
     @Override
-    public void kickPlayer(String playerName, String reason, boolean later) {
+    public void kickPlayer(String playerName, List<String> reason, boolean later) {
         if (later) {
             awaitedKickTaskCache.put(playerName, new AwaitingKick<>(playerName, reason));
             return;
@@ -283,7 +262,8 @@ public class VelocityInstance implements UniversalPlugin {
             return;
         }
 
-        player.disconnect(Component.text(reason));
+        Component component = this.componentAdapter.adapt(reason);
+        player.disconnect(component != null ? component : Component.empty());
     }
 
     @Override
@@ -294,6 +274,11 @@ public class VelocityInstance implements UniversalPlugin {
                 .repeat(period, timeUnit);
 
         return new VelocityTask(taskBuilder.schedule());
+    }
+
+    @Override
+    public ComponentAdapter<Component> getComponentAdapter() {
+        return componentAdapter;
     }
 
     @Override
@@ -320,9 +305,5 @@ public class VelocityInstance implements UniversalPlugin {
     @Override
     public PlayerSettingsCheckProcessor getPlayerSettingsCheckProcessor() {
         return playerSettingsProcessor;
-    }
-
-    public LegacyComponentSerializer getLegacyComponentSerializer() {
-        return legacyComponentSerializer;
     }
 }

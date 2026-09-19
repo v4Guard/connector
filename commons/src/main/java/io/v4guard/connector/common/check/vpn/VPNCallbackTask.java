@@ -13,6 +13,7 @@ import io.v4guard.connector.common.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class VPNCallbackTask extends CallbackTask {
 
@@ -61,20 +62,17 @@ public class VPNCallbackTask extends CallbackTask {
         backend.getPendingTasks().remove(this.taskID);
 
         HashMap<String, String> variables = objectMapper.convertValue(this.data.get("variables"), new TypeReference<>() {});
-
-        String reason;
-
+        List<String> reason;
         if (this.data.has("message")) {
-            reason = StringUtils.buildMultilineString(objectMapper.convertValue(
+            reason = objectMapper.convertValue(
                     this.data.get("message"),
-                    new TypeReference<ArrayList<String>>() {})
+                    new TypeReference<ArrayList<String>>() {}
             );
-            checkData.setKickReason(StringUtils.replacePlaceholders(reason, variables));
         } else {
-            reason = StringUtils.buildMultilineString(backend.getActiveSettings().getMessages().get("kick"));
-            checkData.setKickReason(StringUtils.replacePlaceholders(reason, variables));
+            reason = backend.getActiveSettings().getMessages().get("kick");
         }
 
+        checkData.setKickReason(reason.stream().map(s -> StringUtils.replacePlaceholders(s, variables)).toList());
         checkData.setCheckStatus(isBlocked() ? CheckStatus.USER_DENIED : CheckStatus.USER_ALLOWED);
 
         if (this.data.has("blockReason")) {

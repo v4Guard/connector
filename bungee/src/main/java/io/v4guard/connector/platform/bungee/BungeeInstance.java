@@ -7,38 +7,33 @@ import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.UnifiedLogger;
 import io.v4guard.connector.common.check.brand.BrandCheckProcessor;
 import io.v4guard.connector.common.check.settings.PlayerSettingsCheckProcessor;
-import io.v4guard.connector.common.command.internal.annotations.CommandFlag;
-import io.v4guard.connector.common.command.internal.modifier.ValueCommandFlagModifier;
-import io.v4guard.connector.common.command.internal.part.FlagPartFactory;
-import io.v4guard.connector.common.command.internal.usage.CustomUsageBuilder;
-import io.v4guard.connector.common.compatibility.PlayerFetchResult;
-import io.v4guard.connector.common.compatibility.ServerPlatform;
-import io.v4guard.connector.common.compatibility.UniversalPlugin;
-import io.v4guard.connector.common.compatibility.UniversalTask;
+import io.v4guard.connector.common.compatibility.*;
 import io.v4guard.connector.common.compatibility.kick.AwaitingKick;
+import io.v4guard.connector.platform.bungee.adapter.BungeeComponentAdapter;
 import io.v4guard.connector.platform.bungee.adapter.BungeeMessenger;
 import io.v4guard.connector.platform.bungee.cache.BungeeCheckDataCache;
 import io.v4guard.connector.platform.bungee.check.BungeeCheckProcessor;
 import io.v4guard.connector.platform.bungee.command.ConnectorCommand;
+import io.v4guard.connector.platform.bungee.command.sub.BlacklistCommand;
+import io.v4guard.connector.platform.bungee.command.sub.WhitelistCommand;
 import io.v4guard.connector.platform.bungee.listener.PlayerListener;
 import io.v4guard.connector.platform.bungee.listener.PlayerSettingsListener;
 import io.v4guard.connector.platform.bungee.listener.PluginMessagingListener;
 import io.v4guard.connector.platform.bungee.task.AwaitingKickTask;
+import net.md_5.bungee.UserConnection;
+import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.bstats.bungeecord.Metrics;
-import team.unnamed.commandflow.CommandManager;
-import team.unnamed.commandflow.annotated.AnnotatedCommandTreeBuilder;
-import team.unnamed.commandflow.annotated.SubCommandInstanceCreator;
-import team.unnamed.commandflow.annotated.part.Key;
-import team.unnamed.commandflow.annotated.part.PartInjector;
-import team.unnamed.commandflow.annotated.part.defaults.DefaultsModule;
-import team.unnamed.commandflow.bungee.BungeeCommandManager;
-import team.unnamed.commandflow.bungee.factory.BungeeModule;
+import org.incendo.cloud.SenderMapper;
+import org.incendo.cloud.annotations.AnnotationParser;
+import org.incendo.cloud.bungee.BungeeCommandManager;
+import org.incendo.cloud.execution.ExecutionCoordinator;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -51,7 +46,8 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
     private PluginMessagingListener brandCheckProcessor;
     private PlayerSettingsListener playerSettingsProcessor;
     private Cache<String, AwaitingKick<String>> awaitedKickTaskCache;
-    private AwaitingKickTask awaitedKickTask;
+    private ComponentAdapter<BaseComponent[]> componentAdapter;
+
     private CoreInstance coreInstance;
 
     private final int METRICS = 16219;
@@ -65,10 +61,11 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
 
         instance = this;
 
+        this.componentAdapter = new BungeeComponentAdapter();
         this.checkProcessor = new BungeeCheckProcessor(this);
         this.brandCheckProcessor = new PluginMessagingListener();
         this.playerSettingsProcessor = new PlayerSettingsListener();
-        this.messenger = new BungeeMessenger();
+        this.messenger = new BungeeMessenger(this.componentAdapter);
         this.checkDataCache = new BungeeCheckDataCache();
 
         try {
@@ -91,38 +88,30 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
                 .expireAfterWrite(connectionTimeout, TimeUnit.MILLISECONDS) //prevent memory leaks in case of a player not being processed by the proxy
                 .build();
 
-        this.awaitedKickTask = new AwaitingKickTask(this.awaitedKickTaskCache, this.getProxy());
-        this.schedule(this.awaitedKickTask, 0, 150, TimeUnit.MILLISECONDS);
+        AwaitingKickTask awaitedKickTask = new AwaitingKickTask(
+                this.componentAdapter,
+                this.awaitedKickTaskCache,
+                this.getProxy()
+        );
+        this.schedule(awaitedKickTask, 0, 150, TimeUnit.MILLISECONDS);
 
         //this.getProxy().registerChannel(MessageReceiver.CHANNEL);
         this.getProxy().getPluginManager().registerListener(this, this.brandCheckProcessor);
         this.getProxy().getPluginManager().registerListener(this, this.playerSettingsProcessor);
         this.getProxy().getPluginManager().registerListener(this, new PlayerListener(this, coreInstance));
 
-        PartInjector partInjector = PartInjector.create();
-        partInjector.install(new DefaultsModule());
-        partInjector.install(new BungeeModule());
-        partInjector.bindFactory(new Key(Boolean.class, CommandFlag.class), new FlagPartFactory());
-        partInjector.bindModifier(CommandFlag.class, new ValueCommandFlagModifier());
+        BungeeCommandManager<CommandSender> commandManager = new BungeeCommandManager<>(
+                this,
+                ExecutionCoordinator.asyncCoordinator(),
+                SenderMapper.identity()
+        );
 
-
-        SubCommandInstanceCreator subCommandInstanceCreator = (aClass, commandClass) -> {
-            try {
-                return aClass.getConstructor().newInstance();
-            } catch (Exception e) {
-                UnifiedLogger.get().log(Level.SEVERE, "An exception has occurred while registering the commands", e);
-            }
-            return null;
-        };
-
-        AnnotatedCommandTreeBuilder builder = AnnotatedCommandTreeBuilder.create(partInjector, subCommandInstanceCreator);
-
-        CommandManager commandManager = new BungeeCommandManager(this);
-
-        commandManager.setUsageBuilder(new CustomUsageBuilder());
-
-        commandManager.registerCommands(builder.fromClass(new ConnectorCommand()));
-
+        AnnotationParser<CommandSender> commandParser = new AnnotationParser<>(commandManager, CommandSender.class);
+        commandParser.parse(List.of(
+                new ConnectorCommand(this),
+                new WhitelistCommand(this),
+                new BlacklistCommand(this)
+        ));
 
         getLogger().info("(Bungee) Enabling... [DONE]");
     }
@@ -183,11 +172,11 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
     }
 
     @Override
-    public void kickPlayer(String playerName, String reason) {
+    public void kickPlayer(String playerName, List<String> reason) {
         kickPlayer(playerName, reason, false);
     }
 
-    public void kickPlayer(String playerName, String reason, boolean later) {
+    public void kickPlayer(String playerName, List<String> reason, boolean later) {
         if (later) {
             awaitedKickTaskCache.put(playerName, new AwaitingKick<>(playerName, reason));
             return;
@@ -208,12 +197,19 @@ public class BungeeInstance extends Plugin implements UniversalPlugin {
             return;
         }
 
-        fetchedPlayer.getPlayer().disconnect(TextComponent.fromLegacy(reason));
+        ProxiedPlayer player = fetchedPlayer.getPlayer();
+        player.disconnect(this.getComponentAdapter().adapt(reason, ((UserConnection) player).getCh().getEncodeVersion() < 735));
+        awaitedKickTaskCache.invalidate(playerName);
     }
 
     @Override
     public UniversalTask schedule(Runnable runnable, long delay, long period, TimeUnit timeUnit) {
         return new BungeeTask(getProxy().getScheduler().schedule(this, runnable, delay, period, timeUnit));
+    }
+
+    @Override
+    public ComponentAdapter<BaseComponent[]> getComponentAdapter() {
+        return this.componentAdapter;
     }
 
     @Override

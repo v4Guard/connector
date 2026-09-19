@@ -1,12 +1,14 @@
 package io.v4guard.connector.common.compatibility.kick;
 
+import java.util.List;
+
 public class AwaitingKick<PC> {
 
     private PC player;
-    private String reason;
+    private List<String> reason;
 
 
-    public AwaitingKick(PC player, String reason) {
+    public AwaitingKick(PC player, List<String> reason) {
         this.player = player;
         this.reason = reason;
     }
@@ -15,7 +17,7 @@ public class AwaitingKick<PC> {
         return player;
     }
 
-    public String getReason() {
+    public List<String> getReason() {
         return reason;
     }
 }
