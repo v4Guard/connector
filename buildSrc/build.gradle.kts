@@ -8,16 +8,10 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.goooler.shadow:shadow-gradle-plugin:8.1.7")
+    implementation("com.gradleup.shadow:shadow-gradle-plugin:9.6.1")
 }
 
 
-tasks {
-    compileKotlin {
-        kotlinOptions {
-            //change version
-            jvmTarget = "11"
-        }
-    }
-
+kotlin {
+    jvmToolchain(25)
 }

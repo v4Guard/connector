@@ -8,18 +8,26 @@ extra["bungeecord"] = true
 
 dependencies {
     //compileOnly(libs.bungeecord)
-    compileOnly(libs.floodgate)
-    compileOnly(libs.caffeine)
 
-    implementation(libs.commandflow.bungeecord)
-    compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(libs.bstats.bungeecord)
-    implementation(project(":commons"))
+    listOf(
+        libs.floodgate,
+        libs.caffeine,
+        libs.bundles.adventure,
+        fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar")))
+    ).forEach { cDep -> compileOnly(cDep) }
+
+    listOf(
+        libs.bstats.bungeecord,
+        libs.cloud.bungeecord,
+        libs.cloud.annotations,
+        libs.bundles.adventure.bungeecord,
+        project(":commons")
+    ).forEach { iDep -> implementation(iDep) }
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 bungee {
