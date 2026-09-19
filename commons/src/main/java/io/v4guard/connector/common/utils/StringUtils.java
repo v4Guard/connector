@@ -1,8 +1,6 @@
 package io.v4guard.connector.common.utils;
 
-import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 
 public class StringUtils {
 
@@ -17,15 +15,4 @@ public class StringUtils {
 
         return message;
     }
-
-    public static String buildMultilineString(List<String> lines) {
-        StringJoiner message = new StringJoiner("\n");
-
-        for (String line : lines) {
-            message.add(line);
-        }
-
-        return message.toString();
-    }
-
 }

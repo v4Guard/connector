@@ -3,6 +3,7 @@ package io.v4guard.connector.platform.velocity.check;
 import com.velocitypowered.api.event.Continuation;
 import com.velocitypowered.api.event.ResultedEvent.ComponentResult;
 import com.velocitypowered.api.event.connection.LoginEvent;
+import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.proxy.Player;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.UnifiedLogger;
@@ -12,6 +13,8 @@ import io.v4guard.connector.common.check.PlayerCheckData;
 import io.v4guard.connector.platform.velocity.VelocityInstance;
 import io.v4guard.connector.platform.velocity.event.PostCheckEvent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.geysermc.floodgate.api.FloodgateApi;
 
 import java.net.InetSocketAddress;
@@ -80,7 +83,12 @@ public class VelocityCheckProcessor extends CheckProcessor<LoginEvent> {
             , boolean disconnect
     ) {
         if (checkData.isWaitMode() && disconnect) {
-            event.setResult(ComponentResult.denied(Component.text(checkData.getKickReason())));
+            Component kickComponent = this.plugin.getComponentAdapter().adapt(
+                    checkData.getKickReason(),
+                    event.getPlayer().getProtocolVersion().getProtocol() < ProtocolVersion.MINECRAFT_1_16.getProtocol()
+            );
+
+            event.setResult(ComponentResult.denied(kickComponent != null ? kickComponent : Component.text("An error occurred while processing your login")));
         } else if (disconnect) {
             plugin.kickPlayer(event.getPlayer().getUsername(), checkData.getKickReason(), true);
         }

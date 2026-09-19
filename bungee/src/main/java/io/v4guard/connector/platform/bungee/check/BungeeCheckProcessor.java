@@ -7,6 +7,7 @@ import io.v4guard.connector.common.check.CheckStatus;
 import io.v4guard.connector.common.check.PlayerCheckData;
 import io.v4guard.connector.platform.bungee.BungeeInstance;
 import io.v4guard.connector.platform.bungee.event.PostCheckEvent;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.event.LoginEvent;
@@ -74,7 +75,9 @@ public class BungeeCheckProcessor extends CheckProcessor<LoginEvent> {
 
         if (checkData.isWaitMode() && disconnect) {
             event.setCancelled(true);
-            event.setReason(TextComponent.fromLegacy(checkData.getKickReason()));
+
+            BaseComponent[] parts = this.plugin.getComponentAdapter().adapt(checkData.getKickReason(), event.getConnection().getVersion() < 735);
+            event.setReason(new TextComponent(parts));
         } else if (disconnect) {
             plugin.kickPlayer(
                     event.getConnection().getName(),

@@ -29,6 +29,7 @@ public class BlacklistRequest extends BackendRequest<Boolean> {
         } else {
             entry = Map.entry("username", value);
         }
+
         RequestBody body = new FormBody.Builder()
                 .add(entry.getKey(), entry.getValue())
                 .add("reason", reason)

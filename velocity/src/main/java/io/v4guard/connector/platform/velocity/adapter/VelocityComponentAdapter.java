@@ -59,6 +59,8 @@ public class VelocityComponentAdapter extends ComponentAdapter<Component> {
         return shouldDownsample ? this.downsample(text) : text;
     }
 
+    // So, older version that 1.16 on a kick event that might have gradients; it might not work as expected
+    // Becoming albino.
     private Component downsample(Component c) {
         TextColor color = c.color();
         if (color != null && !(color instanceof NamedTextColor)) {

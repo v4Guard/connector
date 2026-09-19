@@ -27,9 +27,7 @@ public class BrandCheckProcessor {
             .build();
 
     public void process(String username, UUID playerUUID, String channel, byte[] bytes) {
-        if (!CoreInstance.get().getRemoteConnection().isReady() || !isAllowed(channel)) {
-            return;
-        }
+        if (!CoreInstance.get().getRemoteConnection().isReady() || !isAllowed(channel)) return;
 
         DefaultActiveSettings defaultActiveSettings = CoreInstance.get().getActiveSettings();
         boolean invalidatedCache = defaultActiveSettings.getGeneralSetting(SettingsKeys.INVALIDATE_CACHE, false);

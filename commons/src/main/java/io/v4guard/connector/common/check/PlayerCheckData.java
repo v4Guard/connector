@@ -1,5 +1,7 @@
 package io.v4guard.connector.common.check;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 
@@ -21,7 +23,7 @@ public class PlayerCheckData {
     private boolean playerSettingsChecked;
     private boolean playerBrandChecked;
 
-    private String kickReason;
+    private List<String> kickReason;
     private BlockReason blockReason;
 
     private final long createdAt;
@@ -35,7 +37,7 @@ public class PlayerCheckData {
         this.bedrock = bedrock;
         this.playerSettingsChecked = false;
         this.playerBrandChecked = false;
-        this.kickReason = "Disconnected";
+        this.kickReason = List.of("Disconnected.");
         this.blockReason = BlockReason.NONE;
         this.checkStatus = CheckStatus.WAITING;
         this.createdAt = System.currentTimeMillis();
@@ -125,11 +127,11 @@ public class PlayerCheckData {
         this.checkStatus = checkStatus;
     }
 
-    public String getKickReason() {
+    public List<String> getKickReason() {
         return this.kickReason;
     }
 
-    public void setKickReason(String kickReason) {
+    public void setKickReason(List<String> kickReason) {
         this.kickReason = kickReason;
     }
 
