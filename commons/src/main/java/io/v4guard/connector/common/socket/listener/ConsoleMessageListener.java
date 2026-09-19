@@ -1,11 +1,14 @@
 package io.v4guard.connector.common.socket.listener;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.socket.emitter.Emitter;
 import io.v4guard.connector.common.CoreInstance;
 import io.v4guard.connector.common.UnifiedLogger;
+import io.v4guard.connector.common.utils.BannerMessage;
 
+import java.util.ArrayList;
 import java.util.logging.Level;
 
 public class ConsoleMessageListener implements Emitter.Listener {
@@ -27,15 +30,23 @@ public class ConsoleMessageListener implements Emitter.Listener {
             return;
         }
 
-        String message = request.get("message").asText(null);
-
         Level lvl = Level.INFO;
 
         try {
             lvl = Level.parse(request.get("level").asText("INFO").toUpperCase());
         } catch (IllegalArgumentException ignored) {}
 
-        UnifiedLogger.get().log(lvl, message);
+        if (request.has("banner")) {
+            BannerMessage.create()
+                    .lines(coreInstance.getObjectMapper().convertValue(
+                            request.get("lines"),
+                            new TypeReference<ArrayList<String>>() {}
+                    ))
+                    .log(lvl);
+        } else {
+            String message = request.get("message").asText(null);
+            UnifiedLogger.get().log(lvl, message);
+        }
     }
 
 }
