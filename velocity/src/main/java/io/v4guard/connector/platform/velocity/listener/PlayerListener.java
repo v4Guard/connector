@@ -39,6 +39,7 @@ public class PlayerListener {
             ConnectedPlayer connectedPlayer = (ConnectedPlayer) player;
             if (FakeChannelDetector.isFakeChannel(connectedPlayer)) {
                 // If the player is a fake player, we don't want to process the event. As we cannot kick the user
+                continuation.resume();
                 return;
             }
         } catch (ClassCastException e) {
